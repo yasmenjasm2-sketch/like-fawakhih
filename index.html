@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عجلة الهدايا</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        h1 { color: #333; margin-bottom: 20px; }
+
+        .wheel-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin-bottom: 30px;
+        }
+
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 5px solid #fff;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            /* تدرج لوني لتمثيل الأقسام - يمكنك تغيير الألوان هنا */
+            background: conic-gradient(
+                #FF6384 0deg 60deg,
+                #36A2EB 60deg 120deg,
+                #FFCE56 120deg 180deg,
+                #4BC0C0 180deg 240deg,
+                #9966FF 240deg 300deg,
+                #FF9F40 300deg 360deg
+            );
+            transition: transform 4s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+            transform: rotate(0deg);
+        }
+
+        /* المؤشر (السهم) */
+        .marker {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0; 
+            height: 0; 
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 25px solid #ff0000;
+            z-index: 10;
+        }
+
+        button {
+            padding: 15px 40px;
+            font-size: 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: background 0.3s;
+        }
+
+        button:hover { background-color: #218838; }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
+
+        .result-box {
+            margin-top: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            min-height: 40px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>دوار الهدايا 🎉</h1>
+
+    <div class="wheel-container">
+        <div class="marker"></div>
+        <div class="wheel" id="wheel"></div>
+    </div>
+
+    <button id="spinBtn" onclick="spinWheel()">ابدأ الدوران</button>
+    <div class="result-box" id="result"></div>
+
+    <script>
+        // --- قم بتعديل الهدايا هنا ---
+        // ملاحظة: يجب أن يتطابق عدد الهدايا مع عدد الألوان في CSS (حالياً 6 أقسام)
+        const gifts = [
+            "جوال ايفون",   // القسم الأول (الأحمر)
+            "سماعة بلوتوث", // القسم الثاني (الأزرق)
+            "خصم 50%",      // القسم الثالث (الأصفر)
+            "شحن مجاني",    // القسم الرابع (الأخضر المائي)
+            "بطاقة هدايا",  // القسم الخامس (البنفسجي)
+            "جرب مرة أخرى"  // القسم السادس (البرتقالي)
+        ];
+
+        let currentRotation = 0;
+        const wheel = document.getElementById('wheel');
+        const resultText = document.getElementById('result');
+        const btn = document.getElementById('spinBtn');
+
+        function spinWheel() {
+            // تعطيل الزر أثناء الدوران
+            btn.disabled = true;
+            resultText.innerText = "جاري الدوران...";
+
+            // حساب عدد عشوائي للدوران (بين 2000 و 5000 درجة)
+            const randomDeg = Math.floor(5000 + Math.random() * 3000);
+            
+            // إضافة الدوران الجديد إلى الدوران الحالي حتى لا تعود العجلة للصفر
+            currentRotation += randomDeg;
+
+            // تطبيق الدوران
+            wheel.style.transform = `rotate(${currentRotation}deg)`;
+
+            // انتظار انتهاء الحركة (4 ثواني) ثم حساب النتيجة
+            setTimeout(() => {
+                calculateWinner(currentRotation);
+                btn.disabled = false;
+            }, 4000);
+        }
+
+        function calculateWinner(totalDegrees) {
+            const numSegments = gifts.length;
+            const segmentAngle = 360 / numSegments;
+            
+            // حساب الزاوية الفعلية (باقي القسمة على 360)
+            // نستخدم التصحيح لأن المؤشر في الأعلى والدوران مع عقارب الساعة
+            const actualDeg = totalDegrees % 360;
+            
+            // معادلة لتحديد القسم الفائز بناءً على موقع المؤشر الثابت
+            const index = Math.floor((360 - actualDeg + (segmentAngle / 2)) % 360 / segmentAngle);
+            
+            // التأكد من أن المؤشر ضمن حدود المصفوفة
+            const winningGift = gifts[index] || gifts[0];
+
+            resultText.innerText = `مبروك! حصلت على: ${winningGift}`;
+            
+            // تأثير احتفالي بسيط
+            if(winningGift !== "جرب مرة أخرى") {
+                alert(`🎉 مبروك! لقد ربحت: ${winningGift}`);
+            }
+        }
+    </script>
+</body>
+</html>
