@@ -2,18 +2,23 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>عجلة الجوائز الاحترافية</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         /* --- التصميم العام --- */
         :root {
-            --bg-color: #1a1a1a;
-            --bg-gradient: radial-gradient(circle, #2c3e50 0%, #000000 100%);
-            --wheel-border: #ecf0f1;
+            --bg-gradient: radial-gradient(circle at center, #2c3e50 0%, #000000 100%);
+            --wheel-border: #ffffff;
             --marker-color: #e74c3c;
             --btn-color: #f1c40f;
-            --text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+            --text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none; /* منع تحديد النصوص */
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -22,32 +27,48 @@
             color: #fff;
             margin: 0;
             padding: 0;
+            height: 100vh;
+            width: 100vw;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
-            overflow: hidden;
+            overflow: hidden; /* منع السكرول نهائياً */
+            touch-action: none; /* تحسين استجابة اللمس */
+        }
+
+        /* حاوية المحتوى لضمان التوسط */
+        .main-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
         }
 
         h1 {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-            text-shadow: 0 0 10px rgba(255,255,255,0.3);
+            font-size: clamp(1.5rem, 5vw, 2.5rem); /* حجم خط متغير حسب الشاشة */
+            margin: 0 0 20px 0;
+            text-shadow: 0 0 15px rgba(255,255,255,0.4);
+            text-align: center;
+            color: #f1c40f;
         }
 
         /* --- حاوية العجلة --- */
         .wheel-container {
             position: relative;
-            width: 350px;
-            height: 350px;
-            margin: 20px auto;
-            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+            /* العرض والارتفاع يعتمدان على أصغر بعد للشاشة لضمان ظهورها كاملة */
+            width: min(85vw, 85vh, 450px);
+            height: min(85vw, 85vh, 450px);
+            margin-bottom: 20px;
+            filter: drop-shadow(0 15px 30px rgba(0,0,0,0.6));
         }
 
         .marker {
             position: absolute;
-            top: -20px;
+            top: -15px;
             left: 50%;
             transform: translateX(-50%);
             width: 40px;
@@ -55,18 +76,19 @@
             background: var(--marker-color);
             clip-path: polygon(50% 100%, 0 0, 100% 0);
             z-index: 10;
-            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5));
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
         }
 
         .wheel {
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            border: 8px solid #fff;
+            border: 6px solid var(--wheel-border);
             position: relative;
             overflow: hidden;
             transition: transform 5s cubic-bezier(0.25, 0.1, 0.25, 1);
-            box-sizing: border-box;
+            background: #fff; /* خلفية احتياطية */
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
         }
 
         .segment-label {
@@ -79,19 +101,23 @@
             text-align: center;
             display: flex;
             justify-content: center;
-            padding-top: 20px;
-            box-sizing: border-box;
+            padding-top: 10%; /* مسافة من المركز */
         }
 
         .segment-text {
             display: block;
             transform: rotate(90deg);
-            font-weight: bold;
-            font-size: 18px;
+            font-weight: 900;
+            font-size: clamp(12px, 3.5vw, 18px); /* حجم خط متجاوب داخل العجلة */
             color: #fff;
             text-shadow: var(--text-shadow);
-            margin-left: 80px;
+            margin-left: auto;
+            margin-right: auto;
             white-space: nowrap;
+            /* دفع النص نحو الحافة الخارجية */
+            margin-top: 10px; 
+            width: 120px; /* مساحة للنص */
+            text-align: center;
         }
 
         .center-circle {
@@ -99,44 +125,50 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 60px;
-            height: 60px;
+            width: 18%; /* حجم نسبي */
+            height: 18%;
             background: #fff;
             border-radius: 50%;
             z-index: 5;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: clamp(20px, 5vw, 30px);
+            color: #333;
+            border: 4px solid #f1f1f1;
         }
 
-        /* --- الزر ومنطقة العداد --- */
+        /* --- الأزرار والتحكم --- */
         .controls-area {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 15px;
-            margin-top: 30px;
+            width: 100%;
+            z-index: 20;
         }
 
         #spinBtn {
-            padding: 15px 50px;
-            font-size: 22px;
+            padding: 12px 40px;
+            font-size: clamp(16px, 4vw, 22px);
             font-family: 'Tajawal', sans-serif;
-            font-weight: bold;
+            font-weight: 900;
             background: var(--btn-color);
             border: none;
             border-radius: 50px;
             cursor: pointer;
-            box-shadow: 0 5px 0 #c0392b, 0 15px 20px rgba(0,0,0,0.4);
-            transition: all 0.2s;
-            color: #333;
+            box-shadow: 0 6px 0 #c0392b, 0 10px 20px rgba(0,0,0,0.4);
+            transition: all 0.1s;
+            color: #2c3e50;
+            width: min(80%, 300px);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         #spinBtn:active {
             transform: translateY(4px);
-            box-shadow: 0 1px 0 #c0392b;
+            box-shadow: 0 2px 0 #c0392b;
         }
 
         #spinBtn:disabled {
@@ -147,29 +179,31 @@
             transform: translateY(4px);
         }
 
-        /* تصميم العداد الزمني */
+        /* --- العداد الزمني --- */
         .timer-container {
-            background: rgba(0, 0, 0, 0.6);
-            padding: 15px;
-            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 20px;
+            border-radius: 15px;
             border: 1px solid #e74c3c;
             text-align: center;
-            display: none; /* مخفي افتراضياً */
+            display: none;
             animation: fadeIn 0.5s;
+            width: min(90%, 350px);
         }
 
         .timer-title {
             color: #e74c3c;
-            font-size: 14px;
+            font-size: 0.9rem;
             margin-bottom: 5px;
             font-weight: bold;
         }
 
         .timer-digits {
-            font-size: 20px;
+            font-size: 1.2rem;
             color: #fff;
             font-family: monospace;
-            direction: ltr; /* للأرقام */
+            direction: ltr;
+            letter-spacing: 1px;
         }
 
         @keyframes fadeIn {
@@ -177,18 +211,19 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* --- النافذة المنبثقة --- */
+        /* --- النافذة المنبثقة (Modal) --- */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
+            background: rgba(0,0,0,0.9);
             display: flex;
             justify-content: center;
             align-items: center;
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.3s;
+            transition: all 0.3s ease;
             z-index: 100;
+            backdrop-filter: blur(5px);
         }
 
         .modal-overlay.active {
@@ -197,58 +232,68 @@
         }
 
         .modal-content {
-            background: #fff;
+            background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
             color: #333;
-            padding: 40px;
-            border-radius: 20px;
+            padding: 30px;
+            border-radius: 25px;
             text-align: center;
-            width: 90%;
+            width: 85%;
             max-width: 400px;
-            transform: scale(0.8);
+            transform: scale(0.7);
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 10px 30px rgba(255,255,255,0.1);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border: 4px solid #f1c40f;
         }
 
         .modal-overlay.active .modal-content {
             transform: scale(1);
         }
 
-        .modal-icon { font-size: 50px; display: block; margin-bottom: 10px; animation: bounce 1s infinite; }
-        .modal-title { color: #27ae60; margin: 0 0 10px; }
+        .modal-icon { font-size: 60px; display: block; margin-bottom: 15px; animation: bounce 1s infinite; }
+        .modal-title { color: #27ae60; margin: 0 0 10px; font-size: 1.8rem; }
+        .modal-desc { font-size: 1.1rem; line-height: 1.6; color: #555; }
+        
         .close-btn {
             background: #e74c3c;
             color: white;
-            padding: 10px 30px;
+            padding: 12px 35px;
             border: none;
-            border-radius: 8px;
+            border-radius: 50px;
             cursor: pointer;
-            font-size: 16px;
-            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 25px;
+            box-shadow: 0 4px 10px rgba(231, 76, 60, 0.4);
+            transition: transform 0.2s;
         }
+        
+        .close-btn:active { transform: scale(0.95); }
 
         @keyframes bounce {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+            50% { transform: translateY(-15px); }
         }
 
     </style>
 </head>
 <body>
 
-    <h1>عجلة الايام الاضافيه 🎁</h1>
+    <div class="main-wrapper">
+        <h1>🎁 عجلة الحظ</h1>
 
-    <div class="wheel-container">
-        <div class="marker"></div>
-        <div class="wheel" id="wheel"></div>
-        <div class="center-circle">★</div>
-    </div>
+        <div class="wheel-container">
+            <div class="marker"></div>
+            <div class="wheel" id="wheel"></div>
+            <div class="center-circle">★</div>
+        </div>
 
-    <div class="controls-area">
-        <button id="spinBtn" onclick="handleSpinClick()">جرّب حظك الآن</button>
-        
-        <div class="timer-container" id="timerContainer">
-            <div class="timer-title">المحاولة القادمة متاحة بعد:</div>
-            <div class="timer-digits" id="timerDigits">00d 00h 00m 00s</div>
+        <div class="controls-area">
+            <button id="spinBtn" onclick="handleSpinClick()">جرّب حظك الآن</button>
+            
+            <div class="timer-container" id="timerContainer">
+                <div class="timer-title">المحاولة القادمة متاحة بعد:</div>
+                <div class="timer-digits" id="timerDigits">00d 00h 00m 00s</div>
+            </div>
         </div>
     </div>
 
@@ -256,8 +301,8 @@
         <div class="modal-content">
             <span class="modal-icon">🎉</span>
             <h2 class="modal-title" id="resultTitle">مبروك!</h2>
-            <p id="resultMessage">لقد فزت بـ...</p>
-            <button class="close-btn" onclick="closeModal()">حسناً</button>
+            <p class="modal-desc" id="resultMessage">لقد فزت بـ...</p>
+            <button class="close-btn" onclick="closeModal()">استلام الجائزة</button>
         </div>
     </div>
 
@@ -266,7 +311,7 @@
         const COOLDOWN_DAYS = 6;
         const COOLDOWN_TIME_MS = COOLDOWN_DAYS * 24 * 60 * 60 * 1000; // 6 أيام بالمللي ثانية
 
-        // === إعدادات العجلة ===
+        // === إعدادات العجلة (الجوائز والاحتمالات) ===
         const segments = [
             { label: "10 ثواني", color: "#3498db", weight: 50 },
             { label: "20 ثانية", color: "#1abc9c", weight: 30 },
@@ -286,10 +331,10 @@
         const segmentAngle = 360 / segments.length;
         let countdownInterval;
 
-        // === تشغيل عند البدء ===
+        // === تشغيل عند التحميل ===
         function init() {
             drawWheel();
-            checkAvailability(); // فحص إذا كان المستخدم محظوراً
+            checkAvailability(); 
         }
 
         // === 1. نظام الوقت والتحقق ===
@@ -301,13 +346,11 @@
                 const timePassed = now - parseInt(lastSpinTime);
                 
                 if (timePassed < COOLDOWN_TIME_MS) {
-                    // المستخدم لا يزال في فترة الانتظار
                     const remainingTime = COOLDOWN_TIME_MS - timePassed;
                     disableSpinning(remainingTime);
                     return false;
                 }
             }
-            // المستخدم يمكنه اللعب
             enableSpinning();
             return true;
         }
@@ -315,6 +358,7 @@
         function disableSpinning(remainingTime) {
             spinBtn.disabled = true;
             spinBtn.innerText = "عد لاحقاً ⏳";
+            spinBtn.style.opacity = "0.7";
             timerContainer.style.display = 'block';
             startTimer(remainingTime);
         }
@@ -322,6 +366,7 @@
         function enableSpinning() {
             spinBtn.disabled = false;
             spinBtn.innerText = "جرّب حظك الآن";
+            spinBtn.style.opacity = "1";
             timerContainer.style.display = 'none';
             if (countdownInterval) clearInterval(countdownInterval);
         }
@@ -330,7 +375,6 @@
             let timer = duration;
             if (countdownInterval) clearInterval(countdownInterval);
 
-            // تحديث فوري للعداد قبل الانتظار ثانية
             updateTimerDisplay(timer);
 
             countdownInterval = setInterval(() => {
@@ -338,7 +382,7 @@
                 if (timer <= 0) {
                     clearInterval(countdownInterval);
                     enableSpinning();
-                    localStorage.removeItem('lastSpinTime'); // مسح الوقت القديم
+                    localStorage.removeItem('lastSpinTime');
                 } else {
                     updateTimerDisplay(timer);
                 }
@@ -355,17 +399,7 @@
                 `${days}d ${hours}h ${minutes}m ${seconds}s`;
         }
 
-        // === 2. منطق العجلة ===
-        function handleSpinClick() {
-            // تحقق أخير قبل البدء
-            if (!checkAvailability()) return;
-
-            // تسجيل وقت اللعب فوراً لمنع التلاعب (تحديث الصفحة)
-            localStorage.setItem('lastSpinTime', Date.now());
-            
-            spinWheel();
-        }
-
+        // === 2. رسم العجلة ===
         function drawWheel() {
             let gradient = `conic-gradient(`;
             segments.forEach((seg, i) => {
@@ -381,9 +415,19 @@
                 labelDiv.className = 'segment-label';
                 const rotate = (i * segmentAngle) + (segmentAngle / 2);
                 labelDiv.style.transform = `rotate(${rotate}deg)`;
-                labelDiv.innerHTML = `<span class="segment-text">${seg.label}</span>`;
+                // تم تعديل التنسيق هنا لضمان تمركز النص
+                labelDiv.innerHTML = `<span class="segment-text" style="transform: rotate(90deg) translateX(20px);">${seg.label}</span>`;
                 wheel.appendChild(labelDiv);
             });
+        }
+
+        // === 3. منطق الدوران ===
+        function handleSpinClick() {
+            if (!checkAvailability()) return;
+
+            localStorage.setItem('lastSpinTime', Date.now());
+            
+            spinWheel();
         }
 
         function determineWinner() {
@@ -399,33 +443,37 @@
         }
 
         function spinWheel() {
-            // نبدأ وضع الانتظار مباشرة
             const remainingTime = COOLDOWN_TIME_MS; 
             disableSpinning(remainingTime); 
-            // لكن نغير نص الزر ليناسب اللحظة الحالية
             spinBtn.innerText = "جاري السحب...";
 
             const winner = determineWinner();
-            console.log("الفائز:", winner.label);
-
+            // حساب زاوية الفوز بدقة
             const winnerAngle = (winner.index * segmentAngle) + (segmentAngle / 2);
+            
+            // عدد اللفات (5 لفات كاملة + الزاوية المتبقية للوصول للفائز)
             const extraSpins = 360 * 5; 
-            const targetRotation = currentRotation + extraSpins + (360 - (currentRotation % 360)) - winnerAngle;
-            const finalRotation = Math.floor(targetRotation);
+            
+            // التعديل: طرح الزاوية لأن العجلة تدور باتجاه عقارب الساعة
+            const targetRotation = currentRotation + extraSpins + (360 - winnerAngle);
+            
+            // إضافة عشوائية بسيطة لعدم الوقوف في نفس النقطة بالضبط داخل القطاع (واقعية أكثر)
+            // const jitter = (Math.random() - 0.5) * (segmentAngle * 0.8);
+
+            const finalRotation = Math.floor(targetRotation); // + jitter
 
             wheel.style.transform = `rotate(${finalRotation}deg)`;
             currentRotation = finalRotation; 
 
             setTimeout(() => {
                 showResult(winner);
-                // بعد إغلاق الرسالة، الزر سيبقى معطلاً لأننا استدعينا disableSpinning في البداية
                 spinBtn.innerText = "عد لاحقاً ⏳";
-            }, 5000);
+            }, 5000); // 5 ثواني مدة الدوران
         }
 
         function showResult(winner) {
             document.getElementById('resultTitle').innerText = `مبروك! فزت بـ ${winner.label}`;
-            document.getElementById('resultMessage').innerHTML = `تمت إضافة <b>${winner.label}</b> إلى رصيدك بنجاح.<br><br><small>المحاولة القادمة بعد 6 أيام</small>`;
+            document.getElementById('resultMessage').innerHTML = `تمت إضافة <b>${winner.label}</b> إلى رصيدك بنجاح.<br><br><small style="color:#999">المحاولة القادمة بعد 6 أيام</small>`;
             modal.classList.add('active');
         }
 
