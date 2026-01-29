@@ -3,157 +3,439 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>عجلة الهدايا</title>
+    <title>عجلة الحظ الاحترافية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-bg: #2c3e50;
+            --wheel-border: #ecf0f1;
+            --marker-color: #e74c3c;
+            --btn-color: #f1c40f;
+            --btn-hover: #f39c12;
+            --text-color: #333;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5;
+            font-family: 'Tajawal', sans-serif;
+            background: radial-gradient(circle, #34495e 0%, #2c3e50 100%);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
             overflow: hidden;
+            color: white;
         }
 
-        h1 { color: #333; margin-bottom: 20px; }
-
-        .wheel-container {
-            position: relative;
-            width: 300px;
-            height: 300px;
+        h1 {
+            color: #fff;
             margin-bottom: 30px;
+            font-weight: 900;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            font-size: 2.5rem;
         }
 
+        /* حاوية العجلة */
+        .wheel-wrapper {
+            position: relative;
+            width: 350px;
+            height: 350px;
+            margin-bottom: 40px;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5));
+        }
+
+        /* العجلة نفسها */
         .wheel {
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            border: 5px solid #fff;
-            box-shadow: 0 0 15px rgba(0,0,0,0.2);
-            /* تدرج لوني لتمثيل الأقسام - يمكنك تغيير الألوان هنا */
-            background: conic-gradient(
-                #FF6384 0deg 60deg,
-                #36A2EB 60deg 120deg,
-                #FFCE56 120deg 180deg,
-                #4BC0C0 180deg 240deg,
-                #9966FF 240deg 300deg,
-                #FF9F40 300deg 360deg
-            );
-            transition: transform 4s cubic-bezier(0.17, 0.67, 0.83, 0.67);
-            transform: rotate(0deg);
+            border: 8px solid var(--wheel-border);
+            position: relative;
+            overflow: hidden;
+            transition: transform 5s cubic-bezier(0.25, 0.1, 0.25, 1);
+            background: #fff;
         }
 
-        /* المؤشر (السهم) */
+        /* رسم الأقسام باستخدام التدرج المخروطي */
+        .wheel-bg {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            /* سيتم تعيين الألوان عبر الجافاسكربت لتكون ديناميكية */
+        }
+
+        /* النصوص داخل العجلة */
+        .wheel-labels {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .wheel-labels li {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 50%;
+            height: 50%;
+            transform-origin: 0% 100%;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-top: 20px;
+        }
+
+        .wheel-labels span {
+            display: block;
+            transform: rotate(90deg); /* تدوير النص ليقرأ بشكل صحيح */
+            font-weight: bold;
+            font-size: 16px;
+            color: #fff;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            margin-left: 70px; /* دفع النص نحو الحافة */
+            white-space: nowrap;
+        }
+
+        /* المؤشر */
         .marker {
             position: absolute;
-            top: -15px;
+            top: -25px;
             left: 50%;
             transform: translateX(-50%);
-            width: 0; 
-            height: 0; 
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-top: 25px solid #ff0000;
+            width: 40px;
+            height: 50px;
+            background-color: var(--marker-color);
+            clip-path: polygon(50% 100%, 0 0, 100% 0);
             z-index: 10;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
         }
 
-        button {
-            padding: 15px 40px;
+        /* نقطة المركز */
+        .center-circle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 20px;
-            background-color: #28a745;
-            color: white;
+        }
+
+        /* تصميم الزر */
+        button {
+            padding: 15px 60px;
+            font-size: 22px;
+            font-family: 'Tajawal', sans-serif;
+            font-weight: bold;
+            background-color: var(--btn-color);
+            color: #2c3e50;
             border: none;
             border-radius: 50px;
             cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: background 0.3s;
+            box-shadow: 0 6px 0 #d35400, 0 15px 20px rgba(0,0,0,0.2);
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
         }
 
-        button:hover { background-color: #218838; }
-        button:disabled { background-color: #ccc; cursor: not-allowed; }
-
-        .result-box {
-            margin-top: 20px;
-            font-size: 24px;
-            font-weight: bold;
-            color: #333;
-            min-height: 40px;
+        button:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #d35400, 0 5px 10px rgba(0,0,0,0.2);
         }
+
+        button:disabled {
+            background-color: #bdc3c7;
+            color: #7f8c8d;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: translateY(4px);
+        }
+
+        /* نافذة الفوز المنبثقة (Popup) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s;
+            z-index: 100;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+            transform: scale(0.8);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 20px 25px rgba(0,0,0,0.2);
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            display: block;
+            animation: bounce 1s infinite;
+        }
+
+        .modal-title {
+            color: #27ae60;
+            font-size: 28px;
+            margin: 0 0 10px;
+        }
+
+        .modal-message {
+            color: #555;
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .close-btn {
+            background: #e74c3c;
+            color: white;
+            padding: 10px 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 0 #c0392b;
+            font-size: 16px;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
     </style>
 </head>
 <body>
 
-    <h1>دوار الهدايا 🎉</h1>
+    <h1>عجلة الجوائز 🎁</h1>
 
-    <div class="wheel-container">
+    <div class="wheel-wrapper">
         <div class="marker"></div>
-        <div class="wheel" id="wheel"></div>
+        <div class="wheel" id="wheel">
+            <div class="wheel-bg" id="wheelBg"></div>
+            <ul class="wheel-labels" id="wheelLabels">
+                </ul>
+        </div>
+        <div class="center-circle">★</div>
     </div>
 
-    <button id="spinBtn" onclick="spinWheel()">ابدأ الدوران</button>
-    <div class="result-box" id="result"></div>
+    <button id="spinBtn" onclick="spinWheel()">جرّب حظك الآن</button>
+
+    <div class="modal-overlay" id="modal">
+        <div class="modal-content">
+            <span class="modal-icon">🎉</span>
+            <h2 class="modal-title" id="modalTitle">مبروك!</h2>
+            <p class="modal-message" id="modalMessage">تمت الإضافة إلى حسابك، يرجى التحقق.</p>
+            <button class="close-btn" onclick="closeModal()">حسناً</button>
+        </div>
+    </div>
 
     <script>
-        // --- قم بتعديل الهدايا هنا ---
-        // ملاحظة: يجب أن يتطابق عدد الهدايا مع عدد الألوان في CSS (حالياً 6 أقسام)
-        const gifts = [
-            "جوال ايفون",   // القسم الأول (الأحمر)
-            "سماعة بلوتوث", // القسم الثاني (الأزرق)
-            "خصم 50%",      // القسم الثالث (الأصفر)
-            "شحن مجاني",    // القسم الرابع (الأخضر المائي)
-            "بطاقة هدايا",  // القسم الخامس (البنفسجي)
-            "جرب مرة أخرى"  // القسم السادس (البرتقالي)
+        // --- إعدادات العجلة والجوائز ---
+        // weight: يحدد الاحتمالية (رقم أكبر = فرصة أكبر)
+        // لاحظ أن 24 ساعة و 48 ساعة لديهم وزن منخفض جداً (صعوبة عالية)
+        const segments = [
+            { label: "10 ثواني", color: "#3498db", weight: 50 },  // فرصة عالية
+            { label: "20 ثواني", color: "#1abc9c", weight: 30 },  // متوسطة
+            { label: "40 ثانية", color: "#9b59b6", weight: 15 }, // متوسطة
+            { label: "60 ثانية", color: "#e67e22", weight: 10 }, // أقل
+            { label: "24 ساعة",  color: "#f1c40f", weight: 2 },   // صعب (ذهبي)
+            { label: "48 ساعة",  color: "#e74c3c", weight: 1 }    // صعب جداً (أحمر)
         ];
 
-        let currentRotation = 0;
         const wheel = document.getElementById('wheel');
-        const resultText = document.getElementById('result');
-        const btn = document.getElementById('spinBtn');
+        const wheelBg = document.getElementById('wheelBg');
+        const wheelLabels = document.getElementById('wheelLabels');
+        const spinBtn = document.getElementById('spinBtn');
+        const modal = document.getElementById('modal');
+        
+        let currentRotation = 0;
+        const numSegments = segments.length;
+        const segmentAngle = 360 / numSegments;
+
+        // دالة لإنشاء العجلة وتوزيع الألوان والنصوص
+        function initWheel() {
+            let gradientString = "";
+            let currentAngle = 0;
+
+            segments.forEach((seg, index) => {
+                // إعداد الخلفية (conic-gradient)
+                const startAngle = index * segmentAngle;
+                const endAngle = (index + 1) * segmentAngle;
+                gradientString += `${seg.color} ${startAngle}deg ${endAngle}deg, `;
+
+                // إعداد النصوص
+                const li = document.createElement('li');
+                // تدوير العنصر ليشير لمنتصف القسم
+                const rotateAngle = startAngle + (segmentAngle / 2); // 30, 90, 150...
+                // تصحيح التدوير بسبب css transform origin
+                // نريد أن يكون النص في منتصف الـ slice
+                // التحويل: تدوير العنصر Li حول المركز، ثم وضع النص داخله
+                // ملاحظة: الـ skew يستخدم أحياناً لكن هنا سنستخدم تموضع مطلق بسيط
+                li.style.transform = `rotate(${index * segmentAngle}deg) skewY(-${90 - segmentAngle}deg)`;
+                
+                // النص الداخلي يحتاج تدوير عكسي وتعديل ليظهر بشكل مستقيم
+                // هذه طريقة مبسطة للعرض:
+                // الطريقة الأفضل للعجلة الثابتة هي تدوير الـ li للمنتصف
+                
+                // إعادة بناء li ليكون أسهل:
+                li.style.transform = `rotate(${rotateAngle}deg)`; // يوجه لمنتصف القسم
+                li.style.width = "0"; // خدعة لجعله في المركز
+                li.style.left = "50%";
+                li.style.transformOrigin = "bottom"; // التدوير من المركز (الأسفل بالنسبة للـ li)
+                li.style.height = "50%";
+                li.style.top = "0";
+                
+                // المحتوى (النص)
+                li.innerHTML = `<span style="transform: rotate(-${rotateAngle}deg); width: 150px; text-align: center; margin-left: 0; padding-bottom: 220px;">${seg.label}</span>`;
+                // padding-bottom يدفع النص للأعلى نحو الحافة
+                
+                // الطريقة أعلاه معقدة، سنستخدم الطريقة المجربة:
+                // 1. تدوير الحاوية (li) لتشير للزاوية
+                // 2. وضع النص
+            });
+
+            // رسم الخلفية
+            wheelBg.style.background = `conic-gradient(${segments.map((s, i) => `${s.color} ${i * segmentAngle}deg ${(i+1) * segmentAngle}deg`).join(', ')})`;
+
+            // رسم النصوص
+            wheelLabels.innerHTML = '';
+            segments.forEach((seg, i) => {
+                const li = document.createElement('li');
+                // زاوية المنتصف للقسم
+                const angle = (i * segmentAngle) + (segmentAngle / 2);
+                li.style.transform = `rotate(${angle}deg)`;
+                // span داخلي يحمل النص
+                li.innerHTML = `<span>${seg.label}</span>`; 
+                wheelLabels.appendChild(li);
+            });
+        }
+
+        // خوارزمية الاختيار العشوائي الموزون (Weighted Random)
+        function getWeightedWinner() {
+            const totalWeight = segments.reduce((sum, seg) => sum + seg.weight, 0);
+            let random = Math.random() * totalWeight;
+            
+            for (let i = 0; i < segments.length; i++) {
+                if (random < segments[i].weight) {
+                    return i; // إرجاع الـ index للفائز
+                }
+                random -= segments[i].weight;
+            }
+            return 0; // fallback
+        }
 
         function spinWheel() {
-            // تعطيل الزر أثناء الدوران
-            btn.disabled = true;
-            resultText.innerText = "جاري الدوران...";
+            if (spinBtn.disabled) return;
 
-            // حساب عدد عشوائي للدوران (بين 2000 و 5000 درجة)
-            const randomDeg = Math.floor(5000 + Math.random() * 3000);
+            spinBtn.disabled = true;
+            spinBtn.innerText = "جاري السحب...";
+
+            // 1. تحديد الفائز مسبقاً بناءً على الاحتمالات
+            const winnerIndex = getWeightedWinner();
+            const winner = segments[winnerIndex];
+
+            // 2. حساب زاوية الدوران للوصول لهذا الفائز
+            // المؤشر ثابت في الأعلى (0 درجة / 360 درجة)
+            // لكي تأتي الشريحة المطلوبة تحت المؤشر، يجب أن تدور العجلة بحيث تصل زاوية الشريحة إلى 0 (أو 360)
             
-            // إضافة الدوران الجديد إلى الدوران الحالي حتى لا تعود العجلة للصفر
-            currentRotation += randomDeg;
+            // زاوية منتصف الشريحة الفائزة حالياً (بدون دوران)
+            const winnerCenterAngle = (winnerIndex * segmentAngle) + (segmentAngle / 2);
+            
+            // المسافة التي يجب أن تقطعها العجلة لتصل الشريحة للأعلى (360 - الزاوية الحالية)
+            // نضيف دوران عشوائي بسيط داخل الشريحة (+/- قليل) لواقعية أكثر
+            const randomOffset = Math.floor(Math.random() * (segmentAngle - 10)) - (segmentAngle/2 - 5); 
+            
+            // الدوران المطلوب = (360 - زاوية المركز) + لفات إضافية
+            const extraSpins = 360 * 10; // 10 لفات كاملة
+            const targetRotation = (360 - winnerCenterAngle) + extraSpins + randomOffset;
 
-            // تطبيق الدوران
+            // نظرًا لأننا نزيد القيمة دائمًا للأمام، نضيف الدوران الحالي
+            // يجب ضبط الحساب ليكون تراكمياً
+            const degreesToRotate = targetRotation + (Math.ceil(currentRotation / 360) * 360);
+            
+            // التأكد من أننا ندور دائماً للأمام بقيمة كبيرة
+            const finalRotation = currentRotation + (360 * 5) + (360 - (currentRotation % 360) - winnerCenterAngle); 
+            
+            // الطريقة الأبسط للتراكمي:
+            // نريد أن ينتهي الـ rotation عند قيمة X حيث X % 360 تضع الفائز في الأعلى.
+            // الزاوية المستهدفة على الدائرة (حيث يجب أن يتوقف المؤشر) هي 0 (الأعلى).
+            // موقع الفائز هو winnerCenterAngle.
+            // لذا يجب أن نطرح winnerCenterAngle من الدوران.
+            
+            currentRotation += 5000; // قيمة عشوائية كبيرة مبدئية
+            // نضبطها لتقف عند الفائز
+            const remainder = currentRotation % 360;
+            const adjustment = (360 - remainder) - winnerCenterAngle;
+            currentRotation += adjustment;
+
             wheel.style.transform = `rotate(${currentRotation}deg)`;
 
-            // انتظار انتهاء الحركة (4 ثواني) ثم حساب النتيجة
+            // انتظار انتهاء الحركة
             setTimeout(() => {
-                calculateWinner(currentRotation);
-                btn.disabled = false;
-            }, 4000);
+                showResult(winner);
+                spinBtn.disabled = false;
+                spinBtn.innerText = "جرّب حظك مرة أخرى";
+            }, 5000);
         }
 
-        function calculateWinner(totalDegrees) {
-            const numSegments = gifts.length;
-            const segmentAngle = 360 / numSegments;
-            
-            // حساب الزاوية الفعلية (باقي القسمة على 360)
-            // نستخدم التصحيح لأن المؤشر في الأعلى والدوران مع عقارب الساعة
-            const actualDeg = totalDegrees % 360;
-            
-            // معادلة لتحديد القسم الفائز بناءً على موقع المؤشر الثابت
-            const index = Math.floor((360 - actualDeg + (segmentAngle / 2)) % 360 / segmentAngle);
-            
-            // التأكد من أن المؤشر ضمن حدود المصفوفة
-            const winningGift = gifts[index] || gifts[0];
+        function showResult(winner) {
+            const modalTitle = document.getElementById('modalTitle');
+            const modalMessage = document.getElementById('modalMessage');
 
-            resultText.innerText = `مبروك! حصلت على: ${winningGift}`;
+            // تخصيص الرسالة
+            modalTitle.innerText = `🎉 مبروك! فزت بـ ${winner.label}`;
             
-            // تأثير احتفالي بسيط
-            if(winningGift !== "جرب مرة أخرى") {
-                alert(`🎉 مبروك! لقد ربحت: ${winningGift}`);
-            }
+            // الرسالة المطلوبة
+            modalMessage.innerHTML = `تمت إضافة <b>${winner.label}</b> إلى حسابك.<br>يرجى التحقق من الرصيد.`;
+
+            modal.classList.add('active');
+            
+            // تشغيل صوت بسيط (اختياري، لن يعمل إلا بتفاعل المستخدم مسبقاً في بعض المتصفحات)
+            // const audio = new Audio('win.mp3'); audio.play().catch(e=>{}); 
         }
+
+        function closeModal() {
+            modal.classList.remove('active');
+        }
+
+        // تشغيل العجلة عند التحميل
+        initWheel();
+
     </script>
 </body>
 </html>
