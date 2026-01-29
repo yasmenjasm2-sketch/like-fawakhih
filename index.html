@@ -42,11 +42,9 @@
             width: 350px;
             height: 350px;
             margin: 20px auto;
-            /* ظل لإعطاء عمق */
             filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
         }
 
-        /* المؤشر (السهم) */
         .marker {
             position: absolute;
             top: -20px;
@@ -60,7 +58,6 @@
             filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5));
         }
 
-        /* العجلة الدوارة */
         .wheel {
             width: 100%;
             height: 100%;
@@ -68,18 +65,17 @@
             border: 8px solid #fff;
             position: relative;
             overflow: hidden;
-            transition: transform 5s cubic-bezier(0.25, 0.1, 0.25, 1); /* حركة سلسة مع توقف تدريجي */
+            transition: transform 5s cubic-bezier(0.25, 0.1, 0.25, 1);
             box-sizing: border-box;
         }
 
-        /* النصوص داخل العجلة */
         .segment-label {
             position: absolute;
             top: 0;
             left: 50%;
-            width: 50%; /* نصف العرض */
-            height: 50%; /* نصف الطول */
-            transform-origin: 0% 100%; /* نقطة التدوير هي مركز الدائرة */
+            width: 50%;
+            height: 50%;
+            transform-origin: 0% 100%;
             text-align: center;
             display: flex;
             justify-content: center;
@@ -89,16 +85,15 @@
 
         .segment-text {
             display: block;
-            transform: rotate(90deg); /* تدوير النص ليقرأ بشكل عمودي بالنسبة للقطاع */
+            transform: rotate(90deg);
             font-weight: bold;
             font-size: 18px;
             color: #fff;
             text-shadow: var(--text-shadow);
-            margin-left: 80px; /* دفع النص نحو الحافة */
+            margin-left: 80px;
             white-space: nowrap;
         }
 
-        /* الدائرة في المنتصف */
         .center-circle {
             position: absolute;
             top: 50%;
@@ -116,9 +111,16 @@
             font-size: 24px;
         }
 
-        /* --- الزر --- */
+        /* --- الزر ومنطقة العداد --- */
+        .controls-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
         #spinBtn {
-            margin-top: 40px;
             padding: 15px 50px;
             font-size: 22px;
             font-family: 'Tajawal', sans-serif;
@@ -138,14 +140,44 @@
         }
 
         #spinBtn:disabled {
-            background: #95a5a6;
-            color: #555;
+            background: #7f8c8d;
+            color: #bdc3c7;
             cursor: not-allowed;
             box-shadow: none;
             transform: translateY(4px);
         }
 
-        /* --- النافذة المنبثقة (Modal) --- */
+        /* تصميم العداد الزمني */
+        .timer-container {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #e74c3c;
+            text-align: center;
+            display: none; /* مخفي افتراضياً */
+            animation: fadeIn 0.5s;
+        }
+
+        .timer-title {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .timer-digits {
+            font-size: 20px;
+            color: #fff;
+            font-family: monospace;
+            direction: ltr; /* للأرقام */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- النافذة المنبثقة --- */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -207,12 +239,18 @@
 
     <div class="wheel-container">
         <div class="marker"></div>
-        <div class="wheel" id="wheel">
-            </div>
+        <div class="wheel" id="wheel"></div>
         <div class="center-circle">★</div>
     </div>
 
-    <button id="spinBtn" onclick="spinWheel()">جرّب حظك الآن</button>
+    <div class="controls-area">
+        <button id="spinBtn" onclick="handleSpinClick()">جرّب حظك الآن</button>
+        
+        <div class="timer-container" id="timerContainer">
+            <div class="timer-title">المحاولة القادمة متاحة بعد:</div>
+            <div class="timer-digits" id="timerDigits">00d 00h 00m 00s</div>
+        </div>
+    </div>
 
     <div class="modal-overlay" id="modal">
         <div class="modal-content">
@@ -224,110 +262,170 @@
     </div>
 
     <script>
-        // === 1. إعدادات الجوائز والاحتمالات ===
-        // weight: كلما زاد الرقم، زادت فرصة الفوز
+        // === إعدادات المدة الزمنية ===
+        const COOLDOWN_DAYS = 6;
+        const COOLDOWN_TIME_MS = COOLDOWN_DAYS * 24 * 60 * 60 * 1000; // 6 أيام بالمللي ثانية
+
+        // === إعدادات العجلة ===
         const segments = [
-            { label: "10 ثواني", color: "#3498db", weight: 50 },  // 50% تقريباً
-            { label: "20 ثانية", color: "#1abc9c", weight: 30 },  // 30%
-            { label: "40 ثانية", color: "#9b59b6", weight: 10 },  // 10%
-            { label: "60 ثانية", color: "#e67e22", weight: 5 },   // 5%
-            { label: "24 ساعة",  color: "#f1c40f", weight: 3 },   // نادر
-            { label: "48 ساعة",  color: "#c0392b", weight: 2 }    // نادر جداً
+            { label: "10 ثواني", color: "#3498db", weight: 50 },
+            { label: "20 ثانية", color: "#1abc9c", weight: 30 },
+            { label: "40 ثانية", color: "#9b59b6", weight: 10 },
+            { label: "60 ثانية", color: "#e67e22", weight: 5 },
+            { label: "24 ساعة",  color: "#f1c40f", weight: 3 },
+            { label: "48 ساعة",  color: "#c0392b", weight: 2 }
         ];
 
         const wheel = document.getElementById('wheel');
         const modal = document.getElementById('modal');
         const spinBtn = document.getElementById('spinBtn');
+        const timerContainer = document.getElementById('timerContainer');
+        const timerDigits = document.getElementById('timerDigits');
         
-        let currentRotation = 0; // لحفظ مكان العجلة الحالي
-        const segmentAngle = 360 / segments.length; // زاوية كل قسم
+        let currentRotation = 0;
+        const segmentAngle = 360 / segments.length;
+        let countdownInterval;
 
-        // === 2. رسم العجلة ديناميكياً ===
+        // === تشغيل عند البدء ===
+        function init() {
+            drawWheel();
+            checkAvailability(); // فحص إذا كان المستخدم محظوراً
+        }
+
+        // === 1. نظام الوقت والتحقق ===
+        function checkAvailability() {
+            const lastSpinTime = localStorage.getItem('lastSpinTime');
+            
+            if (lastSpinTime) {
+                const now = Date.now();
+                const timePassed = now - parseInt(lastSpinTime);
+                
+                if (timePassed < COOLDOWN_TIME_MS) {
+                    // المستخدم لا يزال في فترة الانتظار
+                    const remainingTime = COOLDOWN_TIME_MS - timePassed;
+                    disableSpinning(remainingTime);
+                    return false;
+                }
+            }
+            // المستخدم يمكنه اللعب
+            enableSpinning();
+            return true;
+        }
+
+        function disableSpinning(remainingTime) {
+            spinBtn.disabled = true;
+            spinBtn.innerText = "عد لاحقاً ⏳";
+            timerContainer.style.display = 'block';
+            startTimer(remainingTime);
+        }
+
+        function enableSpinning() {
+            spinBtn.disabled = false;
+            spinBtn.innerText = "جرّب حظك الآن";
+            timerContainer.style.display = 'none';
+            if (countdownInterval) clearInterval(countdownInterval);
+        }
+
+        function startTimer(duration) {
+            let timer = duration;
+            if (countdownInterval) clearInterval(countdownInterval);
+
+            // تحديث فوري للعداد قبل الانتظار ثانية
+            updateTimerDisplay(timer);
+
+            countdownInterval = setInterval(() => {
+                timer -= 1000;
+                if (timer <= 0) {
+                    clearInterval(countdownInterval);
+                    enableSpinning();
+                    localStorage.removeItem('lastSpinTime'); // مسح الوقت القديم
+                } else {
+                    updateTimerDisplay(timer);
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay(ms) {
+            const days = Math.floor(ms / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((ms % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((ms % (1000 * 60)) / 1000);
+
+            timerDigits.innerHTML = 
+                `${days}d ${hours}h ${minutes}m ${seconds}s`;
+        }
+
+        // === 2. منطق العجلة ===
+        function handleSpinClick() {
+            // تحقق أخير قبل البدء
+            if (!checkAvailability()) return;
+
+            // تسجيل وقت اللعب فوراً لمنع التلاعب (تحديث الصفحة)
+            localStorage.setItem('lastSpinTime', Date.now());
+            
+            spinWheel();
+        }
+
         function drawWheel() {
-            // أ) رسم الخلفية الملونة باستخدام conic-gradient
             let gradient = `conic-gradient(`;
             segments.forEach((seg, i) => {
                 const start = i * segmentAngle;
                 const end = (i + 1) * segmentAngle;
                 gradient += `${seg.color} ${start}deg ${end}deg, `;
             });
-            // إزالة الفاصلة الأخيرة وإغلاق القوس
             wheel.style.background = gradient.slice(0, -2) + ")";
 
-            // ب) إضافة النصوص
-            wheel.innerHTML = ""; // تنظيف
+            wheel.innerHTML = ""; 
             segments.forEach((seg, i) => {
                 const labelDiv = document.createElement('div');
                 labelDiv.className = 'segment-label';
-                // تدوير الحاوية لمنتصف القسم
                 const rotate = (i * segmentAngle) + (segmentAngle / 2);
                 labelDiv.style.transform = `rotate(${rotate}deg)`;
-                
-                // النص الداخلي
                 labelDiv.innerHTML = `<span class="segment-text">${seg.label}</span>`;
                 wheel.appendChild(labelDiv);
             });
         }
 
-        // === 3. خوارزمية الاختيار (المنطق هو الأساس) ===
         function determineWinner() {
-            // جمع الأوزان
             const totalWeight = segments.reduce((sum, seg) => sum + seg.weight, 0);
             let random = Math.random() * totalWeight;
-            
-            // معرفة الفائز بناءً على الرقم العشوائي
             for (let i = 0; i < segments.length; i++) {
                 if (random < segments[i].weight) {
                     return { index: i, ...segments[i] };
                 }
                 random -= segments[i].weight;
             }
-            return { index: 0, ...segments[0] }; // احتياط
+            return { index: 0, ...segments[0] };
         }
 
-        // === 4. وظيفة التدوير ===
         function spinWheel() {
-            if (spinBtn.disabled) return;
-            
-            // قفل الزر
-            spinBtn.disabled = true;
-            spinBtn.textContent = "جاري السحب...";
-            
-            // أ) تحديد الفائز (Logic First)
-            const winner = determineWinner();
-            console.log("الفائز المحدد برمجياً:", winner.label);
+            // نبدأ وضع الانتظار مباشرة
+            const remainingTime = COOLDOWN_TIME_MS; 
+            disableSpinning(remainingTime); 
+            // لكن نغير نص الزر ليناسب اللحظة الحالية
+            spinBtn.innerText = "جاري السحب...";
 
-            // ب) حساب زاوية التوقف
-            // نريد أن يتوقف المؤشر (الذي هو عند 0 درجة / الأعلى) عند منتصف قسم الفائز.
-            // معادلة: الزاوية المستهدفة = (360 - زاوية الفائز)
+            const winner = determineWinner();
+            console.log("الفائز:", winner.label);
+
             const winnerAngle = (winner.index * segmentAngle) + (segmentAngle / 2);
-            
-            // إضافة عدد كبير من اللفات (5 لفات = 1800 درجة) لإعطاء شعور الدوران
             const extraSpins = 360 * 5; 
-            
-            // ضبط التدوير ليكون تراكمياً (حتى لا تدور العجلة للخلف)
-            // العملية الحسابية: الدوران الحالي + لفات اضافية + (الفرق للوصول للهدف)
             const targetRotation = currentRotation + extraSpins + (360 - (currentRotation % 360)) - winnerAngle;
-            
-            // تصحيح بسيط لضمان الوقوف في المركز
-            // نستخدم Math.floor لرقم صحيح ونضيف تباين بسيط جداً لتبدو طبيعية (اختياري)
             const finalRotation = Math.floor(targetRotation);
 
-            // ج) تطبيق الحركة
             wheel.style.transform = `rotate(${finalRotation}deg)`;
-            currentRotation = finalRotation; // حفظ الوضع الجديد
+            currentRotation = finalRotation; 
 
-            // د) إظهار النتيجة بعد انتهاء الحركة (5 ثواني)
             setTimeout(() => {
                 showResult(winner);
-                spinBtn.disabled = false;
-                spinBtn.textContent = "جرّب حظك مرة أخرى";
+                // بعد إغلاق الرسالة، الزر سيبقى معطلاً لأننا استدعينا disableSpinning في البداية
+                spinBtn.innerText = "عد لاحقاً ⏳";
             }, 5000);
         }
 
         function showResult(winner) {
             document.getElementById('resultTitle').innerText = `مبروك! فزت بـ ${winner.label}`;
-            document.getElementById('resultMessage').innerHTML = `تمت إضافة <b>${winner.label}</b> إلى رصيدك بنجاح.`;
+            document.getElementById('resultMessage').innerHTML = `تمت إضافة <b>${winner.label}</b> إلى رصيدك بنجاح.<br><br><small>المحاولة القادمة بعد 6 أيام</small>`;
             modal.classList.add('active');
         }
 
@@ -335,8 +433,8 @@
             modal.classList.remove('active');
         }
 
-        // تشغيل الرسم عند التحميل
-        drawWheel();
+        // تشغيل الكود
+        init();
 
     </script>
 </body>
