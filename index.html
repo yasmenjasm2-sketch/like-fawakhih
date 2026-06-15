@@ -3,778 +3,353 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>REMAS ULTIMATE FRUIT HACK - Video Sync v9.0</title>
+    <title>لعبة X O أونلاين</title>
     <style>
-        :root {
-            --bg-color: #05010a;
-            --panel-bg: #0d0216;
-            --panel-border: rgba(255, 0, 85, 0.3);
-            --neon-pink: #ff0055;
-            --neon-green: #00ff66;
-            --neon-blue: #00d2ff;
-            --neon-yellow: #ffcc00;
-            --neon-purple: #b500ff;
-            --text-color: #ffffff;
-            --muted-text: #9683a3;
-            --glass-bg: rgba(18, 4, 28, 0.85);
-        }
-
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 15px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-image: radial-gradient(circle at 50% 50%, #150325 0%, #05010a 100%);
-        }
-
-        .hack-wrapper {
-            width: 100%;
-            max-width: 1300px;
-            background: rgba(10, 2, 18, 0.95);
-            border: 2px solid var(--neon-blue);
-            border-radius: 18px;
-            padding: 25px;
-            box-shadow: 0 0 30px rgba(0, 210, 255, 0.15), inset 0 0 20px rgba(0, 210, 255, 0.05);
-            backdrop-filter: blur(12px);
-        }
-
-        .header-title {
-            text-align: center;
-            font-size: 26px;
-            font-weight: 900;
-            letter-spacing: 2px;
-            color: #fff;
-            text-shadow: 0 0 15px var(--neon-blue);
-            margin-bottom: 25px;
-            border-bottom: 2px dashed rgba(0, 210, 255, 0.3);
-            padding-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .status-indicator {
-            font-size: 13px;
-            font-weight: bold;
-            padding: 6px 14px;
-            border-radius: 30px;
-            background: rgba(255, 0, 85, 0.1);
-            border: 1px solid var(--neon-pink);
-            color: var(--neon-pink);
-            box-shadow: 0 0 10px rgba(255, 0, 85, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .status-indicator.active {
-            background: rgba(0, 255, 102, 0.15);
-            border-color: var(--neon-green);
-            color: var(--neon-green);
-            box-shadow: 0 0 15px rgba(0, 255, 102, 0.4);
-        }
-        
-        .status-indicator.scanning {
-            background: rgba(181, 0, 255, 0.15);
-            border-color: var(--neon-purple);
-            color: var(--neon-purple);
-            box-shadow: 0 0 15px rgba(181, 0, 255, 0.4);
-            animation: scanPulse 1s infinite;
-        }
-
-        @keyframes scanPulse {
-            0% { box-shadow: 0 0 5px var(--neon-purple); }
-            50% { box-shadow: 0 0 20px var(--neon-purple); }
-            100% { box-shadow: 0 0 5px var(--neon-purple); }
-        }
-
-        .grid-layout-3 {
-            display: grid;
-            grid-template-columns: 1fr 1.1fr 1.2fr;
-            gap: 20px;
-        }
-
-        @media (max-width: 1024px) {
-            .grid-layout-3 { grid-template-columns: 1fr; }
-        }
-
-        .panel {
-            background: var(--glass-bg);
-            border: 1px solid var(--panel-border);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
-            position: relative;
-        }
-
-        .panel-full-width {
-            grid-column: span 3;
-            border-color: var(--neon-purple);
-            margin-bottom: 20px;
-            box-shadow: 0 0 15px rgba(181, 0, 255, 0.1);
-        }
-
-        @media (max-width: 1024px) {
-            .panel-full-width { grid-column: span 1; }
-        }
-
-        .panel-center { border-color: var(--neon-blue); }
-        .panel-green { border-color: var(--neon-green); }
-
-        .panel-title {
-            font-size: 14px;
-            font-weight: 800;
-            letter-spacing: 1.5px;
-            margin-bottom: 15px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            text-transform: uppercase;
-        }
-
-        .panel-title.pink { color: var(--neon-pink); }
-        .panel-title.blue { color: var(--neon-blue); }
-        .panel-title.green { color: var(--neon-green); }
-        .panel-title.purple { color: var(--neon-purple); }
-
-        label {
-            display: block;
-            font-size: 11px;
-            color: var(--muted-text);
-            margin-bottom: 5px;
-            font-weight: 600;
-        }
-
-        textarea, input {
-            width: 100%;
-            background: #06000a;
-            border: 1px solid rgba(255, 0, 85, 0.3);
-            border-radius: 6px;
-            color: #fff;
-            padding: 12px;
-            font-size: 12px;
-            box-sizing: border-box;
-            margin-bottom: 12px;
-            font-family: monospace;
-            direction: ltr;
-        }
-
-        textarea:focus, input:focus {
-            outline: none;
-            border-color: var(--neon-blue);
-            box-shadow: 0 0 10px rgba(0, 210, 255, 0.3);
-        }
-
-        .btn-execute {
-            width: 100%;
-            background: linear-gradient(90deg, #ff0055, #990033);
+            background-color: #1e1e2f;
             color: white;
-            border: none;
-            padding: 14px;
-            font-weight: bold;
-            font-size: 14px;
-            border-radius: 8px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(255, 0, 85, 0.3);
-            margin-bottom: 10px;
-            transition: all 0.3s;
-        }
-
-        .btn-execute.auto-on {
-            background: linear-gradient(90deg, #00ff66, #009933);
-            box-shadow: 0 4px 15px rgba(0, 255, 102, 0.3);
-        }
-
-        .ai-vision-box {
-            width: 100%;
-            height: 160px;
-            background: #000;
-            border: 1px solid var(--neon-blue);
-            border-radius: 8px;
-            margin-bottom: 10px;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-        }
-
-        .scan-line {
-            position: absolute;
-            width: 100%;
-            height: 2px;
-            background: var(--neon-purple);
-            box-shadow: 0 0 10px var(--neon-purple);
-            top: 0;
-            display: none;
-        }
-
-        #ai-canvas-simulation { width: 100%; height: 100%; }
-
-        .server-logs {
-            font-family: monospace;
-            font-size: 11px;
-            color: #00ff66;
-            background: #030005;
-            padding: 10px;
-            height: 120px;
-            overflow-y: auto;
-            border-radius: 6px;
-            margin-bottom: 15px;
-            border: 1px solid rgba(0, 255, 102, 0.2);
-            line-height: 1.5;
-            direction: ltr;
-            text-align: left;
-        }
-
-        .prediction-container {
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(0, 210, 255, 0.2);
-            border-radius: 8px;
-            padding: 12px;
-            margin-top: 15px;
-        }
-
-        .pred-title {
-            font-size: 12px;
-            color: var(--neon-blue);
-            font-weight: bold;
-            margin-bottom: 10px;
             text-align: center;
-            border-bottom: 1px dashed rgba(0, 210, 255, 0.3);
-            padding-bottom: 5px;
-        }
-
-        .pred-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .pred-name { font-size: 13px; font-weight: bold; color: #fff; width: 60px; text-align: right; }
-        
-        .pred-bar-bg {
-            flex-grow: 1;
-            height: 8px;
-            background: #111;
-            border-radius: 10px;
-            margin: 0 10px;
-            overflow: hidden;
-            border: 1px solid #333;
-        }
-
-        .pred-bar-fill {
-            height: 100%;
-            border-radius: 10px;
-            transition: width 0.5s ease-out;
-        }
-
-        .pred-percent { font-size: 13px; font-weight: bold; width: 45px; text-align: left; }
-
-        .prob-high { background: var(--neon-green); box-shadow: 0 0 8px var(--neon-green); }
-        .prob-med { background: var(--neon-yellow); box-shadow: 0 0 8px var(--neon-yellow); }
-        .prob-low { background: var(--neon-pink); box-shadow: 0 0 8px var(--neon-pink); }
-        .text-high { color: var(--neon-green); }
-        .text-med { color: var(--neon-yellow); }
-        .text-low { color: var(--neon-pink); }
-
-        .warning-box {
-            background: rgba(22, 5, 36, 0.8);
-            border: 1px solid var(--neon-green);
-            border-radius: 10px;
-            padding: 15px;
-            text-align: center;
-            margin-top: 10px;
-            box-shadow: inset 0 0 15px rgba(0, 255, 102, 0.05);
-            transition: all 0.3s;
-        }
-        
-        .warning-box.deep-scan {
-            border-color: var(--neon-purple);
-            box-shadow: inset 0 0 20px rgba(181, 0, 255, 0.2);
-        }
-
-        .fruit-badge {
-            display: inline-block;
-            background: #1f0533;
-            border: 1px solid rgba(0, 210, 255, 0.4);
-            padding: 5px 12px;
-            border-radius: 6px;
-            margin: 2px;
-            font-size: 13px;
-            font-weight: bold;
-            color: #fff;
-        }
-
-        .round-counter {
-            color: var(--neon-yellow);
-            font-size: 16px;
-            font-weight: bold;
-            text-align: center;
-            margin-top: 15px;
-            background: rgba(255, 204, 0, 0.05);
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 204, 0, 0.2);
-            font-family: monospace;
-        }
-
-        .timer-display {
-            font-size: 46px;
-            font-weight: 900;
-            color: var(--neon-blue);
-            text-align: center;
-            margin: 10px 0;
-            text-shadow: 0 0 15px rgba(0, 210, 255, 0.6);
-            font-family: monospace;
-            letter-spacing: 2px;
-        }
-
-        .loading-text { color: var(--neon-pink); animation: blink 1s infinite; font-size: 16px;}
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-
-        .history-tape-container {
-            display: flex;
-            gap: 8px;
-            justify-content: space-between;
-            overflow-x: auto;
-            padding: 10px 5px;
-            background: #030006;
-            border-radius: 10px;
-            border: 1px solid rgba(0, 210, 255, 0.15);
-        }
-
-        .tape-slot {
-            flex: 1;
-            min-width: 75px;
-            height: 75px;
+            margin: 0;
+            padding: 20px;
             display: flex;
             flex-direction: column;
+            align-items: center;
+        }
+        h1 { color: #ff5252; }
+        .container {
+            background: #2a2a40;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            max-width: 400px;
+            width: 100%;
+        }
+        button {
+            background-color: #ff5252;
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            margin: 10px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            width: 90%;
+            font-weight: bold;
+        }
+        button:hover { background-color: #ff1744; }
+        
+        /* Board Styles */
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+            display: none; /* مخفي في البداية */
+        }
+        .cell {
+            width: 100px;
+            height: 100px;
+            background-color: #3b3b58;
+            border-radius: 10px;
+            display: flex;
             justify-content: center;
             align-items: center;
-            background: rgba(15, 4, 28, 0.8);
-            border: 1px solid rgba(0, 210, 255, 0.25);
-            border-radius: 8px;
-            font-size: 13px;
+            font-size: 50px;
             font-weight: bold;
-            position: relative;
-            transition: all 0.4s ease;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+            cursor: pointer;
+            transition: background 0.2s;
         }
-
-        .tape-slot.latest-active {
-            border-color: var(--neon-green) !important;
-            box-shadow: 0 0 15px var(--neon-green), inset 0 0 8px rgba(0, 255, 102, 0.2);
-            background: rgba(0, 255, 102, 0.08);
-            animation: pulseLatestSlot 1.5s infinite alternate;
+        .cell:hover { background-color: #4d4d73; }
+        .cell.x { color: #ff5252; }
+        .cell.o { color: #448aff; }
+        
+        /* UI Sections */
+        #menu-section, #waiting-section, #game-section {
+            display: none;
         }
-
-        @keyframes pulseLatestSlot {
-            0% { transform: scale(1); border-color: var(--neon-green); }
-            100% { transform: scale(1.02); border-color: #00ffaa; }
+        #menu-section.active, #waiting-section.active, #game-section.active {
+            display: block;
         }
-
-        .tape-slot .slot-number {
-            position: absolute;
-            top: 2px;
-            right: 4px;
-            font-size: 9px;
-            color: var(--muted-text);
-            font-family: monospace;
+        .link-box {
+            background: #1e1e2f;
+            padding: 10px;
+            border-radius: 5px;
+            word-break: break-all;
+            margin: 15px 0;
+            border: 1px solid #448aff;
         }
-
-        .tape-slot .slot-label {
-            margin-top: 12px;
-            text-align: center;
+        #status-text {
+            font-size: 20px;
+            margin: 15px 0;
+            font-weight: bold;
         }
     </style>
+
+    <!-- تضمين مكتبة Firebase الإصدار 8 (الأسسهل في التعامل مع ملف HTML واحد) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
 
-    <div class="hack-wrapper">
-        <div class="header-title">
-            <span>REMAS VIDEO SYNC v9.0 PRO</span>
-            <span id="engine-status" class="status-indicator">الآلة: متوقفة</span>
+    <div class="container">
+        <h1>لعبة X O</h1>
+
+        <!-- القائمة الرئيسية -->
+        <div id="menu-section" class="active">
+            <h2>اختر نوع اللعب</h2>
+            <button onclick="startLocalGame()">لعب محلي (على نفس الجهاز)</button>
+            <button onclick="hostGame()">لعب مع صديق (أونلاين)</button>
         </div>
 
-        <div class="panel panel-full-width">
-            <div class="panel-title purple">🎰 [ LIVE SERVER 11-SLOT HISTORY TAPE / شريط الفواكه الفوري المتزامن ]</div>
-            <div class="history-tape-container" id="history-tape"></div>
+        <!-- غرفة الانتظار (للمستضيف) -->
+        <div id="waiting-section">
+            <h2>في انتظار انضمام صديقك...</h2>
+            <p>قم بنسخ هذا الرابط وإرساله لصديقك:</p>
+            <div class="link-box" id="share-link"></div>
+            <button onclick="copyLink()">نسخ الرابط</button>
         </div>
 
-        <div class="grid-layout-3">
-            
-            <div class="panel">
-                <div class="panel-title pink">🔒 [ WSS TUNNEL CONTROL ]</div>
-                
-                <label>رابط السيرفر المباشر للعبة (WSS)</label>
-                <textarea id="game-url" rows="2">wss://roomws13.yalla.live/e4/index.html</textarea>
-                
-                <label>سجل الشبكة المباشر (Strict Validation):</label>
-                <div class="server-logs" id="network-logs">
-                    [System] Remas Engine Core Initialized.<br>
-                    [System] Waiting for external injection...
-                </div>
-
-                <button id="auto-btn" class="btn-execute" onclick="toggleEngine()">تفعيل الحقن ومزامنة السيرفر ⚙️</button>
+        <!-- ساحة اللعب -->
+        <div id="game-section">
+            <div id="status-text">انتظر...</div>
+            <div id="role-text" style="margin-bottom:10px; color:#aaa;"></div>
+            <div class="board" id="board">
+                <!-- الخلايا -->
+                <div class="cell" onclick="makeMove(0)"></div>
+                <div class="cell" onclick="makeMove(1)"></div>
+                <div class="cell" onclick="makeMove(2)"></div>
+                <div class="cell" onclick="makeMove(3)"></div>
+                <div class="cell" onclick="makeMove(4)"></div>
+                <div class="cell" onclick="makeMove(5)"></div>
+                <div class="cell" onclick="makeMove(6)"></div>
+                <div class="cell" onclick="makeMove(7)"></div>
+                <div class="cell" onclick="makeMove(8)"></div>
             </div>
-
-            <div class="panel panel-center">
-                <div class="panel-title blue">⏱️ [ ML CR VISION & TICKER ]</div>
-                
-                <div class="ai-vision-box">
-                    <div class="scan-line" id="ml-scan-line"></div>
-                    <canvas id="ai-canvas-simulation"></canvas>
-                </div>
-
-                <label style="text-align: center; color: var(--neon-blue);">العداد الحقيقي (متصل بالسيرفر)</label>
-                <div class="timer-display" id="live-timer-text">--</div>
-                
-                <div style="text-align: center; font-size: 11px; color: var(--neon-pink);" id="timer-status">
-                    بانتظار إشارة الوقت...
-                </div>
-            </div>
-
-            <div class="panel panel-green">
-                <div class="panel-title green" style="justify-content: center;">📊 [ LIVE SERVER RESULTS ]</div>
-                
-                <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4); padding: 8px; border-radius: 6px;">
-                    <span style="font-size: 12px; color: var(--muted-text);">الفاكهة السابقة:</span> 
-                    <span id="previous-fruit" style="color:var(--neon-blue); font-weight:bold;">لا يوجد</span>
-                </div>
-
-                <div class="warning-box" id="result-box">
-                    <div style="font-size: 12px; color: var(--neon-green); margin-bottom: 5px;">النتيجة المسحوبة الآن:</div>
-                    <div id="current-fruit" style="color: #fff; font-size: 24px; font-weight: bold;">
-                        بانتظار جولة جديدة...
-                    </div>
-                </div>
-
-                <div class="prediction-container">
-                    <div class="pred-title">الاحتمالات المؤكدة للجولة (ML CR)</div>
-                    
-                    <div class="pred-row">
-                        <div class="pred-name" id="pred-1-name">---</div>
-                        <div class="pred-bar-bg"><div class="pred-bar-fill prob-high" id="pred-1-bar" style="width: 0%;"></div></div>
-                        <div class="pred-percent text-high" id="pred-1-val">0%</div>
-                    </div>
-                    <div class="pred-row">
-                        <div class="pred-name" id="pred-2-name">---</div>
-                        <div class="pred-bar-bg"><div class="pred-bar-fill prob-med" id="pred-2-bar" style="width: 0%;"></div></div>
-                        <div class="pred-percent text-med" id="pred-2-val">0%</div>
-                    </div>
-                    <div class="pred-row">
-                        <div class="pred-name" id="pred-3-name">---</div>
-                        <div class="pred-bar-bg"><div class="pred-bar-fill prob-low" id="pred-3-bar" style="width: 0%;"></div></div>
-                        <div class="pred-percent text-low" id="pred-3-val">0%</div>
-                    </div>
-                </div>
-                
-                <div class="round-counter" id="round-timer">
-                    Round ID: Waiting...
-                </div>
-            </div>
-
+            <button id="reset-btn" onclick="resetGame()" style="display:none; margin-top:20px;">لعب مرة أخرى</button>
         </div>
     </div>
 
     <script>
-        const LEGAL_FRUITS = ["تفاح", "ليمون", "عنب", "برتقال", "بطيخ", "كرز"];
-        const FRUIT_COLORS = { "برتقال": "#ffa500", "ليمون": "#ffff00", "عنب": "#800080", "كرز": "#ff0000", "تفاح": "#00ff00", "بطيخ": "#fc3d3d" };
+        // إعدادات Firebase الخاصة بك
+        const firebaseConfig = {
+            apiKey: "AIzaSyDr0kbQDE90hhEMohV6X1b4ndu4L7uZz24",
+            projectId: "mehamzaalanat",
+            databaseURL: "https://mehamzaalanat-default-rtdb.europe-west1.firebasedatabase.app",
+            storageBucket: "mehamzaalanat.firebasestorage.app",
+            appId: "1:10248497310:android:bc2b88983738827f15338f"
+        };
 
-        let isEngineRunning = false;
-        let socketToken = null; 
-        let currentRoundId = Math.floor(Math.random() * (1500 - 1000 + 1)) + 1000; 
-        
-        let tapeData = Array(11).fill("—");
+        // تهيئة Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-        let storedPreviousFruit = localStorage.getItem('v9_last_fruit') || "لا يوجد";
-        if (storedPreviousFruit !== "لا يوجد") {
-            document.getElementById('previous-fruit').innerHTML = `<span class="fruit-badge">${storedPreviousFruit}</span>`;
-        }
-        
-        let storedTape = localStorage.getItem('v9_tape_history');
-        if (storedTape) {
-            tapeData = JSON.parse(storedTape);
-        }
+        // المتغيرات الأساسية
+        let myRole = ''; // X أو O
+        let gameId = '';
+        let isOnline = false;
+        let localTurn = 'X'; 
+        let gameBoard = ["", "", "", "", "", "", "", "", ""];
+        let isGameOver = false;
 
-        renderHistoryTape();
+        // التحقق مما إذا كان اللاعب دخل من رابط دعوة
+        const urlParams = new URLSearchParams(window.location.search);
+        const joinId = urlParams.get('game');
 
-        let phase = 'WAITING'; 
-        let gameTimer = 39;
-        let scanTimer = 7;
-        let masterInterval = null;
-        let scanAnimation = null;
-
-        const canvas = document.getElementById('ai-canvas-simulation');
-        const ctx = canvas.getContext('2d');
-        canvas.width = 300; canvas.height = 160;
-
-        function drawCanvas(stateText, fColor = null) {
-            ctx.fillStyle = "#0c0217"; ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.strokeStyle = "rgba(0, 210, 255, 0.05)"; ctx.lineWidth = 1;
-            for(let i=0; i<canvas.width; i+=20) { ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke(); }
-            for(let j=0; j<canvas.height; j+=20) { ctx.beginPath(); ctx.moveTo(0, j); ctx.lineTo(canvas.width, j); ctx.stroke(); }
-
-            if(stateText === "SCANNING") {
-                ctx.fillStyle = "#b500ff"; ctx.font = "bold 16px Tahoma"; ctx.textAlign = "center";
-                ctx.fillText("Deep Server Scan Active...", canvas.width/2, canvas.height/2);
-                return;
-            } else if (stateText === "WAITING") {
-                ctx.fillStyle = "#ffffff"; ctx.font = "14px Tahoma"; ctx.textAlign = "center";
-                ctx.fillText("Waiting Server Sync...", canvas.width/2, canvas.height/2);
-                return;
-            }
-
-            const color = fColor || "#00ff66";
-            ctx.beginPath(); ctx.arc(canvas.width/2, canvas.height/2, 35, 0, 2 * Math.PI);
-            ctx.fillStyle = color + "44"; ctx.fill();
-            ctx.strokeStyle = color; ctx.lineWidth = 2; stroke();
-            ctx.strokeStyle = "#00d2ff"; ctx.strokeRect(canvas.width/2 - 45, canvas.height/2 - 45, 90, 90);
-            ctx.fillStyle = "#ffffff"; ctx.font = "bold 16px Tahoma"; ctx.textAlign = "center";
-            ctx.fillText(stateText, canvas.width/2, canvas.height/2 + 6);
-        }
-        drawCanvas("WAITING");
-
-        function logLine(txt) {
-            const el = document.getElementById('network-logs');
-            const time = new Date().toLocaleTimeString('en-US', {hour12: false});
-            el.innerHTML += `<br><span style="color:#666">[${time}]</span> ${txt}`;
-            el.scrollTop = el.scrollHeight;
+        if (joinId) {
+            joinGame(joinId);
         }
 
-        function renderHistoryTape() {
-            const container = document.getElementById('history-tape');
-            container.innerHTML = '';
-            
-            tapeData.forEach((fruit, index) => {
-                const slot = document.createElement('div');
-                slot.className = 'tape-slot' + (index === 0 ? ' latest-active' : '');
-                
-                const color = FRUIT_COLORS[fruit] || 'rgba(0, 210, 255, 0.2)';
-                if (fruit !== "—") {
-                    slot.style.borderColor = color;
+        // ---- واجهة المستخدم ----
+        function showSection(sectionId) {
+            document.getElementById('menu-section').classList.remove('active');
+            document.getElementById('waiting-section').classList.remove('active');
+            document.getElementById('game-section').classList.remove('active');
+            document.getElementById(sectionId).classList.add('active');
+        }
+
+        // ---- اللعب المحلي (بدون إنترنت) ----
+        function startLocalGame() {
+            isOnline = false;
+            myRole = 'All'; 
+            gameBoard = ["", "", "", "", "", "", "", "", ""];
+            isGameOver = false;
+            localTurn = 'X';
+            showSection('game-section');
+            document.getElementById('board').style.display = 'grid';
+            document.getElementById('role-text').innerText = "وضع اللعب المحلي";
+            updateStatusText();
+            renderBoard();
+        }
+
+        // ---- استضافة لعبة أونلاين ----
+        function hostGame() {
+            isOnline = true;
+            myRole = 'X'; // المستضيف دائماً X
+            gameId = Math.random().toString(36).substring(2, 8); // إنشاء كود عشوائي للغرفة
+
+            // رفع بيانات الغرفة الأولية للقاعدة
+            db.ref('games/' + gameId).set({
+                board: ["", "", "", "", "", "", "", "", ""],
+                turn: 'X',
+                winner: '',
+                player2Joined: false
+            });
+
+            // إنشاء وعرض الرابط
+            let currentUrl = window.location.href.split('?')[0];
+            let shareLink = currentUrl + "?game=" + gameId;
+            document.getElementById('share-link').innerText = shareLink;
+            showSection('waiting-section');
+
+            // الاستماع لدخول اللاعب الثاني
+            db.ref('games/' + gameId + '/player2Joined').on('value', (snapshot) => {
+                if (snapshot.val() === true) {
+                    startGameOnline();
                 }
-
-                slot.innerHTML = `
-                    <span class="slot-number">#${index + 1}</span>
-                    <span class="slot-label" style="color: ${fruit !== "—" ? color : '#9683a3'}; text-shadow: ${fruit !== "—" ? '0 0 10px ' + color : 'none'};">
-                        ${fruit}
-                    </span>
-                `;
-                container.appendChild(slot);
             });
         }
 
-        function pushToTape(newFruit) {
-            tapeData.unshift(newFruit); 
-            if (tapeData.length > 11) {
-                tapeData.pop(); 
-            }
-            localStorage.setItem('v9_tape_history', JSON.stringify(tapeData));
-            renderHistoryTape();
+        // نسخ الرابط
+        function copyLink() {
+            const linkText = document.getElementById('share-link').innerText;
+            navigator.clipboard.writeText(linkText).then(() => {
+                alert("تم نسخ الرابط! أرسله لصديقك الآن.");
+            });
         }
 
-        // دالة إدارة الـ WebSocket الحقيقية بالكامل
-        function toggleEngine() {
-            const btn = document.getElementById('auto-btn');
-            const status = document.getElementById('engine-status');
-            const serverUrl = document.getElementById('game-url').value.trim();
+        // ---- الانضمام للعبة أونلاين ----
+        function joinGame(id) {
+            isOnline = true;
+            myRole = 'O'; // الضيف دائماً O
+            gameId = id;
 
-            if (isEngineRunning) {
-                isEngineRunning = false;
-                if (socketToken) {
-                    socketToken.close();
-                    socketToken = null;
-                }
-                clearInterval(masterInterval);
-                clearInterval(scanAnimation);
-                
-                btn.textContent = "تفعيل الحقن ومزامنة السيرفر ⚙️";
-                btn.classList.remove('auto-on');
-                status.textContent = "الآلة: متوقفة"; status.className = "status-indicator";
-                document.getElementById('live-timer-text').textContent = "--";
-                document.getElementById('timer-status').textContent = "تم إيقاف المزامنة وفصل القناة.";
-                
-                stopScanUI();
-                logLine("<span style='color:var(--neon-pink)'>[System] WebSocket Tunnel Disconnected.</span>");
-            } else {
-                isEngineRunning = true;
-                btn.textContent = "إيقاف الارتباط بالسيرفر 🛑";
-                btn.classList.add('auto-on');
-                
-                status.textContent = "جاري الاتصال... ⏳";
-                status.className = "status-indicator scanning";
-                document.getElementById('timer-status').textContent = "جاري سحب المصادقة والاتصال بالقناة المباشرة...";
-                
-                logLine(`[WSS] Initiating stream connection to: <span style="color:var(--neon-blue)">${serverUrl}</span>`);
-                
-                try {
-                    // فتح اتصال ويب سوكيت حقيقي ومباشر بالسيرفر المعين
-                    socketToken = new WebSocket(serverUrl);
-                    socketToken.binaryType = "arraybuffer"; // لدعم الحزم الثنائية المتقدمة الخاصة بالسيرفرات
+            // إبلاغ القاعدة بأن اللاعب الثاني قد انضم
+            db.ref('games/' + gameId).update({
+                player2Joined: true
+            });
 
-                    socketToken.onopen = function() {
-                        logLine("<span style='color:var(--neon-green)'>[WSS Success] WebSocket Pipeline Connected! Sync Active.</span>");
-                        status.textContent = "متصل بالسيرفر (Strict Mode)";
-                        status.className = "status-indicator active";
-                        document.getElementById('timer-status').textContent = "تمت المزامنة الحية واستقبال حزم التيكر.";
-                        
-                        phase = 'COUNTDOWN';
-                        gameTimer = 39;
-                        startMasterClock();
-                    };
-
-                    socketToken.onmessage = function(event) {
-                        let dataPreview = "";
-                        // قراءة الحزم وتحليلها بناءً على نوع البيانات المستقبلة فوراً من السيرفر
-                        if (event.data instanceof ArrayBuffer) {
-                            const buffer = new Uint8Array(event.data);
-                            dataPreview = `Binary Frame length: ${buffer.length} bytes`;
-                            // تحويل جزء من البيانات الثنائية المباشرة لنص لقراءتها فوراً أمامك
-                            let strHex = "";
-                            for(let i=0; i < Math.min(buffer.length, 12); i++) {
-                                strHex += buffer[i].toString(16).padStart(2, '0') + " ";
-                            }
-                            logLine(`<span style='color:var(--neon-yellow)'>[Stream data]</span> Hex: ${strHex}...`);
-                        } else {
-                            dataPreview = event.data.toString();
-                            logLine(`<span style='color:var(--neon-blue)'>[Text packet]</span> Received: ${dataPreview.substring(0, 50)}`);
-                        }
-                        
-                        // هنا يتم تمرير الحزم لفك تشفير الفواكه إذا أرسلها السيرفر كنصوص أو قيم صريحة
-                        LEGAL_FRUITS.forEach(fruit => {
-                            if(dataPreview.includes(fruit)) {
-                                logLine(`<span style='color:var(--neon-green)'>[Decrypted] Detected Live Keyword: ${fruit}</span>`);
-                            }
-                        });
-                    };
-
-                    socketToken.onerror = function(err) {
-                        logLine("<span style='color:var(--neon-pink)'>[WSS Error] Pipe validation failed or stream refused.</span>");
-                    };
-
-                    socketToken.onclose = function(e) {
-                        logLine(`[WSS Closed] Connection code: ${e.code}. Tunnel detached.`);
-                        if(isEngineRunning) {
-                            logLine("<span style='color:var(--neon-purple)'>[Backup] Running automatic safe simulation overlay.</span>");
-                        }
-                    };
-
-                } catch (error) {
-                    logLine(`<span style='color:var(--neon-pink)'>[Setup Failed] ${error.message}</span>`);
-                    isEngineRunning = false;
-                    btn.textContent = "تفعيل الحقن ومزامنة السيرفر ⚙️";
-                    btn.classList.remove('auto-on');
-                    status.textContent = "خطأ بالاتصال"; status.className = "status-indicator";
-                }
-            }
+            startGameOnline();
         }
 
-        function startMasterClock() {
-            if(masterInterval) clearInterval(masterInterval);
-            masterInterval = setInterval(() => {
-                if (!isEngineRunning) return;
-
-                if (phase === 'COUNTDOWN') {
-                    let displayTime = gameTimer < 10 ? "0" + gameTimer : gameTimer;
-                    document.getElementById('live-timer-text').textContent = displayTime;
+        // ---- بدء اللعبة الأونلاين (للطرفين) ----
+        function startGameOnline() {
+            showSection('game-section');
+            document.getElementById('board').style.display = 'grid';
+            document.getElementById('role-text').innerText = `أنت تلعب كـ : ${myRole}`;
+            
+            // الاستماع المستمر لتغيرات اللوحة من قاعدة البيانات
+            db.ref('games/' + gameId).on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    gameBoard = data.board;
+                    isGameOver = data.winner !== '';
+                    renderBoard();
                     
-                    if (gameTimer === 39) {
-                        document.getElementById('current-fruit').innerHTML = '<span style="font-size: 16px; color: var(--muted-text);">بانتظار السحب القادم...</span>';
-                    }
-
-                    gameTimer--;
-
-                    if (gameTimer < 0) {
-                        phase = 'SCANNING';
-                        scanTimer = 7;
-                        startScanUI();
-                    }
-                } 
-                else if (phase === 'SCANNING') {
-                    document.getElementById('live-timer-text').textContent = "S-" + scanTimer;
-                    scanTimer--;
-
-                    if (scanTimer < 0) {
-                        phase = 'COUNTDOWN';
-                        gameTimer = 39; 
-                        currentRoundId++;
-                        executePrediction(); 
-                        stopScanUI();
+                    if (data.winner !== '') {
+                        if (data.winner === 'Draw') {
+                            document.getElementById('status-text').innerText = "التعادل!";
+                        } else {
+                            document.getElementById('status-text').innerText = `الفائز هو ${data.winner}!`;
+                        }
+                        document.getElementById('reset-btn').style.display = 'block';
+                    } else {
+                        document.getElementById('reset-btn').style.display = 'none';
+                        if (data.turn === myRole) {
+                            document.getElementById('status-text').innerText = "دورك الآن!";
+                        } else {
+                            document.getElementById('status-text').innerText = "دور صديقك...";
+                        }
                     }
                 }
-            }, 1000);
+            });
         }
 
-        function startScanUI() {
-            const statusBox = document.getElementById('engine-status');
-            statusBox.textContent = "Deep Scan: Active"; 
-            statusBox.className = "status-indicator scanning";
-            
-            document.getElementById('result-box').classList.add('deep-scan');
-            document.getElementById('ml-scan-line').style.display = "block";
-            document.getElementById('current-fruit').innerHTML = '<span class="loading-text">جاري فك تشفير السيرفر...</span>';
-            drawCanvas("SCANNING");
-            
-            logLine(`<span style="color:var(--neon-purple)">Phase 2: Deep Scan Initiated (7s)...</span>`);
-            
-            let pos = 0; let dir = 1;
-            const line = document.getElementById('ml-scan-line');
-            if(scanAnimation) clearInterval(scanAnimation);
-            scanAnimation = setInterval(() => {
-                pos += 5 * dir;
-                if(pos > 158 || pos < 0) dir *= -1;
-                line.style.top = pos + 'px';
-            }, 30);
-        }
+        // ---- تنفيذ الحركة (الضغط على المربع) ----
+        function makeMove(index) {
+            if (isGameOver || gameBoard[index] !== "") return;
 
-        function stopScanUI() {
-            clearInterval(scanAnimation);
-            document.getElementById('ml-scan-line').style.display = "none";
-            document.getElementById('result-box').classList.remove('deep-scan');
-            if(isEngineRunning && socketToken && socketToken.readyState === WebSocket.OPEN) {
-                document.getElementById('engine-status').className = "status-indicator active";
-                document.getElementById('engine-status').textContent = "متصل بالسيرفر (Strict Mode)";
+            if (isOnline) {
+                // جلب حالة اللعبة للتأكد من الدور
+                db.ref('games/' + gameId).once('value').then((snapshot) => {
+                    let data = snapshot.val();
+                    if (data.turn === myRole && data.board[index] === "" && data.winner === "") {
+                        data.board[index] = myRole;
+                        data.turn = myRole === 'X' ? 'O' : 'X';
+                        
+                        // فحص الفوز قبل إرسال البيانات
+                        let winner = checkWin(data.board);
+                        if (winner) data.winner = winner;
+
+                        // تحديث القاعدة
+                        db.ref('games/' + gameId).update(data);
+                    }
+                });
+            } else {
+                // منطق اللعب المحلي
+                gameBoard[index] = localTurn;
+                localTurn = localTurn === 'X' ? 'O' : 'X';
+                let winner = checkWin(gameBoard);
+                if (winner) {
+                    isGameOver = true;
+                    if (winner === 'Draw') document.getElementById('status-text').innerText = "التعادل!";
+                    else document.getElementById('status-text').innerText = `الفائز هو ${winner}!`;
+                    document.getElementById('reset-btn').style.display = 'block';
+                } else {
+                    updateStatusText();
+                }
+                renderBoard();
             }
         }
 
-        function executePrediction() {
-            const currentBoxText = document.getElementById('current-fruit').textContent.trim();
-            if (currentBoxText && !currentBoxText.includes("بانتظار") && !currentBoxText.includes("تشفير")) {
-                document.getElementById('previous-fruit').innerHTML = `<span class="fruit-badge">${currentBoxText}</span>`;
-                localStorage.setItem('v9_last_fruit', currentBoxText);
+        // ---- رسم المربعات ----
+        function renderBoard() {
+            const cells = document.querySelectorAll('.cell');
+            cells.forEach((cell, index) => {
+                cell.innerText = gameBoard[index];
+                cell.className = 'cell'; // إعادة تعيين الكلاس
+                if (gameBoard[index] === 'X') cell.classList.add('x');
+                if (gameBoard[index] === 'O') cell.classList.add('o');
+            });
+        }
+
+        function updateStatusText() {
+            if (!isOnline && !isGameOver) {
+                document.getElementById('status-text').innerText = `دور اللاعب: ${localTurn}`;
             }
+        }
 
-            const resultFruit = LEGAL_FRUITS[Math.floor(Math.random() * LEGAL_FRUITS.length)];
-            const fColor = FRUIT_COLORS[resultFruit];
-            
-            pushToTape(resultFruit);
-            drawCanvas(resultFruit, fColor);
-            
-            document.getElementById('current-fruit').innerHTML = `<span style="color: ${fColor}; text-shadow: 0 0 15px ${fColor};">${resultFruit}</span>`;
-            document.getElementById('round-timer').textContent = "Round ID: " + currentRoundId;
-
-            logLine(`Valid Round Intercepted: ${currentRoundId} -> <span style="color:${fColor}">${resultFruit}</span>`);
-
-            let available = [...LEGAL_FRUITS].sort(() => 0.5 - Math.random());
-            available = [resultFruit, ...available.filter(f => f !== resultFruit)].slice(0, 3);
-
-            let p1 = Math.floor(Math.random() * (95 - 82 + 1)) + 82;
-            let p2 = Math.floor(Math.random() * (78 - 60 + 1)) + 60;
-            let p3 = Math.floor(Math.random() * (58 - 40 + 1)) + 40;
-            
-            const preds = [
-                { name: available[0], prob: p1 }, { name: available[1], prob: p2 }, { name: available[2], prob: p3 }
+        // ---- خوارزمية فحص الفوز ----
+        function checkWin(board) {
+            const winConditions = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], // أفقي
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], // عمودي
+                [0, 4, 8], [2, 4, 6]             // قطري
             ];
 
-            for(let i=1; i<=3; i++) {
-                document.getElementById(`pred-${i}-name`).textContent = preds[i-1].name;
-                document.getElementById(`pred-${i}-val`).textContent = preds[i-1].prob + "%";
-                document.getElementById(`pred-${i}-bar`).style.width = preds[i-1].prob + "%";
+            for (let condition of winConditions) {
+                let [a, b, c] = condition;
+                if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                    return board[a]; // يرجع X أو O
+                }
+            }
+
+            if (!board.includes("")) return 'Draw'; // تعادل
+            return null;
+        }
+
+        // ---- إعادة اللعب ----
+        function resetGame() {
+            if (isOnline) {
+                db.ref('games/' + gameId).update({
+                    board: ["", "", "", "", "", "", "", "", ""],
+                    turn: 'X',
+                    winner: ''
+                });
+            } else {
+                startLocalGame();
+                document.getElementById('reset-btn').style.display = 'none';
             }
         }
     </script>
