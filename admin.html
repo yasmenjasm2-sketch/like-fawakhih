@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة الإدارة | لعبة XO</title>
+    <style>
+        :root {
+            --bg-color: #0f0f1a;
+            --container-bg: rgba(26, 26, 46, 0.95);
+            --primary-neon: #ff2a5f;
+            --secondary-neon: #00f0ff;
+            --text-main: #ffffff;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #090910;
+            color: var(--text-main);
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .admin-container {
+            background: var(--container-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(255, 42, 95, 0.3);
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid var(--primary-neon);
+        }
+        h1 { color: var(--primary-neon); margin-top: 0; }
+        input {
+            width: 100%; padding: 15px; margin: 10px 0;
+            background: rgba(0,0,0,0.5); border: 1px solid #444;
+            color: white; border-radius: 8px; text-align: center; outline: none;
+            box-sizing: border-box;
+        }
+        input:focus { border-color: var(--primary-neon); }
+        button {
+            width: 100%; padding: 15px; background: var(--primary-neon);
+            color: white; border: none; border-radius: 8px;
+            font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px;
+        }
+        button:hover { opacity: 0.9; }
+        #panel-section { display: none; }
+        .banned-list {
+            margin-top: 20px; background: rgba(0,0,0,0.3); padding: 10px;
+            border-radius: 8px; max-height: 200px; overflow-y: auto;
+            text-align: right;
+        }
+        .banned-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px; border-bottom: 1px solid #333;
+        }
+        .unban-btn {
+            background: #10b981; padding: 5px 10px; width: auto; margin: 0; font-size: 12px;
+        }
+        .toast {
+            position: fixed; bottom: 20px; background: #10b981; color: white; padding: 10px 20px;
+            border-radius: 30px; font-size: 14px; font-weight: bold;
+            transform: translateY(100px); opacity: 0; pointer-events: none; transition: 0.3s;
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+    </style>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+<body>
+
+    <div class="admin-container" id="login-section">
+        <h1>🔒 لوحة الإدارة</h1>
+        <p style="color: #aaa; font-size: 14px;">أدخل بيانات المطور لتسجيل الدخول</p>
+        <input type="text" id="admin-user" placeholder="اسم المستخدم (الإدمن)">
+        <input type="password" id="admin-pass" placeholder="كلمة المرور">
+        <button onclick="loginAdmin()">تسجيل الدخول</button>
+    </div>
+
+    <div class="admin-container" id="panel-section">
+        <h1>⚙️ إدارة الحظر</h1>
+        <p style="color: #aaa; font-size: 13px;">مرحباً بك يا مطور اللعبة</p>
+        
+        <input type="number" id="ban-id" placeholder="أدخل ID اللاعب لتعطيل حسابه">
+        <button onclick="banUser()">حظر اللاعب 🚫</button>
+
+        <h3 style="text-align: right; margin-top: 25px; color: var(--secondary-neon);">قائمة المحظورين</h3>
+        <div class="banned-list" id="banned-list-container">
+            <!-- سيتم تعبئة القائمة هنا -->
+        </div>
+    </div>
+
+    <div id="custom-toast" class="toast"></div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDr0kbQDE90hhEMohV6X1b4ndu4L7uZz24",
+            projectId: "mehamzaalanat",
+            databaseURL: "https://mehamzaalanat-default-rtdb.europe-west1.firebasedatabase.app",
+            storageBucket: "mehamzaalanat.firebasestorage.app",
+            appId: "1:10248497310:android:bc2b88983738827f15338f"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        function showToast(message, color = "#10b981") {
+            const toast = document.getElementById('custom-toast');
+            toast.innerText = message; toast.style.background = color;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+
+        function loginAdmin() {
+            let user = document.getElementById('admin-user').value;
+            let pass = document.getElementById('admin-pass').value;
+            
+            // بيانات المطور الخاصة
+            if(user === "HamzaDev" && pass === "Dev12345") {
+                document.getElementById('login-section').style.display = "none";
+                document.getElementById('panel-section').style.display = "block";
+                loadBannedUsers();
+                showToast("✅ تم الدخول بنجاح كمسؤول");
+            } else {
+                showToast("❌ بيانات الإدارة غير صحيحة", "#ff2a5f");
+            }
+        }
+
+        function banUser() {
+            let id = document.getElementById('ban-id').value.trim();
+            if(id === "552") { showToast("⚠️ لا يمكنك حظر نفسك!", "#ff2a5f"); return; }
+            if(id === "") { showToast("⚠️ يرجى إدخال الآيدي!", "#ff2a5f"); return; }
+
+            db.ref('banned/' + id).set(true).then(() => {
+                showToast("✅ تم حظر اللاعب نهائياً");
+                document.getElementById('ban-id').value = "";
+            });
+        }
+
+        function unbanUser(id) {
+            db.ref('banned/' + id).remove().then(() => {
+                showToast("✅ تم فك الحظر عن اللاعب");
+            });
+        }
+
+        function loadBannedUsers() {
+            db.ref('banned').on('value', snap => {
+                let html = "";
+                let data = snap.val();
+                if(data) {
+                    for(let id in data) {
+                        html += `
+                        <div class="banned-item">
+                            <span style="color: #fff;">ID: ${id}</span>
+                            <button class="unban-btn" onclick="unbanUser('${id}')">فك الحظر</button>
+                        </div>`;
+                    }
+                } else {
+                    html = "<div style='text-align:center; color:#888;'>لا يوجد لاعبين محظورين</div>";
+                }
+                document.getElementById('banned-list-container').innerHTML = html;
+            });
+        }
+    </script>
+</body>
+</html>
