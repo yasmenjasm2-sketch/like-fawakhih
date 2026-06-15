@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>لعبة X O الاحترافية أونلاين | حمزة الحماده</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
             --bg-color: #0f0f1a;
@@ -104,6 +105,23 @@
         }
         .user-profile-card.active { display: flex; animation: fadeIn 0.3s ease-out; }
         .profile-header { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        
+        /* تنسيق الصورة الرمزية */
+        .avatar-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid var(--secondary-neon);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+            object-fit: cover;
+        }
+
         .user-info { text-align: right; }
         .user-name { font-size: 16px; font-weight: bold; color: var(--secondary-neon); margin-bottom: 5px;}
         .user-id-box { 
@@ -125,7 +143,7 @@
 
         h2 { font-size: 18px; margin-bottom: 15px; color: #d1d1e0; }
 
-        input[type="text"], input[type="password"], input[type="number"] {
+        input[type="text"], input[type="password"], input[type="number"], select {
             width: 100%;
             padding: 14px;
             margin: 8px 0;
@@ -136,8 +154,16 @@
             font-size: 15px;
             text-align: center;
             outline: none;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
         }
-        input:focus { border-color: var(--secondary-neon); }
+        input:focus, select:focus { border-color: var(--secondary-neon); }
+        
+        select option {
+            background: var(--container-bg);
+            color: white;
+        }
 
         button {
             background: linear-gradient(90deg, #511fff, var(--accent-glow));
@@ -153,6 +179,7 @@
             box-shadow: 0 4px 10px rgba(112, 0, 255, 0.3);
         }
         button:active { transform: scale(0.97); }
+        button:disabled { background: #555; cursor: not-allowed; box-shadow: none; color: #aaa; }
         button.secondary-btn { background: linear-gradient(90deg, var(--primary-neon), #d10043); }
         button.action-btn { width: auto; padding: 6px 12px; font-size: 12px; margin: 0; box-shadow: none; }
         button.small-btn { padding: 8px 15px; font-size:13px; width:auto; }
@@ -224,7 +251,8 @@
             display: flex; justify-content: space-between; align-items: center;
             background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; margin-bottom: 5px;
         }
-        .list-item span { font-size: 14px; font-weight: bold; color: #fff; }
+        .list-item span { font-size: 14px; font-weight: bold; color: #fff; display: flex; align-items: center; gap: 8px;}
+        .list-item img { width: 25px; height: 25px; border-radius: 50%; background: #333; object-fit: cover;}
 
         /* الإشعار الجانبي */
         .toast {
@@ -262,14 +290,16 @@
         تطوير: <span>حمزة الحماده</span>
     </div>
 
-    <!-- بطاقة اللاعب -->
     <div class="user-profile-card" id="user-profile">
         <div class="profile-header">
-            <div class="user-info">
-                <div class="user-name" id="display-name">جاري التحميل...</div>
-                <div class="user-stats">
-                    <span id="display-played">🎮 ألعاب: 0</span>
-                    <span id="display-wins">🏆 فوز: 0</span>
+            <div class="avatar-container">
+                <img id="user-avatar" class="user-avatar" src="" alt="Avatar">
+                <div class="user-info">
+                    <div class="user-name" id="display-name">جاري التحميل...</div>
+                    <div class="user-stats">
+                        <span id="display-played">🎮 ألعاب: 0</span>
+                        <span id="display-wins">🏆 فوز: 0</span>
+                    </div>
                 </div>
             </div>
             <button onclick="logout()" class="action-btn secondary-btn">تسجيل خروج</button>
@@ -283,27 +313,28 @@
     <div class="container">
         <h1>لعبة X O أونلاين</h1>
 
-        <!-- قسم تسجيل الدخول / إنشاء حساب -->
         <section id="login-section" class="active">
             <h2>تسجيل الدخول / إنشاء حساب</h2>
             <input type="text" id="username-input" placeholder="اسم المستخدم (أكثر من 5 أحرف)" maxlength="15">
             <input type="password" id="password-input" placeholder="كلمة المرور">
+            <select id="gender-input">
+                <option value="boy">👨 ذكر</option>
+                <option value="girl">👩 أنثى</option>
+            </select>
             <button onclick="authenticateUser()">دخول / تسجيل</button>
             <p style="font-size: 11px; color: #888; margin-top: 10px;">إذا لم يكن الحساب موجوداً سيتم إنشاؤه تلقائياً بهذا الاسم</p>
         </section>
 
-        <!-- القائمة الرئيسية -->
         <section id="menu-section">
             <button onclick="startLocalGame()">لعب محلي (نفس الجهاز)</button>
             <button class="secondary-btn" onclick="showSection('friends-section')">الأصدقاء واللعب أونلاين</button>
         </section>
 
-        <!-- قسم الأصدقاء -->
         <section id="friends-section">
             <h2>البحث وإضافة صديق</h2>
             <div style="display: flex; gap: 5px;">
-                <input type="number" id="search-id-input" placeholder="أدخل ID الصديق (8 أرقام)">
-                <button class="action-btn" onclick="searchAndAddFriend()" style="width: 80px; margin: 8px 0;">إضافة</button>
+                <input type="number" id="search-id-input" placeholder="أدخل ID الصديق">
+                <button class="action-btn" id="add-friend-btn" onclick="searchAndAddFriend()" style="width: 80px; margin: 8px 0;">إضافة</button>
             </div>
 
             <h3 style="font-size: 15px; text-align: right; margin-top: 15px;">طلبات الصداقة</h3>
@@ -319,7 +350,6 @@
             <button onclick="showSection('menu-section')" class="small-btn secondary-btn">رجوع للقائمة</button>
         </section>
 
-        <!-- شاشة الانتظار -->
         <section id="waiting-section">
             <h2>بانتظار قبول صديقك للدعوة...</h2>
             <div class="loader" style="margin: 20px auto; width: 40px; height: 40px; border: 4px solid #333; border-top: 4px solid var(--secondary-neon); border-radius: 50%; animation: spin 1s linear infinite;"></div>
@@ -327,7 +357,6 @@
             <button class="secondary-btn" onclick="cancelInvite()">إلغاء الدعوة</button>
         </section>
 
-        <!-- لوحة اللعب -->
         <section id="game-section">
             <div class="scoreboard">
                 <div class="score-box x-team">
@@ -363,7 +392,6 @@
         </section>
     </div>
 
-    <!-- نافذة استقبال دعوة اللعب -->
     <div class="modal-overlay" id="invite-modal">
         <div class="modal-content">
             <h3 id="invite-msg">صديقك يريد اللعب معك!</h3>
@@ -389,7 +417,7 @@
         const db = firebase.database();
 
         let currentUserData = null;
-        let currentUserId = localStorage.getItem('xo_uid'); // الـ ID المكون من 8 أرقام
+        let currentUserId = localStorage.getItem('xo_uid'); 
         let currentUsername = localStorage.getItem('xo_username');
 
         let myRole = ''; 
@@ -401,11 +429,39 @@
         let scores = { X: 0, O: 0, ties: 0 };
         let hasLoggedStatThisGame = false;
         let pendingInviteId = null;
+        let isRequestOnCooldown = false;
 
         let playerXName = "اللاعب (X)";
         let playerOName = "اللاعب (O)";
 
-        // تأثير القطرات
+        // توليد رابط للصورة الرمزية برمجياً بناءً على الاسم والجنس
+        function generateAvatarURL(seedName, gender) {
+            if (gender === 'boy' || gender === 'girl') {
+                return `https://avatar.iran.liara.run/public/${gender}?username=${encodeURIComponent(seedName)}`;
+            }
+            // Fallback للحسابات القديمة التي لا تحتوي على بيانات الجنس
+            return `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(seedName)}&backgroundColor=16162a`;
+        }
+
+        // إطلاق احتفال الفوز (أنيميشن)
+        function playWinAnimation() {
+            var duration = 3 * 1000;
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 99999 };
+
+            function randomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            var interval = setInterval(function() {
+                var timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) { return clearInterval(interval); }
+                var particleCount = 50 * (timeLeft / duration);
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+        }
+
         function createParticles() {
             const container = document.getElementById('particles');
             const colors = ['#ff2a5f', '#00f0ff', '#7000ff']; 
@@ -423,14 +479,16 @@
 
         window.onload = () => {
             if (currentUserId && currentUsername) {
-                db.ref('users/' + currentUserId).once('value').then(snap => {
-                    if (snap.exists()) {
-                        currentUserData = snap.val();
-                        showProfileAndMenu();
-                        setupRealtimeListeners();
-                    } else {
-                        logout();
-                    }
+                checkIfBanned(currentUserId, () => {
+                    db.ref('users/' + currentUserId).once('value').then(snap => {
+                        if (snap.exists()) {
+                            currentUserData = snap.val();
+                            showProfileAndMenu();
+                            setupRealtimeListeners();
+                        } else {
+                            logout();
+                        }
+                    });
                 });
             }
         };
@@ -448,10 +506,22 @@
             document.getElementById(sectionId).classList.add('active');
         }
 
+        function checkIfBanned(uid, onSuccess) {
+            db.ref('banned/' + uid).once('value').then(snap => {
+                if (snap.exists() && snap.val() === true) {
+                    showToast("❌ هذا الحساب محظور من قبل الإدارة!", "#ff2a5f");
+                    logout();
+                } else {
+                    if(onSuccess) onSuccess();
+                }
+            });
+        }
+
         // ================= نظام التسجيل وتسجيل الدخول =================
         function authenticateUser() {
-            const username = document.getElementById('username-input').value.trim();
+            let username = document.getElementById('username-input').value.trim();
             const password = document.getElementById('password-input').value.trim();
+            const gender = document.getElementById('gender-input').value;
 
             if (username.length <= 5) {
                 showToast("⚠️ اليوزر يجب أن يكون أكثر من 5 أحرف!", "#ff2a5f"); return;
@@ -460,30 +530,51 @@
                 showToast("⚠️ كلمة المرور قصيرة جداً!", "#ff2a5f"); return;
             }
 
+            // نظام حساب الإدارة الخاص
+            let isAdmin = (username === "HamzaDev" && password === "Dev12345");
+            if(isAdmin) {
+                username = "HamzaDev 👑"; 
+            }
+
             db.ref('usernames/' + username).once('value').then(snap => {
-                if (snap.exists()) {
-                    // الحساب موجود -> تسجيل دخول
-                    let uid = snap.val();
-                    db.ref('users/' + uid).once('value').then(userSnap => {
-                        let data = userSnap.val();
-                        if (data.password === password) {
-                            loginSuccess(uid, username, data);
-                        } else {
-                            showToast("❌ كلمة المرور غير صحيحة!", "#ff2a5f");
-                        }
+                let uid = snap.exists() ? snap.val() : null;
+                
+                if (isAdmin) uid = "552"; // إجبار الـ ID للإدمن
+
+                if (uid) {
+                    checkIfBanned(uid, () => {
+                        db.ref('users/' + uid).once('value').then(userSnap => {
+                            let data = userSnap.val();
+                            if (data && data.password === password) {
+                                // تحديث الجنس في حالة تسجيل الدخول ليطابق الاختيار الجديد
+                                data.gender = gender;
+                                db.ref('users/' + uid + '/gender').set(gender);
+                                loginSuccess(uid, username, data);
+                            } else if (isAdmin) {
+                                // إنشاء حساب الإدمن أول مرة
+                                createAccount(username, password, "552", gender);
+                            } else {
+                                showToast("❌ كلمة المرور غير صحيحة!", "#ff2a5f");
+                            }
+                        });
                     });
                 } else {
-                    // حساب جديد -> إنشاء ID بـ 8 أرقام
-                    let newUid = Math.floor(10000000 + Math.random() * 90000000).toString();
-                    let newData = { username: username, password: password, uid: newUid, played: 0, wins: 0 };
-                    
-                    db.ref('usernames/' + username).set(newUid);
-                    db.ref('users/' + newUid).set(newData);
-                    
-                    loginSuccess(newUid, username, newData);
-                    showToast("✅ تم إنشاء الحساب بنجاح!");
+                    if(isAdmin) {
+                         createAccount(username, password, "552", gender);
+                    } else {
+                        let newUid = Math.floor(10000000 + Math.random() * 90000000).toString();
+                        createAccount(username, password, newUid, gender);
+                    }
                 }
             });
+        }
+
+        function createAccount(username, password, uid, gender) {
+            let newData = { username: username, password: password, uid: uid, played: 0, wins: 0, gender: gender };
+            db.ref('usernames/' + username).set(uid);
+            db.ref('users/' + uid).set(newData);
+            loginSuccess(uid, username, newData);
+            showToast("✅ تم إنشاء الحساب بنجاح!");
         }
 
         function loginSuccess(uid, username, data) {
@@ -508,6 +599,10 @@
             document.getElementById('display-id').innerText = currentUserId;
             document.getElementById('display-played').innerText = `🎮 لعب: ${currentUserData.played || 0}`;
             document.getElementById('display-wins').innerText = `🏆 فاز: ${currentUserData.wins || 0}`;
+            
+            // تعيين الصورة الرمزية مع الجنس
+            document.getElementById('user-avatar').src = generateAvatarURL(currentUserData.username, currentUserData.gender);
+            
             showSection('menu-section');
         }
 
@@ -517,16 +612,19 @@
 
         // ================= نظام الأصدقاء والمستمعات =================
         function setupRealtimeListeners() {
-            // الاستماع لطلبات الصداقة
             db.ref('users/' + currentUserId + '/requests').on('value', snap => {
                 const reqs = snap.val();
                 let html = '';
                 if(reqs) {
                     for(let id in reqs) {
+                        // دعم للحسابات القديمة التي كانت تحفظ الاسم كنص فقط
+                        let friendName = typeof reqs[id] === 'string' ? reqs[id] : reqs[id].name;
+                        let friendGender = typeof reqs[id] === 'string' ? null : reqs[id].gender;
+                        
                         html += `
                         <div class="list-item">
-                            <span>${reqs[id]}</span>
-                            <button class="action-btn" onclick="acceptFriend('${id}', '${reqs[id]}')" style="background:#10b981;">قبول</button>
+                            <span><img src="${generateAvatarURL(friendName, friendGender)}"> ${friendName}</span>
+                            <button class="action-btn" onclick="acceptFriend('${id}', '${friendName}', '${friendGender}')" style="background:#10b981;">قبول</button>
                         </div>`;
                     }
                 } else {
@@ -535,16 +633,18 @@
                 document.getElementById('requests-list').innerHTML = html;
             });
 
-            // الاستماع لقائمة الأصدقاء
             db.ref('users/' + currentUserId + '/friends').on('value', snap => {
                 const friends = snap.val();
                 let html = '';
                 if(friends) {
                     for(let id in friends) {
+                        let friendName = typeof friends[id] === 'string' ? friends[id] : friends[id].name;
+                        let friendGender = typeof friends[id] === 'string' ? null : friends[id].gender;
+
                         html += `
                         <div class="list-item">
-                            <span>${friends[id]}</span>
-                            <button class="action-btn" onclick="inviteFriend('${id}', '${friends[id]}')">دعوة للعب</button>
+                            <span><img src="${generateAvatarURL(friendName, friendGender)}"> ${friendName}</span>
+                            <button class="action-btn" onclick="inviteFriend('${id}', '${friendName}')">دعوة</button>
                         </div>`;
                     }
                 } else {
@@ -553,7 +653,6 @@
                 document.getElementById('friends-list').innerHTML = html;
             });
 
-            // الاستماع لدعوات اللعب
             db.ref('users/' + currentUserId + '/game_invite').on('value', snap => {
                 const invite = snap.val();
                 if(invite && invite.gameId) {
@@ -567,34 +666,68 @@
             });
         }
 
+        // نظام الحماية من التكرار (20 ثانية)
         function searchAndAddFriend() {
+            if(isRequestOnCooldown) {
+                showToast("⏳ يرجى الانتظار قليلاً قبل إرسال طلب آخر!", "#ff2a5f");
+                return;
+            }
+
             const targetId = document.getElementById('search-id-input').value.trim();
             if(targetId === currentUserId) { showToast("⚠️ لا يمكنك إضافة نفسك!", "#ff2a5f"); return; }
-            if(targetId.length !== 8) { showToast("⚠️ الآيدي يجب أن يكون 8 أرقام!", "#ff2a5f"); return; }
+            if(targetId === "") { showToast("⚠️ يرجى إدخال الآيدي!", "#ff2a5f"); return; }
 
             db.ref('users/' + targetId).once('value').then(snap => {
                 if(snap.exists()) {
-                    db.ref('users/' + targetId + '/requests/' + currentUserId).set(currentUserData.username);
+                    db.ref('users/' + targetId + '/requests/' + currentUserId).set({
+                        name: currentUserData.username,
+                        gender: currentUserData.gender || 'boy'
+                    });
                     showToast("✅ تم إرسال طلب الصداقة!");
                     document.getElementById('search-id-input').value = "";
+                    
+                    // تشغيل العداد التنازلي لمدة 20 ثانية
+                    startCooldown();
                 } else {
                     showToast("❌ لم يتم العثور على لاعب بهذا الآيدي!", "#ff2a5f");
                 }
             });
         }
 
-        function acceptFriend(friendId, friendName) {
-            // إضافته عندي
-            db.ref('users/' + currentUserId + '/friends/' + friendId).set(friendName);
-            // إضافتي عنده
-            db.ref('users/' + friendId + '/friends/' + currentUserId).set(currentUserData.username);
-            // حذف الطلب
+        function startCooldown() {
+            isRequestOnCooldown = true;
+            let btn = document.getElementById('add-friend-btn');
+            btn.disabled = true;
+            let timeLeft = 20;
+            btn.innerText = `انتظر ${timeLeft}ث`;
+            
+            let interval = setInterval(() => {
+                timeLeft--;
+                btn.innerText = `انتظر ${timeLeft}ث`;
+                if(timeLeft <= 0) {
+                    clearInterval(interval);
+                    isRequestOnCooldown = false;
+                    btn.disabled = false;
+                    btn.innerText = "إضافة";
+                }
+            }, 1000);
+        }
+
+        function acceptFriend(friendId, friendName, friendGender) {
+            db.ref('users/' + currentUserId + '/friends/' + friendId).set({
+                name: friendName, 
+                gender: friendGender
+            });
+            db.ref('users/' + friendId + '/friends/' + currentUserId).set({
+                name: currentUserData.username, 
+                gender: currentUserData.gender || 'boy'
+            });
             db.ref('users/' + currentUserId + '/requests/' + friendId).remove();
             showToast("🤝 أصبحتم أصدقاء الآن!");
         }
 
         // ================= نظام دعوات اللعب أونلاين =================
-        let activeFriendId = null; // للاحتفاظ بآيدي الصديق عند الإلغاء
+        let activeFriendId = null; 
 
         function inviteFriend(friendId, friendName) {
             activeFriendId = friendId;
@@ -602,7 +735,6 @@
             myRole = 'X';
             isOnline = true;
 
-            // تجهيز الغرفة
             db.ref('games/' + gameId).set({
                 board: ["", "", "", "", "", "", "", "", ""],
                 turn: 'X',
@@ -613,7 +745,6 @@
                 scores: { X: 0, O: 0, ties: 0 }
             });
 
-            // إرسال الدعوة
             db.ref('users/' + friendId + '/game_invite').set({
                 gameId: gameId,
                 senderId: currentUserId,
@@ -622,7 +753,6 @@
 
             showSection('waiting-section');
 
-            // انتظار الدخول
             db.ref('games/' + gameId + '/player2Joined').on('value', snap => {
                 if(snap.val() === true) {
                     db.ref('games/' + gameId + '/player2Joined').off();
@@ -630,7 +760,6 @@
                 }
             });
 
-            // الاستماع للرفض
             db.ref('users/' + friendId + '/game_invite').on('value', snap => {
                 if(!snap.exists() && document.getElementById('waiting-section').classList.contains('active')) {
                     showToast("❌ الصديق رفض الدعوة أو غير متاح", "#ff2a5f");
@@ -664,7 +793,7 @@
             document.getElementById('invite-modal').classList.remove('active');
         }
 
-        // ================= محرك اللعبة (Online & Local) =================
+        // ================= محرك اللعبة =================
         function startLocalGame() {
             isOnline = false;
             myRole = 'All'; 
@@ -713,7 +842,6 @@
                         }
                     }
                 } else {
-                    // إذا تم حذف الغرفة (خروج الخصم)
                     if(document.getElementById('game-section').classList.contains('active')){
                         showToast("🚪 غادر الخصم اللعبة", "#ff2a5f");
                         exitGame();
@@ -765,6 +893,7 @@
                         document.getElementById('status-text').innerText = `🎉 الفائز هو: ${winnerRealName}!`;
                         scores[winner] += 1;
                         highlightWinningLine(gameBoard);
+                        playWinAnimation(); // أنيميشن الفوز
                         saveUserStats(true); 
                     }
                     updateScoreboardDOM();
@@ -786,14 +915,17 @@
                 document.getElementById('status-text').innerText = `🎉 الفائز هو: ${winnerRealName}!`;
                 highlightWinningLine(gameBoard);
                 
-                if(data.winner === myRole) saveUserStats(true);
-                else saveUserStats(false);
+                if(data.winner === myRole) {
+                    playWinAnimation(); // أنيميشن الفوز يظهر للفائز فقط
+                    saveUserStats(true);
+                } else {
+                    saveUserStats(false);
+                }
             }
-            // زر الجولة الجديدة يظهر للمستضيف فقط لعدم التضارب
             if(myRole === 'X') {
                 document.getElementById('reset-btn').style.display = 'block';
             } else {
-                document.getElementById('status-text').innerText += " (بانتظار المستضيف لإعادة الجولة)";
+                document.getElementById('status-text').innerText += " (بانتظار المستضيف)";
             }
         }
 
@@ -876,7 +1008,7 @@
 
         function exitGame() {
             if(isOnline && gameId) {
-                db.ref('games/' + gameId).remove(); // حذف الغرفة عند الخروج
+                db.ref('games/' + gameId).remove(); 
                 db.ref('games/' + gameId).off();
             }
             showSection('menu-section');
