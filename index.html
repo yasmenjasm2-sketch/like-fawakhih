@@ -493,15 +493,30 @@
             }
         }
 
-        // تم التحديث: استخدام سيرفر DiceBear لضمان ظهور الصور 100% وباحترافية
+        // تم التحديث: رسم الصور برمجياً (SVG) بشكل احترافي وأنيق حسب الجنس دون الاعتماد على أي روابط خارجية
         function generateAvatarURL(seedName, gender) {
-            const safeName = encodeURIComponent(seedName || 'player');
+            let svgStr = "";
             if (gender === 'boy') {
-                return `https://api.dicebear.com/8.x/avataaars/svg?seed=${safeName}&top=shortHair,shaggy,shaggyMullet&facialHairProbability=0&backgroundColor=16162a`;
+                svgStr = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
+                    <rect width='100' height='100' fill='#16162a'/>
+                    <path d='M20 100 C 20 65, 35 55, 50 55 C 65 55, 80 65, 80 100 Z' fill='#00f0ff'/>
+                    <circle cx='50' cy='30' r='18' fill='#00f0ff'/>
+                </svg>`;
             } else if (gender === 'girl') {
-                return `https://api.dicebear.com/8.x/avataaars/svg?seed=${safeName}&top=longHair,straight02,curly&facialHairProbability=0&backgroundColor=16162a`;
+                svgStr = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
+                    <rect width='100' height='100' fill='#16162a'/>
+                    <path d='M30 40 C 20 60, 25 80, 25 100 L 75 100 C 75 80, 80 60, 70 40 Z' fill='#ff2a5f'/>
+                    <path d='M30 100 C 30 75, 40 65, 50 65 C 60 65, 70 75, 70 100 Z' fill='#16162a'/>
+                    <circle cx='50' cy='35' r='18' fill='#ff2a5f'/>
+                </svg>`;
+            } else {
+                svgStr = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
+                    <rect width='100' height='100' fill='#16162a'/>
+                    <path d='M25 100 C 25 65, 35 55, 50 55 C 65 55, 75 65, 75 100 Z' fill='#7000ff'/>
+                    <circle cx='50' cy='32' r='18' fill='#7000ff'/>
+                </svg>`;
             }
-            return `https://api.dicebear.com/8.x/bottts/svg?seed=${safeName}&backgroundColor=16162a`;
+            return "data:image/svg+xml;base64," + btoa(svgStr);
         }
 
         function playWinAnimation() {
