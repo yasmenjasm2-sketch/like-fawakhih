@@ -123,7 +123,7 @@
         }
 
         .user-info { text-align: right; }
-        .user-name { font-size: 16px; font-weight: bold; color: var(--secondary-neon); margin-bottom: 5px; display: flex; align-items: center;}
+        .user-name { font-size: 16px; font-weight: bold; color: var(--secondary-neon); margin-bottom: 5px; display: flex; align-items: center; flex-wrap: wrap; gap: 5px;}
         
         /* شارة الإدارة الاحترافية */
         .admin-badge {
@@ -211,7 +211,7 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
         .score-box { display: flex; flex-direction: column; align-items: center; width: 30%; }
-        .score-label { font-size: 11px; color: #ccc; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+        .score-label { font-size: 11px; color: #ccc; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; line-height: 1.5; }
         .score-value { font-size: 20px; font-weight: bold; }
         .score-box.x-team .score-value, .score-box.x-team .score-label { color: var(--primary-neon); }
         .score-box.o-team .score-value, .score-box.o-team .score-label { color: var(--secondary-neon); }
@@ -493,8 +493,13 @@
             }
         }
 
-        // تم التحديث: رسم الصور برمجياً (SVG) بشكل احترافي وأنيق حسب الجنس دون الاعتماد على أي روابط خارجية
+        // تم التحديث: إضافة صورة المطور وتوليد الصور برمجياً (SVG)
         function generateAvatarURL(seedName, gender) {
+            // تخصيص صورة المطور (حمزة الحماده)
+            if (seedName === "حمزة الحماده") {
+                return "nbras.jpg";
+            }
+
             let svgStr = "";
             if (gender === 'boy') {
                 svgStr = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
@@ -685,8 +690,9 @@
             document.getElementById('user-profile').classList.add('active');
             
             let displayNameHTML = `أهلاً، ${currentUserData.username}`;
+            // إضافة رسمة המطور (SVG) في ملفه الشخصي
             if (currentUserData.username === "حمزة الحماده" || currentUserId === "552") {
-                displayNameHTML += ` <span class="admin-badge">👑 المطور</span>`;
+                displayNameHTML += ` <span class="admin-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="vertical-align: middle; margin-left: 2px;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg> المطور</span>`;
             }
             
             document.getElementById('display-name').innerHTML = displayNameHTML;
@@ -1097,12 +1103,26 @@
             });
         }
 
+        // تم التحديث: إضافة رسمة المطور (SVG) بجانب اسم المطور في لوحة النتائج داخل اللعبة
         function updateScoreboardDOM() {
             document.getElementById('score-x').innerText = scores.X;
             document.getElementById('score-o').innerText = scores.O;
             document.getElementById('score-ties').innerText = scores.ties;
-            document.getElementById('label-x').innerText = playerXName + " (X)";
-            document.getElementById('label-o').innerText = playerOName + " (O)";
+            
+            const devSvgIcon = `<div class="admin-badge" style="font-size: 10px; padding: 2px 5px; margin-top: 5px;"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="vertical-align: middle;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg> المطور</div>`;
+
+            let labelXHtml = playerXName + " (X)";
+            if (playerXName === "حمزة الحماده") {
+                labelXHtml += devSvgIcon;
+            }
+            
+            let labelOHtml = playerOName + " (O)";
+            if (playerOName === "حمزة الحماده") {
+                labelOHtml += devSvgIcon;
+            }
+
+            document.getElementById('label-x').innerHTML = labelXHtml;
+            document.getElementById('label-o').innerHTML = labelOHtml;
         }
 
         function updateStatusText() {
