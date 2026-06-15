@@ -209,8 +209,9 @@
             border-radius: 12px;
             margin-bottom: 15px;
             border: 1px solid rgba(255, 255, 255, 0.05);
+            align-items: flex-end;
         }
-        .score-box { display: flex; flex-direction: column; align-items: center; width: 30%; }
+        .score-box { display: flex; flex-direction: column; align-items: center; width: 33%; }
         .score-label { font-size: 11px; color: #ccc; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; line-height: 1.5; }
         .score-value { font-size: 20px; font-weight: bold; }
         .score-box.x-team .score-value, .score-box.x-team .score-label { color: var(--primary-neon); }
@@ -397,7 +398,7 @@
                     <span class="score-label" id="label-x">اللاعب (X)</span>
                     <span class="score-value" id="score-x">0</span>
                 </div>
-                <div class="score-box">
+                <div class="score-box" style="justify-content: flex-end;">
                     <span class="score-label">تعادل</span>
                     <span class="score-value" id="score-ties">0</span>
                 </div>
@@ -493,33 +494,20 @@
             }
         }
 
-        // تم التحديث: إضافة صورة المطور وتوليد الصور برمجياً (SVG)
+        // تم التحديث: إضافة رسمات احترافية ومحسنة للمستخدمين (ذكر/أنثى)
         function generateAvatarURL(seedName, gender) {
-            // تخصيص صورة المطور (حمزة الحماده)
+            // تخصيص صورة المطور
             if (seedName === "حمزة الحماده") {
                 return "nbras.jpg";
             }
 
             let svgStr = "";
             if (gender === 'boy') {
-                svgStr = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
-                    <rect width='100' height='100' fill='#16162a'/>
-                    <path d='M20 100 C 20 65, 35 55, 50 55 C 65 55, 80 65, 80 100 Z' fill='#00f0ff'/>
-                    <circle cx='50' cy='30' r='18' fill='#00f0ff'/>
-                </svg>`;
+                svgStr = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='gb' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='#00f0ff'/><stop offset='100%' stop-color='#0080ff'/></linearGradient></defs><rect width='100' height='100' fill='#16162a'/><path d='M15 100 C 15 60, 30 50, 50 50 C 70 50, 85 60, 85 100 Z' fill='url(#gb)' opacity='0.9'/><circle cx='50' cy='32' r='18' fill='#ffffff'/><path d='M30 30 Q 50 10 70 30 Q 60 15 40 15 Z' fill='url(#gb)'/></svg>`;
             } else if (gender === 'girl') {
-                svgStr = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
-                    <rect width='100' height='100' fill='#16162a'/>
-                    <path d='M30 40 C 20 60, 25 80, 25 100 L 75 100 C 75 80, 80 60, 70 40 Z' fill='#ff2a5f'/>
-                    <path d='M30 100 C 30 75, 40 65, 50 65 C 60 65, 70 75, 70 100 Z' fill='#16162a'/>
-                    <circle cx='50' cy='35' r='18' fill='#ff2a5f'/>
-                </svg>`;
+                svgStr = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='gg' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='#ff2a5f'/><stop offset='100%' stop-color='#d10043'/></linearGradient></defs><rect width='100' height='100' fill='#16162a'/><path d='M25 40 C 20 60, 15 90, 15 100 L 85 100 C 85 90, 80 60, 75 40 Z' fill='url(#gg)' opacity='0.7'/><path d='M25 100 C 25 70, 35 60, 50 60 C 65 60, 75 70, 75 100 Z' fill='url(#gg)'/><circle cx='50' cy='35' r='16' fill='#ffffff'/></svg>`;
             } else {
-                svgStr = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
-                    <rect width='100' height='100' fill='#16162a'/>
-                    <path d='M25 100 C 25 65, 35 55, 50 55 C 65 55, 75 65, 75 100 Z' fill='#7000ff'/>
-                    <circle cx='50' cy='32' r='18' fill='#7000ff'/>
-                </svg>`;
+                svgStr = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='gd' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='#7000ff'/><stop offset='100%' stop-color='#511fff'/></linearGradient></defs><rect width='100' height='100' fill='#16162a'/><path d='M20 100 C 20 65, 35 55, 50 55 C 65 55, 80 65, 80 100 Z' fill='url(#gd)' opacity='0.9'/><circle cx='50' cy='35' r='18' fill='#ffffff'/><rect x='35' y='30' width='30' height='8' rx='4' fill='url(#gd)'/></svg>`;
             }
             return "data:image/svg+xml;base64," + btoa(svgStr);
         }
@@ -690,7 +678,6 @@
             document.getElementById('user-profile').classList.add('active');
             
             let displayNameHTML = `أهلاً، ${currentUserData.username}`;
-            // إضافة رسمة המطور (SVG) في ملفه الشخصي
             if (currentUserData.username === "حمزة الحماده" || currentUserId === "552") {
                 displayNameHTML += ` <span class="admin-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="vertical-align: middle; margin-left: 2px;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg> المطور</span>`;
             }
@@ -873,7 +860,7 @@
             gameId = Math.random().toString(36).substring(2, 10);
             myRole = 'X';
             isOnline = true;
-            activeFriendId = null; // لا يوجد صديق محدد
+            activeFriendId = null; 
 
             db.ref('games/' + gameId).set({
                 board: ["", "", "", "", "", "", "", "", ""],
@@ -905,7 +892,6 @@
             });
         }
 
-        // فحص الانضمام عبر الرابط
         function checkAndJoinLinkInvite(gameIdParam) {
             db.ref('games/' + gameIdParam).once('value').then(snap => {
                 let data = snap.val();
@@ -939,7 +925,7 @@
             
             db.ref('games/' + gameId).update({ 
                 player2Joined: true,
-                guestName: currentUserData.username // تحديث اسم الضيف في حال كانت دعوة رابط
+                guestName: currentUserData.username 
             });
             db.ref('users/' + currentUserId + '/game_invite').remove();
             
@@ -1103,26 +1089,44 @@
             });
         }
 
-        // تم التحديث: إضافة رسمة المطور (SVG) بجانب اسم المطور في لوحة النتائج داخل اللعبة
+        // تم التحديث: دالة عرض النتائج وإظهار شارة وصورة المطور للأعداء أثناء اللعب
         function updateScoreboardDOM() {
             document.getElementById('score-x').innerText = scores.X;
             document.getElementById('score-o').innerText = scores.O;
             document.getElementById('score-ties').innerText = scores.ties;
             
-            const devSvgIcon = `<div class="admin-badge" style="font-size: 10px; padding: 2px 5px; margin-top: 5px;"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="vertical-align: middle;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg> المطور</div>`;
+            const devSvgIcon = `<div class="admin-badge" style="font-size: 10px; padding: 2px 5px; margin-top: 5px; margin-bottom: 5px;"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="vertical-align: middle;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg> المطور</div>`;
 
-            let labelXHtml = playerXName + " (X)";
-            if (playerXName === "حمزة الحماده") {
-                labelXHtml += devSvgIcon;
-            }
+            let genderX = playerXName === (currentUserData ? currentUserData.username : '') ? (currentUserData ? currentUserData.gender : null) : null;
+            let genderO = playerOName === (currentUserData ? currentUserData.username : '') ? (currentUserData ? currentUserData.gender : null) : null;
+
+            let avatarX = generateAvatarURL(playerXName, genderX);
+            let avatarO = generateAvatarURL(playerOName, genderO);
+
+            let labelXHtml = `
+                <div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                    <img src="${avatarX}" style="width:35px; height:35px; border-radius:50%; border:2px solid var(--primary-neon); margin-bottom:5px; object-fit:cover; box-shadow: 0 0 8px rgba(255,42,95,0.5);">
+                    <span style="display:block; width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${playerXName} (X)</span>
+                    ${playerXName === "حمزة الحماده" ? devSvgIcon : ''}
+                </div>`;
             
-            let labelOHtml = playerOName + " (O)";
-            if (playerOName === "حمزة الحماده") {
-                labelOHtml += devSvgIcon;
-            }
+            let labelOHtml = `
+                <div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                    <img src="${avatarO}" style="width:35px; height:35px; border-radius:50%; border:2px solid var(--secondary-neon); margin-bottom:5px; object-fit:cover; box-shadow: 0 0 8px rgba(0,240,255,0.5);">
+                    <span style="display:block; width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${playerOName} (O)</span>
+                    ${playerOName === "حمزة الحماده" ? devSvgIcon : ''}
+                </div>`;
 
-            document.getElementById('label-x').innerHTML = labelXHtml;
-            document.getElementById('label-o').innerHTML = labelOHtml;
+            const labelXElem = document.getElementById('label-x');
+            const labelOElem = document.getElementById('label-o');
+            
+            labelXElem.style.whiteSpace = "normal"; 
+            labelOElem.style.whiteSpace = "normal"; 
+            labelXElem.style.overflow = "visible";
+            labelOElem.style.overflow = "visible";
+
+            labelXElem.innerHTML = labelXHtml;
+            labelOElem.innerHTML = labelOHtml;
         }
 
         function updateStatusText() {
