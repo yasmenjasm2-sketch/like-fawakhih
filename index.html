@@ -123,31 +123,22 @@
         }
 
         .user-info { text-align: right; }
-        .user-name { font-size: 16px; font-weight: bold; color: var(--secondary-neon); margin-bottom: 5px;}
+        .user-name { font-size: 16px; font-weight: bold; color: var(--secondary-neon); margin-bottom: 5px; display: flex; align-items: center;}
         
-        /* تنسيق خاص بحساب الإدارة */
-        .admin-name-style {
-            background: linear-gradient(90deg, #ffd700, #ffaa00);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        /* شارة الإدارة الاحترافية */
+        .admin-badge {
+            background: linear-gradient(90deg, #ffd700, #ff8c00);
+            color: #000;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin-right: 8px;
             font-weight: 900;
+            box-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
             display: inline-flex;
             align-items: center;
-            gap: 4px;
-        }
-        .admin-badge-icon {
-            color: #ffd700;
-            -webkit-text-fill-color: #ffd700;
-            font-size: 15px;
-            text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
-        }
-        .admin-dev-tag {
-            font-family: monospace;
-            font-size: 11px;
-            color: #00f0ff;
-            -webkit-text-fill-color: #00f0ff;
-            text-shadow: 0 0 5px rgba(0, 240, 255, 0.5);
-            letter-spacing: 1px;
+            gap: 3px;
+            text-shadow: none;
         }
 
         .user-id-box { 
@@ -190,9 +181,6 @@
             background: var(--container-bg);
             color: white;
         }
-        
-        /* تلوين خيار الجنس الافتراضي لتمييزه */
-        select:invalid { color: #888; }
 
         button {
             background: linear-gradient(90deg, #511fff, var(--accent-glow));
@@ -346,13 +334,11 @@
             <h2>تسجيل الدخول / إنشاء حساب</h2>
             <input type="text" id="username-input" placeholder="اسم المستخدم (أكثر من 5 أحرف)" maxlength="15">
             <input type="password" id="password-input" placeholder="كلمة المرور">
-            
             <select id="gender-input" required>
-                <option value="" disabled selected hidden>⚧️ حدد الجنس (إلزامي للدخول)</option>
+                <option value="" disabled selected>-- حدد الجنس للبدء --</option>
                 <option value="boy">👨 ذكر</option>
                 <option value="girl">👩 أنثى</option>
             </select>
-
             <button onclick="authenticateUser()">دخول / تسجيل</button>
             <p style="font-size: 11px; color: #888; margin-top: 10px;">إذا لم يكن الحساب موجوداً سيتم إنشاؤه تلقائياً بهذا الاسم</p>
         </section>
@@ -437,10 +423,6 @@
     <div id="custom-toast" class="toast"></div>
 
     <script>
-        // الأصوات الاحترافية
-        const soundInviteSent = new Audio('https://assets.mixkit.co/active_storage/sfx/1114/1114-preview.mp3'); 
-        const soundInviteAccepted = new Audio('https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3');
-
         // إعدادات فايربيس
         const firebaseConfig = {
             apiKey: "AIzaSyDr0kbQDE90hhEMohV6X1b4ndu4L7uZz24",
@@ -470,12 +452,30 @@
         let playerXName = "اللاعب (X)";
         let playerOName = "اللاعب (O)";
 
-        // دالة تنسيق اسم الإدمن برمجياً
-        function formatAdminName(name) {
-            if (name === "حمزة الحماده") {
-                return `<span class="admin-name-style"><span class="admin-badge-icon">👑</span> ${name} <span class="admin-dev-tag">&lt;Dev/&gt;</span></span>`;
+        // توليد تأثير صوتي جميل للقبول باستخدام Web Audio API (احترافي ومضمون العمل)
+        function playAcceptSound() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.type = 'sine';
+                
+                // نغمات متتالية لتعطي صوت جميل عند القبول
+                osc.frequency.setValueAtTime(523.25, ctx.currentTime); 
+                osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1); 
+                osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.2); 
+                osc.frequency.setValueAtTime(1046.50, ctx.currentTime + 0.3); 
+                
+                gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 1);
+                
+                osc.start();
+                osc.stop(ctx.currentTime + 1);
+            } catch(e) {
+                console.log("Audio play failed", e);
             }
-            return name;
         }
 
         // توليد رابط للصورة الرمزية برمجياً بناءً على الاسم والجنس
@@ -573,10 +573,8 @@
             if (password.length < 4) {
                 showToast("⚠️ كلمة المرور قصيرة جداً!", "#ff2a5f"); return;
             }
-            
-            // تحقق من اختيار الجنس لمنع الخطأ
-            if (!gender) {
-                showToast("⚠️ يرجى تحديد الجنس أولاً لتتمكن من الدخول!", "#ff2a5f"); return;
+            if (!gender || gender === "") {
+                showToast("⚠️ يرجى تحديد الجنس للتمكن من الدخول!", "#ff2a5f"); return;
             }
 
             // نظام حساب الإدارة الخاص
@@ -645,15 +643,18 @@
         function showProfileAndMenu() {
             document.getElementById('user-profile').classList.add('active');
             
-            // تمييز اسم الإدمن إن وجد
-            let displayedName = formatAdminName(currentUserData.username);
-            document.getElementById('display-name').innerHTML = `أهلاً، ${displayedName}`;
+            // إضافة ميزة الإدمن ورسمتها البرمجية
+            let displayNameHTML = `أهلاً، ${currentUserData.username}`;
+            if (currentUserData.username === "حمزة الحماده" || currentUserId === "552") {
+                displayNameHTML += ` <span class="admin-badge">👑 المطور</span>`;
+            }
             
+            document.getElementById('display-name').innerHTML = displayNameHTML;
             document.getElementById('display-id').innerText = currentUserId;
             document.getElementById('display-played').innerText = `🎮 لعب: ${currentUserData.played || 0}`;
             document.getElementById('display-wins').innerText = `🏆 فاز: ${currentUserData.wins || 0}`;
             
-            // تعيين الصورة الرمزية مع الجنس بشكل صحيح
+            // تعيين الصورة الرمزية مع الجنس
             document.getElementById('user-avatar').src = generateAvatarURL(currentUserData.username, currentUserData.gender);
             
             showSection('menu-section');
@@ -670,13 +671,13 @@
                 let html = '';
                 if(reqs) {
                     for(let id in reqs) {
+                        // دعم للحسابات القديمة التي كانت تحفظ الاسم كنص فقط
                         let friendName = typeof reqs[id] === 'string' ? reqs[id] : reqs[id].name;
                         let friendGender = typeof reqs[id] === 'string' ? null : reqs[id].gender;
-                        let formattedName = formatAdminName(friendName);
                         
                         html += `
                         <div class="list-item">
-                            <span><img src="${generateAvatarURL(friendName, friendGender)}"> ${formattedName}</span>
+                            <span><img src="${generateAvatarURL(friendName, friendGender)}"> ${friendName}</span>
                             <button class="action-btn" onclick="acceptFriend('${id}', '${friendName}', '${friendGender}')" style="background:#10b981;">قبول</button>
                         </div>`;
                     }
@@ -693,11 +694,10 @@
                     for(let id in friends) {
                         let friendName = typeof friends[id] === 'string' ? friends[id] : friends[id].name;
                         let friendGender = typeof friends[id] === 'string' ? null : friends[id].gender;
-                        let formattedName = formatAdminName(friendName);
 
                         html += `
                         <div class="list-item">
-                            <span><img src="${generateAvatarURL(friendName, friendGender)}"> ${formattedName}</span>
+                            <span><img src="${generateAvatarURL(friendName, friendGender)}"> ${friendName}</span>
                             <button class="action-btn" onclick="inviteFriend('${id}', '${friendName}')">دعوة</button>
                         </div>`;
                     }
@@ -711,8 +711,7 @@
                 const invite = snap.val();
                 if(invite && invite.gameId) {
                     pendingInviteId = invite.gameId;
-                    let formattedSender = formatAdminName(invite.senderName);
-                    document.getElementById('invite-msg').innerHTML = `صديقك ${formattedSender} يدعوك للعب!`;
+                    document.getElementById('invite-msg').innerText = `صديقك ${invite.senderName} يدعوك للعب!`;
                     document.getElementById('invite-modal').classList.add('active');
                 } else {
                     document.getElementById('invite-modal').classList.remove('active');
@@ -806,16 +805,11 @@
                 senderName: currentUserData.username
             });
 
-            // تشغيل صوت إرسال الدعوة
-            soundInviteSent.play().catch(err => console.log("Sound play error:", err));
-
             showSection('waiting-section');
 
             db.ref('games/' + gameId + '/player2Joined').on('value', snap => {
                 if(snap.val() === true) {
-                    // تشغيل صوت الموافقة عند المستضيف
-                    soundInviteAccepted.play().catch(err => console.log("Sound play error:", err));
-                    
+                    playAcceptSound(); // تشغيل الصوت للمستضيف عند قبول الضيف
                     db.ref('games/' + gameId + '/player2Joined').off();
                     startGameOnline();
                 }
@@ -838,6 +832,7 @@
 
         function acceptGameInvite() {
             if(!pendingInviteId) return;
+            playAcceptSound(); // تشغيل الصوت للضيف عند ضغطه على قبول
             gameId = pendingInviteId;
             myRole = 'O';
             isOnline = true;
@@ -845,9 +840,6 @@
             db.ref('games/' + gameId).update({ player2Joined: true });
             db.ref('users/' + currentUserId + '/game_invite').remove();
             
-            // تشغيل صوت قبول الدعوة عند الضيف
-            soundInviteAccepted.play().catch(err => console.log("Sound play error:", err));
-
             document.getElementById('invite-modal').classList.remove('active');
             startGameOnline();
         }
@@ -901,7 +893,7 @@
                             document.getElementById('status-text').innerText = "🟢 دورك الآن..";
                             document.getElementById('status-text').style.color = "var(--secondary-neon)";
                         } else {
-                            document.getElementById('status-text').innerHTML = `⏳ بانتظار ${formatAdminName(currentPlayerName)}...`;
+                            document.getElementById('status-text').innerText = `⏳ بانتظار ${currentPlayerName}...`;
                             document.getElementById('status-text').style.color = "#aaa";
                         }
                     }
@@ -954,7 +946,7 @@
                         saveUserStats(false); 
                     } else {
                         let winnerRealName = winner === 'X' ? playerXName : playerOName;
-                        document.getElementById('status-text').innerHTML = `🎉 الفائز هو: ${formatAdminName(winnerRealName)}!`;
+                        document.getElementById('status-text').innerText = `🎉 الفائز هو: ${winnerRealName}!`;
                         scores[winner] += 1;
                         highlightWinningLine(gameBoard);
                         playWinAnimation(); // أنيميشن الفوز
@@ -976,7 +968,7 @@
                 saveUserStats(false); 
             } else {
                 let winnerRealName = data.winner === 'X' ? playerXName : playerOName;
-                document.getElementById('status-text').innerHTML = `🎉 الفائز هو: ${formatAdminName(winnerRealName)}!`;
+                document.getElementById('status-text').innerText = `🎉 الفائز هو: ${winnerRealName}!`;
                 highlightWinningLine(gameBoard);
                 
                 if(data.winner === myRole) {
@@ -989,7 +981,7 @@
             if(myRole === 'X') {
                 document.getElementById('reset-btn').style.display = 'block';
             } else {
-                document.getElementById('status-text').innerHTML += " (بانتظار المستضيف)";
+                document.getElementById('status-text').innerText += " (بانتظار المستضيف)";
             }
         }
 
@@ -1012,14 +1004,14 @@
             document.getElementById('score-x').innerText = scores.X;
             document.getElementById('score-o').innerText = scores.O;
             document.getElementById('score-ties').innerText = scores.ties;
-            document.getElementById('label-x').innerHTML = formatAdminName(playerXName) + " (X)";
-            document.getElementById('label-o').innerHTML = formatAdminName(playerOName) + " (O)";
+            document.getElementById('label-x').innerText = playerXName + " (X)";
+            document.getElementById('label-o').innerText = playerOName + " (O)";
         }
 
         function updateStatusText() {
             if (!isOnline && !isGameOver) {
                 let currentName = localTurn === 'X' ? playerXName : playerOName;
-                document.getElementById('status-text').innerHTML = `🎯 دور: ${formatAdminName(currentName)}`;
+                document.getElementById('status-text').innerText = `🎯 دور: ${currentName}`;
                 document.getElementById('status-text').style.color = "#fff";
             }
         }
