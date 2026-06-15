@@ -531,9 +531,9 @@
             }
 
             // نظام حساب الإدارة الخاص
-            let isAdmin = (username === "HamzaDev" && password === "Dev12345");
+            let isAdmin = (username === "حمزة الحماده" && password === "hamzagmailcom34567");
             if(isAdmin) {
-                username = "HamzaDev 👑"; 
+                username = "حمزة الحماده"; 
             }
 
             db.ref('usernames/' + username).once('value').then(snap => {
