@@ -336,7 +336,7 @@
                     </div>
                 </div>
             </div>
-            <button onclick="logout()" class="action-btn secondary-btn">خروج</button>
+            <button onclick="openSettings()" class="action-btn" style="background: transparent; font-size: 24px; box-shadow: none; padding: 5px;">⚙️</button>
         </div>
         <div class="user-id-box">
             <span>الآيدي (ID): <strong id="display-id" style="color:var(--secondary-neon); letter-spacing:1px;">--------</strong></span>
@@ -444,6 +444,16 @@
         </section>
     </div>
 
+    <div class="modal-overlay" id="settings-modal">
+        <div class="modal-content">
+            <h3>⚙️ الإعدادات</h3>
+            <div class="modal-buttons">
+                <button onclick="logout()" class="secondary-btn" style="background: linear-gradient(90deg, #ff2a5f, #c10036);">تسجيل الخروج 🚪</button>
+                <button onclick="closeSettings()" class="secondary-btn" style="background: #252535; margin-top: 10px;">إغلاق الترس ✖️</button>
+            </div>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="choose-game-modal">
         <div class="modal-content">
             <h3>اختر نوع المواجهة</h3>
@@ -500,6 +510,10 @@
         
         let activeFriendIdForInvite = null;
         let activeFriendNameForInvite = null;
+
+        // أوامر الترس
+        function openSettings() { document.getElementById('settings-modal').classList.add('active'); }
+        function closeSettings() { document.getElementById('settings-modal').classList.remove('active'); }
 
         function playAcceptSound() {
             try {
@@ -688,6 +702,8 @@
             navigator.clipboard.writeText(currentUserId).then(() => showToast("📋 تم نسخ الآيدي الخاص بك"));
         }
 
+        let friendStatusListeners = {}; // تم تعيين متغير لتخفيض الاستهلاك ومراقبة كل مستخدم بشكل منفصل
+
         function setupRealtimeListeners() {
             db.ref('users/' + currentUserId + '/requests').on('value', snap => {
                 const reqs = snap.val(); let html = '';
@@ -705,26 +721,62 @@
                 document.getElementById('requests-list').innerHTML = html;
             });
 
-            db.ref('users').on('value', snap => {
-                const allUsers = snap.val(); if(!allUsers || !allUsers[currentUserId]) return;
-                const friends = allUsers[currentUserId].friends; let html = '';
+            // تم استبدال مراقبة كل المستخدمين بمراقبة الأصدقاء فقط لتوفير حزم قاعدة البيانات وتنفيذ أسرع
+            db.ref('users/' + currentUserId + '/friends').on('value', snap => {
+                const friends = snap.val(); 
+                let html = '';
                 if(friends) {
                     for(let id in friends) {
                         let friendName = typeof friends[id] === 'string' ? friends[id] : friends[id].name;
                         let friendGender = typeof friends[id] === 'string' ? null : friends[id].gender;
-                        let friendStatus = allUsers[id] && allUsers[id].status === 'online';
-                        let statusDot = friendStatus ? '<span style="color:#10b981;font-size:10px;">🟢 متصل</span>' : '<span style="color:#ff2a5f;font-size:10px;">🔴 غير متصل</span>';
-                        let inviteBtnHtml = friendStatus 
-                            ? `<button class="action-btn" onclick="openGameOptionsModal('${id}', '${friendName}')" style="background:linear-gradient(90deg, #511fff, var(--accent-glow));">دعوة للعب</button>` 
-                            : `<button class="action-btn" style="background:#444; cursor:not-allowed;" disabled>انتظار</button>`;
+                        
                         html += `
                         <div class="list-item">
-                            <span><img src="${generateAvatarURL(friendName, friendGender)}"> ${friendName} (${statusDot})</span>
-                            ${inviteBtnHtml}
+                            <span><img src="${generateAvatarURL(friendName, friendGender)}"> ${friendName} <span id="status-${id}" style="color:#aaa;font-size:10px;margin-right:5px;">⏳</span></span>
+                            <button class="action-btn" id="invite-btn-${id}" style="background:#444; cursor:not-allowed;" disabled>انتظار</button>
                         </div>`;
+
+                        // مراقبة فردية لحالة الصديق لعدم استهلاك قاعدة البيانات
+                        if (!friendStatusListeners[id]) {
+                            friendStatusListeners[id] = db.ref('users/' + id + '/status').on('value', statusSnap => {
+                                let st = statusSnap.val();
+                                let isOnline = (st === 'online');
+                                let statusDot = isOnline ? '<span style="color:#10b981;font-size:10px;">🟢 متصل</span>' : '<span style="color:#ff2a5f;font-size:10px;">🔴 غير متصل</span>';
+                                
+                                let statElem = document.getElementById('status-' + id);
+                                if(statElem) statElem.innerHTML = statusDot;
+                                
+                                let btn = document.getElementById('invite-btn-' + id);
+                                if(btn) {
+                                    if(isOnline) {
+                                        btn.style.background = 'linear-gradient(90deg, #511fff, var(--accent-glow))';
+                                        btn.style.cursor = 'pointer';
+                                        btn.disabled = false;
+                                        btn.innerText = 'دعوة للعب';
+                                        btn.onclick = () => openGameOptionsModal(id, friendName);
+                                    } else {
+                                        btn.style.background = '#444';
+                                        btn.style.cursor = 'not-allowed';
+                                        btn.disabled = true;
+                                        btn.innerText = 'انتظار';
+                                        btn.onclick = null;
+                                    }
+                                }
+                            });
+                        }
                     }
-                } else { html = '<div style="text-align:center;color:#666;padding:10px;">لا يوجد أصدقاء بعد</div>'; }
+                } else { 
+                    html = '<div style="text-align:center;color:#666;padding:10px;">لا يوجد أصدقاء بعد</div>'; 
+                }
                 document.getElementById('friends-list').innerHTML = html;
+
+                // إزالة المراقبة للأشخاص المحذوفين لعدم الاستهلاك
+                Object.keys(friendStatusListeners).forEach(id => {
+                    if (!friends || !friends[id]) {
+                        db.ref('users/' + id + '/status').off('value', friendStatusListeners[id]);
+                        delete friendStatusListeners[id];
+                    }
+                });
             });
 
             db.ref('users/' + currentUserId + '/game_invite').on('value', snap => {
@@ -807,8 +859,21 @@
 
             db.ref('games/' + gameId + '/player2Joined').on('value', snap => {
                 if(snap.val() === true) {
-                    playAcceptSound(); db.ref('games/' + gameId + '/player2Joined').off();
+                    playAcceptSound(); 
+                    db.ref('games/' + gameId + '/player2Joined').off();
+                    db.ref('games/' + gameId + '/rejected').off();
                     if(gameType === 'xo') startGameOnline(); else startLudoOnline(gameType);
+                }
+            });
+
+            // إضافة مراقب لحالة الرفض لإنهاء الانتظار فوراً
+            db.ref('games/' + gameId + '/rejected').on('value', snap => {
+                if(snap.val() === true) {
+                    db.ref('games/' + gameId + '/player2Joined').off();
+                    db.ref('games/' + gameId + '/rejected').off();
+                    db.ref('games/' + gameId).remove();
+                    showToast("❌ رفض الصديق طلب اللعب.", "#ff2a5f");
+                    showSection('friends-section');
                 }
             });
         }
@@ -831,7 +896,8 @@
 
             db.ref('games/' + gameId + '/player2Joined').on('value', snap => {
                 if(snap.val() === true) {
-                    playAcceptSound(); db.ref('games/' + gameId + '/player2Joined').off();
+                    playAcceptSound(); 
+                    db.ref('games/' + gameId + '/player2Joined').off();
                     if(gameType === 'xo') startGameOnline(); else startLudoOnline(gameType);
                 }
             });
@@ -852,7 +918,11 @@
 
         function cancelInvite() {
             if(activeFriendId) db.ref('users/' + activeFriendId + '/game_invite').remove();
-            if(gameId) db.ref('games/' + gameId).remove();
+            if(gameId) {
+                db.ref('games/' + gameId + '/player2Joined').off();
+                db.ref('games/' + gameId + '/rejected').off();
+                db.ref('games/' + gameId).remove();
+            }
             showSection('menu-section');
         }
 
@@ -870,13 +940,17 @@
             });
         }
 
+        // تم تعيين حالة الرفض لتبليغ المستضيف بالخروج من ساحة الانتظار فوراً
         function rejectGameInvite() {
+            if(pendingInviteId) {
+                db.ref('games/' + pendingInviteId + '/rejected').set(true);
+            }
             db.ref('users/' + currentUserId + '/game_invite').remove();
             document.getElementById('invite-modal').classList.remove('active');
+            pendingInviteId = null;
         }
 
         function startLudoOnline(type) {
-            // توجيه فوري للملف المعزول مع تمرير بارامترات التحكم
             window.location.href = `ludo.html?gameId=${gameId}&role=${myRole}&uid=${currentUserId}&username=${encodeURIComponent(currentUsername)}&type=${type}`;
         }
 
