@@ -77,6 +77,17 @@
             position: relative;
         }
 
+        /* خاصية قلب الشاشة الذكية للخصم الأصفر ليراها كأنه في الأسفل */
+        .perspective-yellow {
+            transform: rotate(180deg);
+        }
+        .perspective-yellow .player-dice-zone,
+        .perspective-yellow .choice-box,
+        .perspective-yellow .ludo-safe,
+        .perspective-yellow .ludo-token::after {
+            transform: rotate(180deg);
+        }
+
         .ludo-cell {
             background: #1f2136; width: 100%; height: 100%;
             position: relative; display: flex; justify-content: center; align-items: center;
@@ -104,14 +115,33 @@
             position: relative; display: flex; justify-content: center; align-items: center;
         }
         
-        /* تصميم الأحجار وتأثيرات الأنيميشن الخطوي */
+        /* تصميم الأحجار الفاخرة بشكل جنود ملكي (👑) وتأثيرات الحركة الدائرية */
         .ludo-token {
             width: 85%; height: 85%; border-radius: 50%;
             box-shadow: 0 5px 10px rgba(0,0,0,0.6), inset 0 -4px 6px rgba(0,0,0,0.4);
             border: 2px solid white; cursor: pointer; z-index: 10;
             position: relative; transform: scale(1);
+            display: flex; justify-content: center; align-items: center;
             transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), top 0.15s linear, left 0.15s linear;
         }
+        .ludo-token::after {
+            content: "👑";
+            font-size: 11px;
+            color: #fff;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            position: absolute;
+        }
+        
+        /* أنيميشن قفز تحريك الدائرة الاحترافي خطوة بخطوة */
+        .token-jump {
+            animation: tokenJumpAnim 0.16s ease-in-out;
+        }
+        @keyframes tokenJumpAnim {
+            0% { transform: scale(1) translateY(0); }
+            50% { transform: scale(1.3) translateY(-10px); filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5)); }
+            100% { transform: scale(1) translateY(0); }
+        }
+
         .ludo-token.active-turn { animation: pulseGlow 1s infinite alternate; border: 2px solid #fff; }
         @keyframes pulseGlow { 0% { transform: scale(1); box-shadow: 0 0 8px #fff; } 100% { transform: scale(1.15); box-shadow: 0 0 20px var(--secondary-neon); } }
 
@@ -126,38 +156,57 @@
         .token-yellow { background: radial-gradient(circle, #fff38a, var(--ludo-yellow)); }
         .token-blue { background: radial-gradient(circle, #8ae0ff, var(--ludo-blue)); }
         
-        /* لوحة التحكم والتحضير للزهر المتعدد */
-        .control-panel {
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 18px; padding: 15px; margin-top: 15px;
-            border: 1px solid rgba(255,255,255,0.06);
-            display: flex; justify-content: space-around; align-items: center; gap: 10px;
-        }
-
+        /* تثبيت الزهر بشكل مباشر فوق مركز أرضية كل لاعب على الشاشة */
         .player-dice-zone {
-            display: flex; flex-direction: column; align-items: center; gap: 5px;
+            position: absolute;
+            z-index: 1000;
+            background: rgba(15, 16, 21, 0.95);
+            padding: 6px;
+            border-radius: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+            width: 70px;
         }
+        .active-dice-turn {
+            border-color: var(--secondary-neon);
+            animation: diceGlow 1.5s infinite alternate;
+        }
+        @keyframes diceGlow {
+            0% { box-shadow: 0 0 5px rgba(0, 240, 255, 0.3); }
+            100% { box-shadow: 0 0 15px rgba(0, 240, 255, 0.6); }
+        }
+        
+        #dice-zone-red { bottom: 8px; left: 8px; }
+        #dice-zone-yellow { top: 8px; right: 8px; }
+        #dice-zone-green { top: 8px; left: 8px; }
+        #dice-zone-blue { bottom: 8px; right: 8px; }
+
+        .dice-label { font-size: 9px; color: #aaa; font-weight: bold; }
 
         /* الـ 3D لرمي النرد والمزامنة الفورية للخصم */
         .scene-dice {
-            width: 50px; height: 50px; perspective: 300px; cursor: pointer;
+            width: 40px; height: 40px; perspective: 200px; cursor: pointer;
         }
         .cube-dice {
             width: 100%; height: 100%; position: relative; transform-style: preserve-3d;
             transform: rotateX(-20deg) rotateY(20deg); transition: transform 0.1s linear;
         }
         .cube-face {
-            position: absolute; width: 50px; height: 50px; background: #fff;
-            border: 2px solid #ccc; border-radius: 10px; font-size: 24px; font-weight: bold;
+            position: absolute; width: 40px; height: 40px; background: #fff;
+            border: 2px solid #ccc; border-radius: 8px; font-size: 20px; font-weight: bold;
             color: #111; display: flex; justify-content: center; align-items: center;
-            box-shadow: inset 0 0 10px #ddd;
+            box-shadow: inset 0 0 8px #ddd;
         }
-        .face-1  { transform: rotateY(0deg) translateZ(25px); }
-        .face-2  { transform: rotateY(90deg) translateZ(25px); }
-        .face-3  { transform: rotateX(90deg) translateZ(25px); }
-        .face-4  { transform: rotateX(-90deg) translateZ(25px); }
-        .face-5  { transform: rotateY(-90deg) translateZ(25px); }
-        .face-6  { transform: rotateY(180deg) translateZ(25px); }
+        .face-1  { transform: rotateY(0deg) translateZ(20px); }
+        .face-2  { transform: rotateY(90deg) translateZ(20px); }
+        .face-3  { transform: rotateX(90deg) translateZ(20px); }
+        .face-4  { transform: rotateX(-90deg) translateZ(20px); }
+        .face-5  { transform: rotateY(-90deg) translateZ(20px); }
+        .face-6  { transform: rotateY(180deg) translateZ(20px); }
 
         .cube-dice.rolling { animation: spinCube 0.5s linear infinite; }
         @keyframes spinCube {
@@ -167,8 +216,8 @@
 
         .pool-badge {
             background: #252a44; border: 1px solid var(--ludo-yellow);
-            border-radius: 8px; padding: 4px 8px; font-size: 13px; font-weight: bold;
-            color: var(--ludo-yellow); max-width: 100px; min-height: 26px;
+            border-radius: 6px; padding: 2px 4px; font-size: 9px; font-weight: bold;
+            color: var(--ludo-yellow); text-align: center; width: 100%;
         }
 
         /* نافذة الاختيار المنبثقة لاختيار عدد خطوات التحريك الاستراتيجي */
@@ -202,6 +251,30 @@
             box-shadow: 0 10px 20px rgba(0,0,0,0.4);
         }
         #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+        /* شاشة الفوز الاحترافية والتحكم في التصويت على إعادة اللعب */
+        .win-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(3, 3, 7, 0.95); z-index: 99999;
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+            backdrop-filter: blur(10px);
+        }
+        .win-overlay.active { display: flex; }
+        .win-box {
+            background: #18192a; border: 3px solid var(--ludo-yellow);
+            padding: 30px; border-radius: 24px; width: 90%; max-width: 400px;
+            text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 30px rgba(255, 215, 0, 0.3);
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn { 0% { transform: scale(0.7); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .win-btn {
+            flex: 1; padding: 12px; font-weight: bold; border: none; border-radius: 12px; cursor: pointer; font-size: 14px;
+        }
+        .rematch-btn { background: linear-gradient(90deg, #10b981, #059669); color: white; }
+        .exit-game-btn { background: linear-gradient(90deg, var(--ludo-red), #b5002e); color: white; }
+        .rematch-status {
+            margin: 15px 0; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 10px; font-size: 13px; text-align: right; line-height: 1.8;
+        }
     </style>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -227,39 +300,20 @@
             </div>
         </div>
         
-        <div class="control-panel">
-            <div class="player-dice-zone">
-                <span style="font-size: 11px; color:#aaa;">زهرك الخاص</span>
-                <div class="scene-dice" onclick="rollDiceProcess()">
-                    <div id="my-cube" class="cube-dice">
-                        <div class="cube-face face-1">1</div>
-                        <div class="cube-face face-2">2</div>
-                        <div class="cube-face face-3">3</div>
-                        <div class="cube-face face-4">4</div>
-                        <div class="cube-face face-5">5</div>
-                        <div class="cube-face face-6">6</div>
-                    </div>
-                </div>
-                <div class="pool-badge" id="my-pool-badge">فارغ</div>
-            </div>
+        <button onclick="exitGame()" class="exit-btn">انسحاب والعودة للمنصة</button>
+    </div>
 
-            <div class="player-dice-zone">
-                <span style="font-size: 11px; color:#aaa;">زهر الخصم (مباشر)</span>
-                <div class="scene-dice" style="pointer-events: none;">
-                    <div id="enemy-cube" class="cube-dice">
-                        <div class="cube-face face-1">1</div>
-                        <div class="cube-face face-2">2</div>
-                        <div class="cube-face face-3">3</div>
-                        <div class="cube-face face-4">4</div>
-                        <div class="cube-face face-5">5</div>
-                        <div class="cube-face face-6">6</div>
-                    </div>
-                </div>
-                <div class="pool-badge" id="enemy-pool-badge">فارغ</div>
+    <!-- نافذة الفوز الفاخرة المدمجة ونظام تصويت جميع اللاعبين للإعادة -->
+    <div class="win-overlay" id="win-overlay">
+        <div class="win-box">
+            <h2 id="win-title" style="color: var(--ludo-yellow); margin-top: 0;">🏆 مبروك الفوز! 🏆</h2>
+            <p style="color: #b1b1c7; font-size: 14px;">يجب على جميع اللاعبين الموافقة لإعادة اللعب:</p>
+            <div class="rematch-status" id="rematch-status-list"></div>
+            <div style="display:flex; gap:10px; width:100%; margin-top:20px;">
+                <button class="win-btn rematch-btn" onclick="voteRematch()">🔄 طلب إعادة اللعب</button>
+                <button class="win-btn exit-game-btn" onclick="exitGame()">🚪 خروج</button>
             </div>
         </div>
-        
-        <button onclick="exitGame()" class="exit-btn">انسحاب والعودة للمنصة</button>
     </div>
 
     <div id="toast">تم النسخ</div>
@@ -367,6 +421,11 @@
             myRole = myRole.toLowerCase();
             document.getElementById('ludo-role-text').innerText = `أنت تلعب باللون: ${getRoleName(myRole)} ${gameType === 'ludo4' ? '(4 لاعبين)' : '(1v1)'}`;
             
+            // تفعيل نظام انعكاس الشاشة التلقائي إذا كان اللاعب أصفر
+            if (myRole === 'yellow') {
+                document.getElementById('ludo-grid').classList.add('perspective-yellow');
+            }
+
             initGameData();
             createGrid();
             listenToGameState();
@@ -386,7 +445,8 @@
                     db.ref('games/' + gameId).update({
                         tokens: initialTokens, turn: 'red',
                         dicePool: [], consecutiveSixes: 0,
-                        diceRolled: false, winner: ''
+                        diceRolled: false, winner: '',
+                        rematchVotes: { red: false, yellow: false, green: false, blue: false }
                     });
                 }
             });
@@ -394,9 +454,34 @@
 
         function createGrid() {
             const grid = document.getElementById('ludo-grid');
-            // تأمين بقاء نافذة الاختيار
             const overlay = document.getElementById('choice-overlay');
             grid.innerHTML = ''; grid.appendChild(overlay);
+
+            // بناء وحدات الزهر الطائرة ديناميكياً لتثبيتها فوق مركز أرضية كل لاعب
+            const roles = ['red', 'yellow', 'green', 'blue'];
+            roles.forEach(r => {
+                const zone = document.createElement('div');
+                zone.className = 'player-dice-zone';
+                zone.id = `dice-zone-${r}`;
+                zone.onclick = () => rollDiceProcess();
+                
+                let labelText = r === 'red' ? 'الأحمر' : r === 'yellow' ? 'الأصفر' : r === 'green' ? 'الأخضر' : 'الأزرق';
+                zone.innerHTML = `
+                    <span class="dice-label">${labelText}</span>
+                    <div class="scene-dice">
+                        <div id="cube-${r}" class="cube-dice">
+                            <div class="cube-face face-1">1</div>
+                            <div class="cube-face face-2">2</div>
+                            <div class="cube-face face-3">3</div>
+                            <div class="cube-face face-4">4</div>
+                            <div class="cube-face face-5">5</div>
+                            <div class="cube-face face-6">6</div>
+                        </div>
+                    </div>
+                    <div class="pool-badge" id="pool-badge-${r}">فارغ</div>
+                `;
+                grid.appendChild(zone);
+            });
 
             for(let row = 0; row < 15; row++) {
                 for(let col = 0; col < 15; col++) {
@@ -461,43 +546,89 @@
                     renderTokens(data.tokens);
                 }
 
+                // إدارة نافذة الفوز الإجباري وخاصية التصويت لإعادة اللعب الجماعية
+                const winOverlay = document.getElementById('win-overlay');
                 if(data.winner) {
                     document.getElementById('ludo-status-text').innerText = `🏆 الفائز هو: ${getRoleName(data.winner)}`;
+                    winOverlay.classList.add('active');
+                    document.getElementById('win-title').innerText = `🏆 فاز بالمعركة: ${getRoleName(data.winner)} 🏆`;
+                    
+                    const votes = data.rematchVotes || {};
+                    const statusList = document.getElementById('rematch-status-list');
+                    statusList.innerHTML = '';
+                    
+                    let activeRoles = gameType === 'ludo4' ? ['red', 'green', 'yellow', 'blue'] : ['red', 'yellow'];
+                    let allPlayersAgreed = true;
+                    
+                    activeRoles.forEach(role => {
+                        const rowEl = document.createElement('div');
+                        const hasVoted = votes[role] === true;
+                        if (!hasVoted) allPlayersAgreed = false;
+                        rowEl.innerText = `${getRoleName(role)}: ${hasVoted ? '✅ وافق على الإعادة' : '⏳ بانتظار التصويت...'}`;
+                        statusList.appendChild(rowEl);
+                    });
+
+                    // إعادة تشغيل الغرفة تلقائياً عند موافقة جميع الأطراف
+                    if (allPlayersAgreed) {
+                        setTimeout(() => {
+                            let initialTokens = { red: [-1,-1,-1,-1], yellow: [-1,-1,-1,-1] };
+                            if(gameType === 'ludo4') { initialTokens.green = [-1,-1,-1,-1]; initialTokens.blue = [-1,-1,-1,-1]; }
+                            db.ref('games/' + gameId).set({
+                                tokens: initialTokens, turn: 'red',
+                                dicePool: [], consecutiveSixes: 0,
+                                diceRolled: false, winner: '',
+                                rematchVotes: { red: false, yellow: false, green: false, blue: false }
+                            });
+                            winOverlay.classList.remove('active');
+                        }, 1200);
+                    }
+                } else {
+                    winOverlay.classList.remove('active');
                 }
             });
         }
 
         function updateDiceUI(data) {
             const statusEl = document.getElementById('ludo-status-text');
-            const myPoolBadge = document.getElementById('my-pool-badge');
-            const enemyPoolBadge = document.getElementById('enemy-pool-badge');
-
-            const poolArray = data.dicePool || [];
-            const poolText = poolArray.length > 0 ? poolArray.join(' + ') : 'فارغ';
+            const roles = ['red', 'yellow', 'green', 'blue'];
             
-            // تحديد وتوجيه الزهر التلقائي والمباشر للخصم واللاعب
-            if(isMyTurn) {
-                myPoolBadge.innerText = poolText;
-                enemyPoolBadge.innerText = "فارغ";
-                if(poolArray.length > 0) {
-                    let lastVal = poolArray[poolArray.length - 1];
-                    document.getElementById('my-cube').style.transform = faceRotations[lastVal] || faceRotations[1];
-                }
+            roles.forEach(r => {
+                const zone = document.getElementById(`dice-zone-${r}`);
+                const badge = document.getElementById(`pool-badge-${r}`);
+                const cube = document.getElementById(`cube-${r}`);
                 
+                if(!zone) return;
+
+                if(gameType === 'ludo2' && (r === 'green' || r === 'blue')) {
+                    zone.style.display = 'none';
+                    return;
+                } else {
+                    zone.style.display = 'flex';
+                }
+
+                if(data.turn === r) {
+                    zone.classList.add('active-dice-turn');
+                    const poolArray = data.dicePool || [];
+                    badge.innerText = poolArray.length > 0 ? poolArray.join(' + ') : 'دور الرمي';
+                    if(poolArray.length > 0) {
+                        let lastVal = poolArray[poolArray.length - 1];
+                        if(cube) cube.style.transform = faceRotations[lastVal] || faceRotations[1];
+                    }
+                } else {
+                    zone.classList.remove('active-dice-turn');
+                    badge.innerText = 'انتظار...';
+                }
+            });
+
+            if(isMyTurn) {
                 if(!data.diceRolled) {
-                    statusEl.innerText = "🟢 دورك! ارمِ الزهر بالضغط عليه.";
+                    statusEl.innerText = "🟢 دورك! اضغط على نردك لترميه.";
                 } else {
                     statusEl.innerText = "👆 اضغط على أحد أحجارك لبدء التحريك الاستراتيجي...";
                     checkIfCanMove(); 
                 }
             } else {
-                enemyPoolBadge.innerText = poolText;
-                myPoolBadge.innerText = "فارغ";
-                if(poolArray.length > 0) {
-                    let lastVal = poolArray[poolArray.length - 1];
-                    document.getElementById('enemy-cube').style.transform = faceRotations[lastVal] || faceRotations[1];
-                }
-                statusEl.innerText = `⏳ انتظار ${getRoleName(data.turn)}...`;
+                statusEl.innerText = `⏳ انتظار اللاعب ${getRoleName(data.turn)} ليلعب...`;
             }
         }
 
@@ -506,12 +637,11 @@
             if(!isMyTurn || gameState.diceRolled) return;
             AudioEngine.playDice();
 
-            const myCube = document.getElementById('my-cube');
-            myCube.classList.add('rolling');
+            const myCube = document.getElementById(`cube-${myRole}`);
+            if(myCube) myCube.classList.add('rolling');
 
-            // إرسال إشعار بالتحديث وقفل الرمي أثناء الحركة
             setTimeout(() => {
-                myCube.classList.remove('rolling');
+                if(myCube) myCube.classList.remove('rolling');
                 const roll = Math.floor(Math.random() * 6) + 1;
                 
                 let currentPool = gameState.dicePool || [];
@@ -520,28 +650,27 @@
                 if(roll === 6) {
                     currentSixes++;
                     if(currentSixes === 3) {
-                        // استراتيجية إلغاء الدور الصارمة عند تكرار 6 ثلاث مرات متتالية
                         db.ref('games/' + gameId).update({
                             dicePool: [],
                             consecutiveSixes: 0,
                             diceRolled: false,
                             turn: getNextTurn()
                         });
-                        alert("🔴 حصلت على 6 ثلاث مرات متتالية! ينقلب الدور للاعب التالي.");
+                        alert("🔴 حصلت على رقم 6 ثلاث مرات متتالية! ينقلب الدور للاعب التالي.");
                         return;
                     }
                     currentPool.push(roll);
                     db.ref('games/' + gameId).update({
                         dicePool: currentPool,
                         consecutiveSixes: currentSixes,
-                        diceRolled: false // يبقى متاحاً للرمي مجدداً
+                        diceRolled: false 
                     });
                 } else {
                     currentPool.push(roll);
                     db.ref('games/' + gameId).update({
                         dicePool: currentPool,
                         consecutiveSixes: 0,
-                        diceRolled: true // تم الانتهاء من حزمة الرمي والانتقال للتحريك
+                        diceRolled: true 
                     });
                 }
             }, 600);
@@ -593,16 +722,25 @@
             return "center-cell";
         }
 
-        // نظام التحريك والمفاضلة بين أرقام الزهر المتراكم
+        // نظام التحريك والمفاضلة مع ميزة الخروج الفوري التلقائي بالرقم 6 دون نافذة الاختيار
         function handleTokenInteraction(color, index, currentPos) {
             if(!isMyTurn || color !== myRole || !gameState.diceRolled) return;
 
             let pool = gameState.dicePool || [];
-            let validChoices = pool.filter(dice => canMoveToken(currentPos, dice));
 
+            // ميزة التمكين التلقائي: الخروج الفوري من المنزل بالرقم 6 مباشرة بدون إظهار قائمة اختيار
+            if(currentPos === -1) {
+                if(pool.includes(6)) {
+                    executeStrategyMove(index, currentPos, 6);
+                    return;
+                } else {
+                    return; 
+                }
+            }
+
+            let validChoices = pool.filter(dice => canMoveToken(currentPos, dice));
             if(validChoices.length === 0) return;
 
-            // إذا توفر خيار واحد فقط، يتم تنفيذه فوراً، عدا ذلك تظهر لوحة الاختيار العائمة
             if(validChoices.length === 1) {
                 executeStrategyMove(index, currentPos, validChoices[0]);
             } else {
@@ -615,7 +753,6 @@
             const container = document.getElementById('choice-buttons-container');
             container.innerHTML = '';
             
-            // إزالة تكرار الخيارات لعدم التشويش
             let uniqueChoices = [...new Set(choices)];
             
             uniqueChoices.forEach(dice => {
@@ -631,12 +768,11 @@
             overlay.classList.add('active');
         }
 
-        // تنفيذ خطة التحريك التدريجي والتأكد من جوائز اللعب والالتهام
+        // تنفيذ خطة التحريك التدريجي والتأكد من جوائز اللعب والالتهام مع أنيميشن دائري نطاط
         async function executeStrategyMove(index, currentPos, selectedDice) {
             localRenderingInProgress = true;
             let targetPos = currentPos === -1 ? 0 : currentPos + selectedDice;
             
-            // محاكاة أنيميشن الحركة خطوة بخطوة بالوقت الحقيقي ومزامنة الصوت المربعي
             if(currentPos === -1) {
                 AudioEngine.playStep();
                 drawTokenAtTemporaryPosition(myRole, index, 0);
@@ -656,10 +792,9 @@
             if(idxToRemove > -1) currentPool.splice(idxToRemove, 1);
 
             let updates = {};
-            let nextTurn = myRole;
             let gotBonus = false;
 
-            // قواعد الالتهام (الأكل) في المربعات غير الآمنة ومكافأة الدور الإضافي
+            // قواعد الالتهام في المربعات غير الآمنة ومكافأة الدور الإضافي
             if (targetPos < 52 && targetPos >= 0) {
                 let actualGlobalPos = (targetPos + startOffsets[myRole]) % 52;
                 if(!safeZones.includes(actualGlobalPos)) {
@@ -694,14 +829,13 @@
             // تحديد نقل الدور الاستراتيجي
             if(currentPool.length === 0) {
                 if(gotBonus) {
-                    updates['diceRolled'] = false; // تصفير للسماح له بالرمي مرة أخرى كمكافأة
+                    updates['diceRolled'] = false; 
                     updates['turn'] = myRole;
                 } else {
                     updates['diceRolled'] = false;
                     updates['turn'] = getNextTurn();
                 }
             } else {
-                // بقاء الدور حتى يستنفذ كافة نقاط الزهر المتراكم في مخزنه
                 updates['diceRolled'] = true;
                 updates['turn'] = myRole;
             }
@@ -713,7 +847,7 @@
             document.querySelectorAll(`.token-${color}`)[index]?.remove();
             
             const token = document.createElement('div');
-            token.className = `ludo-token token-${color}`;
+            token.className = `ludo-token token-${color} token-jump`; // إضافة كلاس النط الحركي الدائري
             
             let cellId = getCellIdFromPosition(color, tempPos);
             const cell = document.getElementById(cellId);
@@ -737,7 +871,6 @@
                 });
             });
 
-            // تمرير تلقائي ذكي للدور إذا تعذر التحريك استراتيجياً لحماية انسياب اللعب
             if(!canMoveAny) {
                 setTimeout(() => {
                     db.ref('games/' + gameId).update({ 
@@ -766,6 +899,10 @@
                 AudioEngine.playWin();
                 db.ref('games/' + gameId).update({ winner: myRole }); 
             }
+        }
+
+        function voteRematch() {
+            db.ref(`games/${gameId}/rematchVotes/${myRole}`).set(true);
         }
 
         function copyInviteLink() {
