@@ -4,17 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>لعبة X O الاحترافية أونلاين | حمزة الحماده</title>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js">
+    </script>
     <style>
         :root {
             --bg-color: #0f0f1a;
-            --container-bg: rgba(26, 26, 46, 0.9);
+            --container-bg: rgba(26, 26, 46, 0.92);
             --primary-neon: #ff2a5f;
             --secondary-neon: #00f0ff;
             --accent-glow: #7000ff;
             --text-main: #ffffff;
             --cell-bg: #16162a;
             --cell-hover: #232342;
+            --gold: #ffd700;
         }
 
         * {
@@ -29,7 +31,7 @@
             text-align: center;
             margin: 0;
             padding: 15px;
-            min-height: 100dvh; 
+            min-height: 100dvh;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -40,11 +42,15 @@
 
         .particles-container {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             z-index: -1;
             overflow: hidden;
             pointer-events: none;
         }
+
         .drop {
             position: absolute;
             bottom: -50px;
@@ -55,11 +61,22 @@
             will-change: transform, opacity;
             animation: rise linear infinite;
         }
+
         @keyframes rise {
-            0% { transform: translate3d(0, 0, 0) scale(1); opacity: 0; }
-            20% { opacity: 0.6; }
-            80% { opacity: 0.3; }
-            100% { transform: translate3d(0, -120vh, 0) scale(0.5); opacity: 0; }
+            0% {
+                transform: translate3d(0, 0, 0) scale(1);
+                opacity: 0;
+            }
+            20% {
+                opacity: 0.6;
+            }
+            80% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: translate3d(0, -120vh, 0) scale(0.5);
+                opacity: 0;
+            }
         }
 
         .developer-badge {
@@ -74,9 +91,154 @@
             align-items: center;
             gap: 5px;
         }
+
         .developer-badge span {
             color: var(--secondary-neon);
             font-weight: bold;
+        }
+
+        /* ========= أيقونة الترس ========= */
+        .settings-gear {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 48px;
+            height: 48px;
+            background: rgba(26, 26, 46, 0.85);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .settings-gear:hover {
+            border-color: var(--secondary-neon);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+            transform: rotate(30deg);
+        }
+
+        .settings-gear svg {
+            width: 26px;
+            height: 26px;
+            fill: #ffffff;
+            transition: all 0.4s ease;
+        }
+
+        .settings-gear:hover svg {
+            fill: var(--secondary-neon);
+            filter: drop-shadow(0 0 6px rgba(0, 240, 255, 0.7));
+        }
+
+        /* ========= مودال الإعدادات ========= */
+        .settings-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 99999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+        }
+
+        .settings-modal-overlay.active {
+            display: flex;
+            animation: fadeIn 0.3s;
+        }
+
+        .settings-modal {
+            background: var(--container-bg);
+            padding: 30px 25px;
+            border-radius: 20px;
+            border: 2px solid var(--secondary-neon);
+            text-align: center;
+            width: 90%;
+            max-width: 380px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+            position: relative;
+        }
+
+        .settings-modal h3 {
+            margin-top: 0;
+            color: #fff;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .settings-modal h3 svg {
+            width: 28px;
+            height: 28px;
+            fill: var(--secondary-neon);
+        }
+
+        .settings-modal .close-btn {
+            position: absolute;
+            top: 12px;
+            left: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #fff;
+            font-size: 20px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .settings-modal .close-btn:hover {
+            background: rgba(255, 42, 95, 0.3);
+        }
+
+        .settings-modal .dev-credit {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 140, 0, 0.1));
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 14px;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .settings-modal .dev-credit svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--gold);
+        }
+
+        .settings-modal .logout-btn {
+            background: linear-gradient(90deg, #ff2a5f, #d10043);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(255, 42, 95, 0.3);
         }
 
         .container {
@@ -84,7 +246,7 @@
             padding: 25px 20px;
             border-radius: 20px;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
-            max-width: 400px;
+            max-width: 420px;
             width: 100%;
             border: 1px solid rgba(255, 255, 255, 0.08);
             backdrop-filter: blur(5px);
@@ -99,33 +261,54 @@
             border-radius: 12px;
             padding: 12px;
             margin-bottom: 15px;
-            display: none; 
+            display: none;
             flex-direction: column;
             gap: 10px;
         }
-        .user-profile-card.active { display: flex; animation: fadeIn 0.3s ease-out; }
-        .profile-header { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-        
-        /* تنسيق الصورة الرمزية */
+
+        .user-profile-card.active {
+            display: flex;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
         .avatar-container {
             display: flex;
             align-items: center;
             gap: 10px;
         }
+
         .user-avatar {
             width: 45px;
             height: 45px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             border: 2px solid var(--secondary-neon);
             box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
             object-fit: cover;
         }
 
-        .user-info { text-align: right; }
-        .user-name { font-size: 16px; font-weight: bold; color: var(--secondary-neon); margin-bottom: 5px; display: flex; align-items: center; flex-wrap: wrap; gap: 5px;}
-        
-        /* شارة الإدارة الاحترافية */
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--secondary-neon);
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
         .admin-badge {
             background: linear-gradient(90deg, #ffd700, #ff8c00);
             color: #000;
@@ -141,12 +324,31 @@
             text-shadow: none;
         }
 
-        .user-id-box { 
-            background: rgba(255,255,255,0.1); padding: 5px 10px; border-radius: 6px; 
-            font-size: 13px; color: #fff; display: flex; align-items: center; gap: 8px; justify-content: space-between;
+        .user-id-box {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: space-between;
         }
-        .user-stats { font-size: 11px; color: #aaa; display: flex; gap: 10px; margin-top: 5px;}
-        .user-stats span { background: rgba(255,255,255,0.05); padding: 3px 6px; border-radius: 6px;}
+
+        .user-stats {
+            font-size: 11px;
+            color: #aaa;
+            display: flex;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .user-stats span {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 3px 6px;
+            border-radius: 6px;
+        }
 
         h1 {
             font-size: 28px;
@@ -158,9 +360,16 @@
             -webkit-text-fill-color: transparent;
         }
 
-        h2 { font-size: 18px; margin-bottom: 15px; color: #d1d1e0; }
+        h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #d1d1e0;
+        }
 
-        input[type="text"], input[type="password"], input[type="number"], select {
+        input[type="text"],
+        input[type="password"],
+        input[type="number"],
+        select {
             width: 100%;
             padding: 14px;
             margin: 8px 0;
@@ -175,8 +384,12 @@
             -webkit-appearance: none;
             -moz-appearance: none;
         }
-        input:focus, select:focus { border-color: var(--secondary-neon); }
-        
+
+        input:focus,
+        select:focus {
+            border-color: var(--secondary-neon);
+        }
+
         select option {
             background: var(--container-bg);
             color: white;
@@ -195,11 +408,94 @@
             width: 100%;
             box-shadow: 0 4px 10px rgba(112, 0, 255, 0.3);
         }
-        button:active { transform: scale(0.97); }
-        button:disabled { background: #555; cursor: not-allowed; box-shadow: none; color: #aaa; }
-        button.secondary-btn { background: linear-gradient(90deg, var(--primary-neon), #d10043); }
-        button.action-btn { width: auto; padding: 6px 12px; font-size: 12px; margin: 0; box-shadow: none; }
-        button.small-btn { padding: 8px 15px; font-size:13px; width:auto; }
+
+        button:active {
+            transform: scale(0.97);
+        }
+
+        button:disabled {
+            background: #555;
+            cursor: not-allowed;
+            box-shadow: none;
+            color: #aaa;
+        }
+
+        button.secondary-btn {
+            background: linear-gradient(90deg, var(--primary-neon), #d10043);
+        }
+
+        button.action-btn {
+            width: auto;
+            padding: 6px 12px;
+            font-size: 12px;
+            margin: 0;
+            box-shadow: none;
+        }
+
+        button.small-btn {
+            padding: 8px 15px;
+            font-size: 13px;
+            width: auto;
+        }
+
+        /* زر لودو المميز */
+        button.ludo-btn {
+            background: linear-gradient(135deg, #10b981, #059669, #047857);
+            border: 2px solid #34d399;
+            font-size: 17px;
+            padding: 15px;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 1px;
+        }
+
+        button.ludo-btn::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.08),
+                    transparent);
+            transform: rotate(45deg);
+            animation: ludoShine 3s infinite;
+        }
+
+        @keyframes ludoShine {
+            0% {
+                left: -50%;
+            }
+            100% {
+                left: 150%;
+            }
+        }
+
+        button.ludo-btn:hover {
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.7);
+            transform: translateY(-2px);
+        }
+
+        /* ========= أيقونات الأصدقاء مع حالة الأونلاين ========= */
+        .friend-status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+            flex-shrink: 0;
+        }
+
+        .friend-status-dot.online {
+            background: #10b981;
+            box-shadow: 0 0 8px #10b981;
+        }
+
+        .friend-status-dot.offline {
+            background: #555;
+            box-shadow: none;
+        }
 
         .scoreboard {
             display: flex;
@@ -211,11 +507,39 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
             align-items: flex-end;
         }
-        .score-box { display: flex; flex-direction: column; align-items: center; width: 33%; }
-        .score-label { font-size: 11px; color: #ccc; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; line-height: 1.5; }
-        .score-value { font-size: 20px; font-weight: bold; }
-        .score-box.x-team .score-value, .score-box.x-team .score-label { color: var(--primary-neon); }
-        .score-box.o-team .score-value, .score-box.o-team .score-label { color: var(--secondary-neon); }
+
+        .score-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 33%;
+        }
+
+        .score-label {
+            font-size: 11px;
+            color: #ccc;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+            line-height: 1.5;
+        }
+
+        .score-value {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .score-box.x-team .score-value,
+        .score-box.x-team .score-label {
+            color: var(--primary-neon);
+        }
+
+        .score-box.o-team .score-value,
+        .score-box.o-team .score-label {
+            color: var(--secondary-neon);
+        }
 
         .board {
             display: grid;
@@ -225,6 +549,7 @@
             display: none;
             max-width: 300px;
         }
+
         .cell {
             width: 100%;
             aspect-ratio: 1;
@@ -238,65 +563,175 @@
             cursor: pointer;
             border: 1px solid rgba(255, 255, 255, 0.02);
         }
-        .cell:active { transform: scale(0.95); }
-        .cell span { animation: popIn 0.2s ease-out forwards; display: inline-block; }
 
-        @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .cell:active {
+            transform: scale(0.95);
+        }
 
-        .cell.x { color: var(--primary-neon); text-shadow: 0 0 10px rgba(255, 42, 95, 0.5); }
-        .cell.o { color: var(--secondary-neon); text-shadow: 0 0 10px rgba(0, 240, 255, 0.5); }
+        .cell span {
+            animation: popIn 0.2s ease-out forwards;
+            display: inline-block;
+        }
 
-        .cell.winning-cell { background-color: var(--accent-glow) !important; color: #fff !important; transform: scale(1.05); }
+        @keyframes popIn {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
 
-        section { display: none; }
-        section.active { display: block; animation: fadeIn 0.3s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .cell.x {
+            color: var(--primary-neon);
+            text-shadow: 0 0 10px rgba(255, 42, 95, 0.5);
+        }
 
-        #status-text { font-size: 16px; margin: 10px 0; font-weight: bold; color: #e2e8f0; }
-        #role-text { font-size: 13px; padding: 4px 10px; background: rgba(255, 255, 255, 0.05); border-radius: 20px; display: inline-block; margin-bottom: 5px; }
+        .cell.o {
+            color: var(--secondary-neon);
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+        }
 
-        /* ستايل قائمة الأصدقاء */
+        .cell.winning-cell {
+            background-color: var(--accent-glow) !important;
+            color: #fff !important;
+            transform: scale(1.05);
+        }
+
+        section {
+            display: none;
+        }
+
+        section.active {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        #status-text {
+            font-size: 16px;
+            margin: 10px 0;
+            font-weight: bold;
+            color: #e2e8f0;
+        }
+
+        #role-text {
+            font-size: 13px;
+            padding: 4px 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 5px;
+        }
+
         .list-container {
-            background: rgba(0,0,0,0.3);
+            background: rgba(0, 0, 0, 0.3);
             border-radius: 10px;
             max-height: 200px;
             overflow-y: auto;
             margin-bottom: 15px;
             padding: 5px;
-            border: 1px solid rgba(255,255,255,0.05);
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
-        .list-item {
-            display: flex; justify-content: space-between; align-items: center;
-            background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; margin-bottom: 5px;
-        }
-        .list-item span { font-size: 14px; font-weight: bold; color: #fff; display: flex; align-items: center; gap: 8px;}
-        .list-item img { width: 25px; height: 25px; border-radius: 50%; background: #333; object-fit: cover;}
 
-        /* الإشعار الجانبي */
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+        }
+
+        .list-item span {
+            font-size: 14px;
+            font-weight: bold;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .list-item img {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #333;
+            object-fit: cover;
+        }
+
         .toast {
-            position: fixed; bottom: 20px; background: #10b981; color: white; padding: 10px 20px;
-            border-radius: 30px; font-size: 14px; font-weight: bold;
-            transform: translateY(100px); opacity: 0; pointer-events: none; z-index: 9999;
+            position: fixed;
+            bottom: 20px;
+            background: #10b981;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: bold;
+            transform: translateY(100px);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 9999;
             transition: 0.3s ease-out;
         }
-        .toast.show { transform: translateY(0); opacity: 1; }
 
-        /* نافذة الدعوة المنبثقة */
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
         .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); z-index: 99999;
-            display: none; justify-content: center; align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 99999;
+            display: none;
+            justify-content: center;
+            align-items: center;
             backdrop-filter: blur(5px);
         }
-        .modal-overlay.active { display: flex; animation: fadeIn 0.3s; }
-        .modal-content {
-            background: var(--container-bg); padding: 25px; border-radius: 20px;
-            border: 2px solid var(--secondary-neon); text-align: center; width: 90%; max-width: 320px;
+
+        .modal-overlay.active {
+            display: flex;
+            animation: fadeIn 0.3s;
         }
-        .modal-content h3 { margin-top: 0; color: #fff; }
-        .modal-buttons { display: flex; gap: 10px; margin-top: 20px; }
-        
-        /* ستايل دعوة الرابط */
+
+        .modal-content {
+            background: var(--container-bg);
+            padding: 25px;
+            border-radius: 20px;
+            border: 2px solid var(--secondary-neon);
+            text-align: center;
+            width: 90%;
+            max-width: 320px;
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+            color: #fff;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
         .invite-link-box {
             background: rgba(255, 42, 95, 0.1);
             border: 1px dashed var(--primary-neon);
@@ -305,14 +740,97 @@
             margin-bottom: 20px;
             text-align: center;
         }
+
+        /* لودو مودال */
+        .ludo-room-modal {
+            background: var(--container-bg);
+            padding: 30px 25px;
+            border-radius: 20px;
+            border: 2px solid #10b981;
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+        }
+
+        .ludo-room-modal h3 {
+            color: #10b981;
+            font-size: 20px;
+            margin-top: 0;
+        }
+
+        .player-option {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 10px 0;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            transition: all 0.3s;
+        }
+
+        .player-option:hover {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
     </style>
 
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js">
+    </script>
 </head>
 <body>
 
     <div class="particles-container" id="particles"></div>
+
+    <!-- ========= زر الترس ========= -->
+    <div class="settings-gear" onclick="openSettings()" title="الإعدادات">
+        <svg viewBox="0 0 24 24">
+            <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.33-.02-.64-.06-.94l2.02-1.58c.18-.14.23-.38.12-.56l-1.89-3.28c-.12-.19-.36-.26-.56-.18l-2.38.96c-.5-.38-1.06-.68-1.66-.88L14.45 3.5c-.04-.2-.2-.34-.4-.34h-3.78c-.2 0-.36.14-.4.34l-.3 2.52c-.6.2-1.16.5-1.66.88l-2.38-.96c-.2-.08-.44-.01-.56.18l-1.89 3.28c-.12.19-.07.42.12.56l2.02 1.58c-.04.3-.06.61-.06.94 0 .33.02.64.06.94l-2.02 1.58c-.18.14-.23.38-.12.56l1.89 3.28c.12.19.36.26.56.18l2.38-.96c.5.38 1.06.68 1.66.88l.3 2.52c.04.2.2.34.4.34h3.78c.2 0 .36-.14.4-.34l.3-2.52c.6-.2 1.16-.5 1.66-.88l2.38.96c.2.08.44.01.56-.18l1.89-3.28c.12-.19.07-.42-.12-.56l-2.02-1.58zM12 15c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"/>
+        </svg>
+    </div>
+
+    <!-- ========= مودال الإعدادات ========= -->
+    <div class="settings-modal-overlay" id="settings-modal-overlay">
+        <div class="settings-modal">
+            <button class="close-btn" onclick="closeSettings()">✕</button>
+            <h3>
+                <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.33-.02-.64-.06-.94l2.02-1.58c.18-.14.23-.38.12-.56l-1.89-3.28c-.12-.19-.36-.26-.56-.18l-2.38.96c-.5-.38-1.06-.68-1.66-.88L14.45 3.5c-.04-.2-.2-.34-.4-.34h-3.78c-.2 0-.36.14-.4.34l-.3 2.52c-.6.2-1.16.5-1.66.88l-2.38-.96c-.2-.08-.44-.01-.56.18l-1.89 3.28c-.12.19-.07.42.12.56l2.02 1.58c-.04.3-.06.61-.06.94 0 .33.02.64.06.94l-2.02 1.58c-.18.14-.23.38-.12.56l1.89 3.28c.12.19.36.26.56.18l2.38-.96c.5.38 1.06.68 1.66.88l.3 2.52c.04.2.2.34.4.34h3.78c.2 0 .36-.14.4-.34l.3-2.52c.6-.2 1.16-.5 1.66-.88l2.38.96c.2.08.44.01.56-.18l1.89-3.28c.12-.19.07-.42-.12-.56l-2.02-1.58zM12 15c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"/></svg>
+                الإعدادات
+            </h3>
+            <div class="dev-credit">
+                <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                <span>جميع الحقوق محفوظة © <strong>Hamza Elhumada</strong></span>
+            </div>
+            <p style="color:#aaa;font-size:13px;margin:10px 0;">المطور: <strong style="color:var(--secondary-neon);">حمزة الحماده</strong></p>
+            <button class="logout-btn" onclick="logout()">🚪 تسجيل الخروج</button>
+        </div>
+    </div>
+
+    <!-- ========= مودال لودو ========= -->
+    <div class="modal-overlay" id="ludo-modal-overlay">
+        <div class="ludo-room-modal">
+            <h3>🎲 لعبة لودو</h3>
+            <p style="color:#ccc;font-size:14px;">اختر عدد اللاعبين</p>
+            <div class="player-option" onclick="startLudoGame(2)">
+                👥 <strong>لاعبين (1 ضد 1)</strong>
+                <br><small style="color:#aaa;">أنت وصديقك</small>
+            </div>
+            <div class="player-option" onclick="startLudoGame(4)">
+                👥👥 <strong>4 لاعبين</strong>
+                <br><small style="color:#aaa;">أنت و3 أصدقاء</small>
+            </div>
+            <div class="player-option" onclick="startLudoWithFriend()">
+                📨 <strong>استدعاء صديق</strong>
+                <br><small style="color:#aaa;">اختر صديقاً من القائمة</small>
+            </div>
+            <button class="secondary-btn small-btn" onclick="closeLudoModal()" style="margin-top:10px;">إلغاء</button>
+        </div>
+    </div>
 
     <div class="developer-badge">
         تطوير: <span>حمزة الحماده</span>
@@ -330,7 +848,6 @@
                     </div>
                 </div>
             </div>
-            <button onclick="logout()" class="action-btn secondary-btn">تسجيل خروج</button>
         </div>
         <div class="user-id-box">
             <span>الآيدي (ID): <strong id="display-id" style="color:var(--secondary-neon); letter-spacing:2px;">--------</strong></span>
@@ -355,8 +872,9 @@
         </section>
 
         <section id="menu-section">
-            <button onclick="startLocalGame()">لعب محلي (نفس الجهاز)</button>
-            <button class="secondary-btn" onclick="showSection('friends-section')">الأصدقاء واللعب أونلاين</button>
+            <button onclick="startLocalGame()">🎮 لعب محلي (نفس الجهاز)</button>
+            <button class="secondary-btn" onclick="showSection('friends-section')">👥 الأصدقاء واللعب أونلاين</button>
+            <button class="ludo-btn" onclick="openLudoModal()">🎲 لعبة لودو</button>
         </section>
 
         <section id="friends-section">
@@ -388,7 +906,16 @@
         <section id="waiting-section">
             <h2 id="waiting-msg-title">بانتظار قبول صديقك للدعوة...</h2>
             <div class="loader" style="margin: 20px auto; width: 40px; height: 40px; border: 4px solid #333; border-top: 4px solid var(--secondary-neon); border-radius: 50%; animation: spin 1s linear infinite;"></div>
-            <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
+            <style>
+            @keyframes spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+            </style>
             <button class="secondary-btn" onclick="cancelInvite()">إلغاء الدعوة</button>
         </section>
 
@@ -410,7 +937,7 @@
 
             <div id="role-text"></div>
             <div id="status-text">جاري التحضير...</div>
-            
+
             <div class="board" id="board">
                 <div class="cell" onclick="makeMove(0)"></div>
                 <div class="cell" onclick="makeMove(1)"></div>
@@ -452,13 +979,13 @@
         const db = firebase.database();
 
         let currentUserData = null;
-        let currentUserId = localStorage.getItem('xo_uid'); 
+        let currentUserId = localStorage.getItem('xo_uid');
         let currentUsername = localStorage.getItem('xo_username');
 
-        let myRole = ''; 
+        let myRole = '';
         let gameId = '';
         let isOnline = false;
-        let localTurn = 'X'; 
+        let localTurn = 'X';
         let gameBoard = ["", "", "", "", "", "", "", "", ""];
         let isGameOver = false;
         let scores = { X: 0, O: 0, ties: 0 };
@@ -469,45 +996,80 @@
         let playerXName = "اللاعب (X)";
         let playerOName = "اللاعب (O)";
 
-        // توليد تأثير صوتي جميل للقبول باستخدام Web Audio API
+        // ========= كائن لتخزين حالات الأصدقاء =========
+        let friendsOnlineStatus = {};
+
+        function openSettings() {
+            document.getElementById('settings-modal-overlay').classList.add('active');
+        }
+
+        function closeSettings() {
+            document.getElementById('settings-modal-overlay').classList.remove('active');
+        }
+
+        function openLudoModal() {
+            document.getElementById('ludo-modal-overlay').classList.add('active');
+        }
+
+        function closeLudoModal() {
+            document.getElementById('ludo-modal-overlay').classList.remove('active');
+        }
+
+        function startLudoGame(playerCount) {
+            closeLudoModal();
+            localStorage.setItem('ludo_playerCount', playerCount);
+            localStorage.setItem('ludo_uid', currentUserId);
+            localStorage.setItem('ludo_username', currentUserData.username);
+            localStorage.setItem('ludo_gender', currentUserData.gender || 'boy');
+            window.location.href = 'ludo.html';
+        }
+
+        function startLudoWithFriend() {
+            closeLudoModal();
+            showToast("📨 سيتم الانتقال لقائمة الأصدقاء لاختيار صديق للودو");
+            showSection('friends-section');
+            // سيتم إرسال الدعوة عبر الرابط بعد اختيار الصديق
+            localStorage.setItem('ludo_uid', currentUserId);
+            localStorage.setItem('ludo_username', currentUserData.username);
+            localStorage.setItem('ludo_gender', currentUserData.gender || 'boy');
+            localStorage.setItem('ludo_playerCount', '2');
+        }
+
         function playAcceptSound() {
             try {
-                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const ctx = new(window.AudioContext || window.webkitAudioContext)();
                 const osc = ctx.createOscillator();
                 const gain = ctx.createGain();
                 osc.connect(gain);
                 gain.connect(ctx.destination);
                 osc.type = 'sine';
-                
-                osc.frequency.setValueAtTime(523.25, ctx.currentTime); 
-                osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1); 
-                osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.2); 
-                osc.frequency.setValueAtTime(1046.50, ctx.currentTime + 0.3); 
-                
+                osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+                osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1);
+                osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.2);
+                osc.frequency.setValueAtTime(1046.50, ctx.currentTime + 0.3);
                 gain.gain.setValueAtTime(0.1, ctx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 1);
-                
                 osc.start();
                 osc.stop(ctx.currentTime + 1);
-            } catch(e) {
+            } catch (e) {
                 console.log("Audio play failed", e);
             }
         }
 
-        // تم التحديث: إضافة رسمات احترافية ومحسنة للمستخدمين (ذكر/أنثى)
         function generateAvatarURL(seedName, gender) {
-            // تخصيص صورة المطور
             if (seedName === "حمزة الحماده") {
                 return "nbras.jpg";
             }
-
             let svgStr = "";
             if (gender === 'boy') {
-                svgStr = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='gb' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='#00f0ff'/><stop offset='100%' stop-color='#0080ff'/></linearGradient></defs><rect width='100' height='100' fill='#16162a'/><path d='M15 100 C 15 60, 30 50, 50 50 C 70 50, 85 60, 85 100 Z' fill='url(#gb)' opacity='0.9'/><circle cx='50' cy='32' r='18' fill='#ffffff'/><path d='M30 30 Q 50 10 70 30 Q 60 15 40 15 Z' fill='url(#gb)'/></svg>`;
+                svgStr =
+                    `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='gb' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='#00f0ff'/><stop offset='100%' stop-color='#0080ff'/></linearGradient></defs><rect width='100' height='100' fill='#16162a'/><path d='M15 100 C 15 60, 30 50, 50 50 C 70 50, 85 60, 85 100 Z' fill='url(#gb)' opacity='0.9'/><circle cx='50' cy='32' r='18' fill='#ffffff'/><path d='M30 30 Q 50 10 70 30 Q 60 15 40 15 Z' fill='url(#gb)'/></svg>`;
             } else if (gender === 'girl') {
-                svgStr = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='gg' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='#ff2a5f'/><stop offset='100%' stop-color='#d10043'/></linearGradient></defs><rect width='100' height='100' fill='#16162a'/><path d='M25 40 C 20 60, 15 90, 15 100 L 85 100 C 85 90, 80 60, 75 40 Z' fill='url(#gg)' opacity='0.7'/><path d='M25 100 C 25 70, 35 60, 50 60 C 65 60, 75 70, 75 100 Z' fill='url(#gg)'/><circle cx='50' cy='35' r='16' fill='#ffffff'/></svg>`;
+                svgStr =
+                    `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='gg' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='#ff2a5f'/><stop offset='100%' stop-color='#d10043'/></linearGradient></defs><rect width='100' height='100' fill='#16162a'/><path d='M25 40 C 20 60, 15 90, 15 100 L 85 100 C 85 90, 80 60, 75 40 Z' fill='url(#gg)' opacity='0.7'/><path d='M25 100 C 25 70, 35 60, 50 60 C 65 60, 75 70, 75 100 Z' fill='url(#gg)'/><circle cx='50' cy='35' r='16' fill='#ffffff'/></svg>`;
             } else {
-                svgStr = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='gd' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='#7000ff'/><stop offset='100%' stop-color='#511fff'/></linearGradient></defs><rect width='100' height='100' fill='#16162a'/><path d='M20 100 C 20 65, 35 55, 50 55 C 65 55, 80 65, 80 100 Z' fill='url(#gd)' opacity='0.9'/><circle cx='50' cy='35' r='18' fill='#ffffff'/><rect x='35' y='30' width='30' height='8' rx='4' fill='url(#gd)'/></svg>`;
+                svgStr =
+                    `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='gd' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='#7000ff'/><stop offset='100%' stop-color='#511fff'/></linearGradient></defs><rect width='100' height='100' fill='#16162a'/><path d='M20 100 C 20 65, 35 55, 50 55 C 65 55, 80 65, 80 100 Z' fill='url(#gd)' opacity='0.9'/><circle cx='50' cy='35' r='18' fill='#ffffff'/><rect x='35' y='30' width='30' height='8' rx='4' fill='url(#gd)'/></svg>`;
             }
             return "data:image/svg+xml;base64," + btoa(svgStr);
         }
@@ -520,26 +1082,28 @@
             function randomInRange(min, max) {
                 return Math.random() * (max - min) + min;
             }
-
             var interval = setInterval(function() {
                 var timeLeft = animationEnd - Date.now();
                 if (timeLeft <= 0) { return clearInterval(interval); }
                 var particleCount = 50 * (timeLeft / duration);
-                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
-                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1,
+                        0.3), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7,
+                        0.9), y: Math.random() - 0.2 } }));
             }, 250);
         }
 
         function createParticles() {
             const container = document.getElementById('particles');
-            const colors = ['#ff2a5f', '#00f0ff', '#7000ff']; 
+            const colors = ['#ff2a5f', '#00f0ff', '#7000ff'];
             for (let i = 0; i < 15; i++) {
                 let drop = document.createElement('div');
                 drop.classList.add('drop');
                 drop.style.left = Math.random() * 100 + 'vw';
-                drop.style.animationDuration = (Math.random() * 2 + 3) + 's'; 
+                drop.style.animationDuration = (Math.random() * 2 + 3) + 's';
                 drop.style.animationDelay = (Math.random() * 3) + 's';
-                drop.style.background = `linear-gradient(180deg, ${colors[Math.floor(Math.random() * colors.length)]}, transparent)`;
+                drop.style.background =
+                    `linear-gradient(180deg, ${colors[Math.floor(Math.random() * colors.length)]}, transparent)`;
                 container.appendChild(drop);
             }
         }
@@ -548,16 +1112,16 @@
         window.onload = () => {
             const urlParams = new URLSearchParams(window.location.search);
             const inviteParam = urlParams.get('invite');
-
             if (currentUserId && currentUsername) {
                 checkIfBanned(currentUserId, () => {
                     db.ref('users/' + currentUserId).once('value').then(snap => {
                         if (snap.exists()) {
                             currentUserData = snap.val();
+                            // تحديث حالة الأونلاين
+                            setUserOnlineStatus(true);
                             showProfileAndMenu();
                             setupRealtimeListeners();
-                            
-                            if(inviteParam) {
+                            if (inviteParam) {
                                 checkAndJoinLinkInvite(inviteParam);
                             }
                         } else {
@@ -567,6 +1131,26 @@
                 });
             }
         };
+
+        // ========= نظام Presence: تتبع حالة الأونلاين =========
+        function setUserOnlineStatus(isOnline) {
+            if (!currentUserId) return;
+            const userStatusRef = db.ref('users/' + currentUserId + '/presence');
+            const connectedRef = db.ref('.info/connected');
+
+            connectedRef.on('value', function(snap) {
+                if (snap.val() === true) {
+                    userStatusRef.set({
+                        isOnline: true,
+                        lastSeen: firebase.database.ServerValue.TIMESTAMP
+                    });
+                    userStatusRef.onDisconnect().set({
+                        isOnline: false,
+                        lastSeen: firebase.database.ServerValue.TIMESTAMP
+                    });
+                }
+            });
+        }
 
         function showToast(message, color = "#10b981") {
             const toast = document.getElementById('custom-toast');
@@ -587,37 +1171,34 @@
                     showToast("❌ هذا الحساب محظور من قبل الإدارة!", "#ff2a5f");
                     logout();
                 } else {
-                    if(onSuccess) onSuccess();
+                    if (onSuccess) onSuccess();
                 }
             });
         }
 
-        // ================= نظام التسجيل وتسجيل الدخول =================
         function authenticateUser() {
             let username = document.getElementById('username-input').value.trim();
             const password = document.getElementById('password-input').value.trim();
             const gender = document.getElementById('gender-input').value;
-
             if (username.length <= 5) {
-                showToast("⚠️ اليوزر يجب أن يكون أكثر من 5 أحرف!", "#ff2a5f"); return;
+                showToast("⚠️ اليوزر يجب أن يكون أكثر من 5 أحرف!", "#ff2a5f");
+                return;
             }
             if (password.length < 4) {
-                showToast("⚠️ كلمة المرور قصيرة جداً!", "#ff2a5f"); return;
+                showToast("⚠️ كلمة المرور قصيرة جداً!", "#ff2a5f");
+                return;
             }
             if (!gender || gender === "") {
-                showToast("⚠️ يرجى تحديد الجنس للتمكن من الدخول!", "#ff2a5f"); return;
+                showToast("⚠️ يرجى تحديد الجنس للتمكن من الدخول!", "#ff2a5f");
+                return;
             }
-
             let isAdmin = (username === "حمزة الحماده" && password === "hamzagmailcom34567");
-            if(isAdmin) {
-                username = "حمزة الحماده"; 
+            if (isAdmin) {
+                username = "حمزة الحماده";
             }
-
             db.ref('usernames/' + username).once('value').then(snap => {
                 let uid = snap.exists() ? snap.val() : null;
-                
                 if (isAdmin) uid = "552";
-
                 if (uid) {
                     checkIfBanned(uid, () => {
                         db.ref('users/' + uid).once('value').then(userSnap => {
@@ -634,8 +1215,8 @@
                         });
                     });
                 } else {
-                    if(isAdmin) {
-                         createAccount(username, password, "552", gender);
+                    if (isAdmin) {
+                        createAccount(username, password, "552", gender);
                     } else {
                         let newUid = Math.floor(10000000 + Math.random() * 90000000).toString();
                         createAccount(username, password, newUid, gender);
@@ -645,7 +1226,8 @@
         }
 
         function createAccount(username, password, uid, gender) {
-            let newData = { username: username, password: password, uid: uid, played: 0, wins: 0, gender: gender };
+            let newData = { username: username, password: password, uid: uid, played: 0, wins: 0, gender: gender,
+                presence: { isOnline: true, lastSeen: firebase.database.ServerValue.TIMESTAMP } };
             db.ref('usernames/' + username).set(uid);
             db.ref('users/' + uid).set(newData);
             loginSuccess(uid, username, newData);
@@ -658,17 +1240,23 @@
             currentUserData = data;
             localStorage.setItem('xo_uid', uid);
             localStorage.setItem('xo_username', username);
+            setUserOnlineStatus(true);
             showProfileAndMenu();
             setupRealtimeListeners();
-
             const urlParams = new URLSearchParams(window.location.search);
             const inviteParam = urlParams.get('invite');
-            if(inviteParam) {
+            if (inviteParam) {
                 checkAndJoinLinkInvite(inviteParam);
             }
         }
 
         function logout() {
+            if (currentUserId) {
+                db.ref('users/' + currentUserId + '/presence').set({
+                    isOnline: false,
+                    lastSeen: firebase.database.ServerValue.TIMESTAMP
+                });
+            }
             localStorage.removeItem('xo_uid');
             localStorage.removeItem('xo_username');
             location.reload();
@@ -676,19 +1264,17 @@
 
         function showProfileAndMenu() {
             document.getElementById('user-profile').classList.add('active');
-            
             let displayNameHTML = `أهلاً، ${currentUserData.username}`;
             if (currentUserData.username === "حمزة الحماده" || currentUserId === "552") {
-                displayNameHTML += ` <span class="admin-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="vertical-align: middle; margin-left: 2px;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg> المطور</span>`;
+                displayNameHTML +=
+                    ` <span class="admin-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="vertical-align: middle; margin-left: 2px;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg> المطور</span>`;
             }
-            
             document.getElementById('display-name').innerHTML = displayNameHTML;
             document.getElementById('display-id').innerText = currentUserId;
             document.getElementById('display-played').innerText = `🎮 لعب: ${currentUserData.played || 0}`;
             document.getElementById('display-wins').innerText = `🏆 فاز: ${currentUserData.wins || 0}`;
-            
-            document.getElementById('user-avatar').src = generateAvatarURL(currentUserData.username, currentUserData.gender);
-            
+            document.getElementById('user-avatar').src = generateAvatarURL(currentUserData.username, currentUserData
+                .gender);
             showSection('menu-section');
         }
 
@@ -696,21 +1282,19 @@
             navigator.clipboard.writeText(currentUserId).then(() => showToast("📋 تم نسخ الآيدي الخاص بك"));
         }
 
-        // ================= نظام الأصدقاء والمستمعات =================
         function setupRealtimeListeners() {
             db.ref('users/' + currentUserId + '/requests').on('value', snap => {
                 const reqs = snap.val();
                 let html = '';
-                if(reqs) {
-                    for(let id in reqs) {
+                if (reqs) {
+                    for (let id in reqs) {
                         let friendName = typeof reqs[id] === 'string' ? reqs[id] : reqs[id].name;
                         let friendGender = typeof reqs[id] === 'string' ? null : reqs[id].gender;
-                        
                         html += `
-                        <div class="list-item">
-                            <span><img src="${generateAvatarURL(friendName, friendGender)}"> ${friendName}</span>
-                            <button class="action-btn" onclick="acceptFriend('${id}', '${friendName}', '${friendGender}')" style="background:#10b981;">قبول</button>
-                        </div>`;
+                            <div class="list-item">
+                                <span><img src="${generateAvatarURL(friendName, friendGender)}"> ${friendName}</span>
+                                <button class="action-btn" onclick="acceptFriend('${id}', '${friendName}', '${friendGender}')" style="background:#10b981;">قبول</button>
+                            </div>`;
                     }
                 } else {
                     html = '<div style="text-align:center;color:#666;padding:10px;">لا توجد طلبات</div>';
@@ -721,26 +1305,40 @@
             db.ref('users/' + currentUserId + '/friends').on('value', snap => {
                 const friends = snap.val();
                 let html = '';
-                if(friends) {
-                    for(let id in friends) {
+                if (friends) {
+                    let friendCount = Object.keys(friends).length;
+                    let processedCount = 0;
+                    for (let id in friends) {
                         let friendName = typeof friends[id] === 'string' ? friends[id] : friends[id].name;
                         let friendGender = typeof friends[id] === 'string' ? null : friends[id].gender;
-
+                        // مراقبة حالة الأونلاين لهذا الصديق
+                        db.ref('users/' + id + '/presence').on('value', presSnap => {
+                            const pres = presSnap.val();
+                            friendsOnlineStatus[id] = pres && pres.isOnline === true;
+                            updateFriendStatusDot(id, friendsOnlineStatus[id]);
+                        });
+                        let isOnlineNow = friendsOnlineStatus[id] === true;
+                        let statusDot =
+                            `<span class="friend-status-dot ${isOnlineNow ? 'online' : 'offline'}" id="dot-${id}"></span>`;
                         html += `
-                        <div class="list-item">
-                            <span><img src="${generateAvatarURL(friendName, friendGender)}"> ${friendName}</span>
-                            <button class="action-btn" onclick="inviteFriend('${id}', '${friendName}')">دعوة</button>
-                        </div>`;
+                            <div class="list-item">
+                                <span><img src="${generateAvatarURL(friendName, friendGender)}">${statusDot} ${friendName}</span>
+                                <button class="action-btn invite-btn" id="invite-btn-${id}" onclick="inviteFriend('${id}', '${friendName}')" ${!isOnlineNow ? 'disabled style="background:#444;color:#888;cursor:not-allowed;"' : ''}>${isOnlineNow ? '🎮 دعوة' : '⚫ غير متصل'}</button>
+                            </div>`;
+                        processedCount++;
+                        if (processedCount >= friendCount) {
+                            document.getElementById('friends-list').innerHTML = html || '<div style="text-align:center;color:#666;padding:10px;">لا يوجد أصدقاء بعد</div>';
+                        }
                     }
                 } else {
                     html = '<div style="text-align:center;color:#666;padding:10px;">لا يوجد أصدقاء بعد</div>';
+                    document.getElementById('friends-list').innerHTML = html;
                 }
-                document.getElementById('friends-list').innerHTML = html;
             });
 
             db.ref('users/' + currentUserId + '/game_invite').on('value', snap => {
                 const invite = snap.val();
-                if(invite && invite.gameId) {
+                if (invite && invite.gameId) {
                     pendingInviteId = invite.gameId;
                     document.getElementById('invite-msg').innerText = `صديقك ${invite.senderName} يدعوك للعب!`;
                     document.getElementById('invite-modal').classList.add('active');
@@ -751,25 +1349,45 @@
             });
         }
 
+        function updateFriendStatusDot(friendId, isOnline) {
+            const dot = document.getElementById('dot-' + friendId);
+            const btn = document.getElementById('invite-btn-' + friendId);
+            if (dot) {
+                dot.className = 'friend-status-dot ' + (isOnline ? 'online' : 'offline');
+            }
+            if (btn) {
+                if (isOnline) {
+                    btn.disabled = false;
+                    btn.style.background = '';
+                    btn.style.color = '';
+                    btn.style.cursor = '';
+                    btn.innerText = '🎮 دعوة';
+                } else {
+                    btn.disabled = true;
+                    btn.style.background = '#444';
+                    btn.style.color = '#888';
+                    btn.style.cursor = 'not-allowed';
+                    btn.innerText = '⚫ غير متصل';
+                }
+            }
+        }
+
         function searchAndAddFriend() {
-            if(isRequestOnCooldown) {
+            if (isRequestOnCooldown) {
                 showToast("⏳ يرجى الانتظار قليلاً قبل إرسال طلب آخر!", "#ff2a5f");
                 return;
             }
-
             const targetId = document.getElementById('search-id-input').value.trim();
-            if(targetId === currentUserId) { showToast("⚠️ لا يمكنك إضافة نفسك!", "#ff2a5f"); return; }
-            if(targetId === "") { showToast("⚠️ يرجى إدخال الآيدي!", "#ff2a5f"); return; }
-
+            if (targetId === currentUserId) { showToast("⚠️ لا يمكنك إضافة نفسك!", "#ff2a5f"); return; }
+            if (targetId === "") { showToast("⚠️ يرجى إدخال الآيدي!", "#ff2a5f"); return; }
             db.ref('users/' + targetId).once('value').then(snap => {
-                if(snap.exists()) {
+                if (snap.exists()) {
                     db.ref('users/' + targetId + '/requests/' + currentUserId).set({
                         name: currentUserData.username,
                         gender: currentUserData.gender || 'boy'
                     });
                     showToast("✅ تم إرسال طلب الصداقة!");
                     document.getElementById('search-id-input').value = "";
-                    
                     startCooldown();
                 } else {
                     showToast("❌ لم يتم العثور على لاعب بهذا الآيدي!", "#ff2a5f");
@@ -783,11 +1401,10 @@
             btn.disabled = true;
             let timeLeft = 20;
             btn.innerText = `انتظر ${timeLeft}ث`;
-            
             let interval = setInterval(() => {
                 timeLeft--;
                 btn.innerText = `انتظر ${timeLeft}ث`;
-                if(timeLeft <= 0) {
+                if (timeLeft <= 0) {
                     clearInterval(interval);
                     isRequestOnCooldown = false;
                     btn.disabled = false;
@@ -798,28 +1415,38 @@
 
         function acceptFriend(friendId, friendName, friendGender) {
             db.ref('users/' + currentUserId + '/friends/' + friendId).set({
-                name: friendName, 
+                name: friendName,
                 gender: friendGender
             });
             db.ref('users/' + friendId + '/friends/' + currentUserId).set({
-                name: currentUserData.username, 
+                name: currentUserData.username,
                 gender: currentUserData.gender || 'boy'
             });
             db.ref('users/' + currentUserId + '/requests/' + friendId).remove();
             showToast("🤝 أصبحتم أصدقاء الآن!");
         }
 
-        // ================= نظام دعوات اللعب أونلاين (دعوة عادية + روابط) =================
-        let activeFriendId = null; 
+        let activeFriendId = null;
 
         function inviteFriend(friendId, friendName) {
+            // التحقق من حالة الأونلاين قبل إرسال الدعوة
+            db.ref('users/' + friendId + '/presence').once('value').then(presSnap => {
+                const pres = presSnap.val();
+                if (!pres || pres.isOnline !== true) {
+                    showToast("❌ هذا اللاعب غير متصل حالياً!", "#ff2a5f");
+                    return;
+                }
+                // اللاعب متصل، نرسل الدعوة
+                sendGameInvite(friendId, friendName);
+            });
+        }
+
+        function sendGameInvite(friendId, friendName) {
             activeFriendId = friendId;
             gameId = Math.random().toString(36).substring(2, 10);
             myRole = 'X';
             isOnline = true;
-
             document.getElementById('waiting-msg-title').innerText = "بانتظار قبول صديقك للدعوة...";
-
             db.ref('games/' + gameId).set({
                 board: ["", "", "", "", "", "", "", "", ""],
                 turn: 'X',
@@ -829,25 +1456,22 @@
                 guestName: friendName,
                 scores: { X: 0, O: 0, ties: 0 }
             });
-
             db.ref('users/' + friendId + '/game_invite').set({
                 gameId: gameId,
                 senderId: currentUserId,
                 senderName: currentUserData.username
             });
-
             showSection('waiting-section');
-
             db.ref('games/' + gameId + '/player2Joined').on('value', snap => {
-                if(snap.val() === true) {
-                    playAcceptSound(); 
+                if (snap.val() === true) {
+                    playAcceptSound();
                     db.ref('games/' + gameId + '/player2Joined').off();
                     startGameOnline();
                 }
             });
-
             db.ref('users/' + friendId + '/game_invite').on('value', snap => {
-                if(!snap.exists() && document.getElementById('waiting-section').classList.contains('active')) {
+                if (!snap.exists() && document.getElementById('waiting-section').classList.contains(
+                        'active')) {
                     showToast("❌ الصديق رفض الدعوة أو غير متاح", "#ff2a5f");
                     db.ref('games/' + gameId).remove();
                     showSection('friends-section');
@@ -855,13 +1479,11 @@
             });
         }
 
-        // إنشاء رابط دعوة جديد
         function createInviteLink() {
             gameId = Math.random().toString(36).substring(2, 10);
             myRole = 'X';
             isOnline = true;
-            activeFriendId = null; 
-
+            activeFriendId = null;
             db.ref('games/' + gameId).set({
                 board: ["", "", "", "", "", "", "", "", ""],
                 turn: 'X',
@@ -872,19 +1494,16 @@
                 scores: { X: 0, O: 0, ties: 0 },
                 isLinkInvite: true
             });
-
             const inviteLink = window.location.origin + window.location.pathname + "?invite=" + gameId;
             navigator.clipboard.writeText(inviteLink).then(() => {
                 showToast("🔗 تم نسخ رابط الدعوة! أرسله لمن تريد", "#10b981");
             }).catch(err => {
                 prompt("انسخ هذا الرابط وأرسله لصديقك:", inviteLink);
             });
-
             document.getElementById('waiting-msg-title').innerText = "بانتظار دخول صديقك عبر الرابط...";
             showSection('waiting-section');
-
             db.ref('games/' + gameId + '/player2Joined').on('value', snap => {
-                if(snap.val() === true) {
+                if (snap.val() === true) {
                     playAcceptSound();
                     db.ref('games/' + gameId + '/player2Joined').off();
                     startGameOnline();
@@ -897,7 +1516,8 @@
                 let data = snap.val();
                 if (data && data.isLinkInvite && !data.player2Joined) {
                     pendingInviteId = gameIdParam;
-                    document.getElementById('invite-msg').innerText = `دعوة خاصة للعب من ${data.hostName}!`;
+                    document.getElementById('invite-msg').innerText =
+                        `دعوة خاصة للعب من ${data.hostName}!`;
                     document.getElementById('invite-modal').classList.add('active');
                     window.history.replaceState({}, document.title, window.location.pathname);
                 } else if (data && data.player2Joined) {
@@ -911,24 +1531,22 @@
         }
 
         function cancelInvite() {
-            if(activeFriendId) db.ref('users/' + activeFriendId + '/game_invite').remove();
-            if(gameId) db.ref('games/' + gameId).remove();
+            if (activeFriendId) db.ref('users/' + activeFriendId + '/game_invite').remove();
+            if (gameId) db.ref('games/' + gameId).remove();
             showSection('friends-section');
         }
 
         function acceptGameInvite() {
-            if(!pendingInviteId) return;
-            playAcceptSound(); 
+            if (!pendingInviteId) return;
+            playAcceptSound();
             gameId = pendingInviteId;
             myRole = 'O';
             isOnline = true;
-            
-            db.ref('games/' + gameId).update({ 
+            db.ref('games/' + gameId).update({
                 player2Joined: true,
-                guestName: currentUserData.username 
+                guestName: currentUserData.username
             });
             db.ref('users/' + currentUserId + '/game_invite').remove();
-            
             document.getElementById('invite-modal').classList.remove('active');
             startGameOnline();
         }
@@ -938,19 +1556,16 @@
             document.getElementById('invite-modal').classList.remove('active');
         }
 
-        // ================= محرك اللعبة =================
         function startLocalGame() {
             isOnline = false;
-            myRole = 'All'; 
+            myRole = 'All';
             gameBoard = ["", "", "", "", "", "", "", "", ""];
             isGameOver = false;
             hasLoggedStatThisGame = false;
             localTurn = 'X';
             scores = { X: 0, O: 0, ties: 0 };
-            
             playerXName = currentUserData.username;
             playerOName = "المنافس";
-            
             setupGameUI("🎮 نمط: لعب محلي");
             renderBoard();
         }
@@ -959,20 +1574,16 @@
             hasLoggedStatThisGame = false;
             let roleDisplay = myRole === 'X' ? "أنت (X) المستضيف" : "أنت (O) الضيف";
             setupGameUI(`⚡ ${roleDisplay}`);
-            
             db.ref('games/' + gameId).on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
                     gameBoard = data.board || ["", "", "", "", "", "", "", "", ""];
                     isGameOver = data.winner !== '';
-                    
                     playerXName = data.hostName || 'اللاعب (X)';
                     playerOName = data.guestName || 'اللاعب (O)';
                     if (data.scores) scores = data.scores;
-                    
                     updateScoreboardDOM();
                     renderBoard();
-                    
                     if (data.winner !== '') {
                         handleWinOnline(data);
                     } else {
@@ -982,12 +1593,13 @@
                             document.getElementById('status-text').innerText = "🟢 دورك الآن..";
                             document.getElementById('status-text').style.color = "var(--secondary-neon)";
                         } else {
-                            document.getElementById('status-text').innerText = `⏳ بانتظار ${currentPlayerName}...`;
+                            document.getElementById('status-text').innerText =
+                                `⏳ بانتظار ${currentPlayerName}...`;
                             document.getElementById('status-text').style.color = "#aaa";
                         }
                     }
                 } else {
-                    if(document.getElementById('game-section').classList.contains('active')){
+                    if (document.getElementById('game-section').classList.contains('active')) {
                         showToast("🚪 غادر الخصم اللعبة", "#ff2a5f");
                         exitGame();
                     }
@@ -1006,14 +1618,12 @@
 
         function makeMove(index) {
             if (isGameOver || gameBoard[index] !== "") return;
-
             if (isOnline) {
                 db.ref('games/' + gameId).once('value').then((snapshot) => {
                     let data = snapshot.val();
                     if (data.turn === myRole && data.board[index] === "" && data.winner === "") {
                         data.board[index] = myRole;
                         data.turn = myRole === 'X' ? 'O' : 'X';
-                        
                         let winner = checkWin(data.board);
                         if (winner) {
                             data.winner = winner;
@@ -1032,14 +1642,15 @@
                     if (winner === 'Draw') {
                         document.getElementById('status-text').innerText = "🏁 تعادل!";
                         scores.ties += 1;
-                        saveUserStats(false); 
+                        saveUserStats(false);
                     } else {
                         let winnerRealName = winner === 'X' ? playerXName : playerOName;
-                        document.getElementById('status-text').innerText = `🎉 الفائز هو: ${winnerRealName}!`;
+                        document.getElementById('status-text').innerText =
+                            `🎉 الفائز هو: ${winnerRealName}!`;
                         scores[winner] += 1;
                         highlightWinningLine(gameBoard);
-                        playWinAnimation(); 
-                        saveUserStats(true); 
+                        playWinAnimation();
+                        saveUserStats(true);
                     }
                     updateScoreboardDOM();
                     document.getElementById('reset-btn').style.display = 'block';
@@ -1054,20 +1665,19 @@
         function handleWinOnline(data) {
             if (data.winner === 'Draw') {
                 document.getElementById('status-text').innerText = "🏁 تعادل!";
-                saveUserStats(false); 
+                saveUserStats(false);
             } else {
                 let winnerRealName = data.winner === 'X' ? playerXName : playerOName;
                 document.getElementById('status-text').innerText = `🎉 الفائز هو: ${winnerRealName}!`;
                 highlightWinningLine(gameBoard);
-                
-                if(data.winner === myRole) {
-                    playWinAnimation(); 
+                if (data.winner === myRole) {
+                    playWinAnimation();
                     saveUserStats(true);
                 } else {
                     saveUserStats(false);
                 }
             }
-            if(myRole === 'X') {
+            if (myRole === 'X') {
                 document.getElementById('reset-btn').style.display = 'block';
             } else {
                 document.getElementById('status-text').innerText += " (بانتظار المستضيف)";
@@ -1078,7 +1688,8 @@
             const cells = document.querySelectorAll('.cell');
             cells.forEach((cell, index) => {
                 if (gameBoard[index] !== "") {
-                    if (!cell.hasChildNodes()) cell.innerHTML = `<span>${gameBoard[index]}</span>`;
+                    if (!cell.hasChildNodes()) cell.innerHTML =
+                        `<span>${gameBoard[index]}</span>`;
                 } else {
                     cell.innerHTML = "";
                     cell.classList.remove('winning-cell');
@@ -1089,42 +1700,36 @@
             });
         }
 
-        // تم التحديث: دالة عرض النتائج وإظهار شارة وصورة المطور للأعداء أثناء اللعب
         function updateScoreboardDOM() {
             document.getElementById('score-x').innerText = scores.X;
             document.getElementById('score-o').innerText = scores.O;
             document.getElementById('score-ties').innerText = scores.ties;
-            
-            const devSvgIcon = `<div class="admin-badge" style="font-size: 10px; padding: 2px 5px; margin-top: 5px; margin-bottom: 5px;"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="vertical-align: middle;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg> المطور</div>`;
-
-            let genderX = playerXName === (currentUserData ? currentUserData.username : '') ? (currentUserData ? currentUserData.gender : null) : null;
-            let genderO = playerOName === (currentUserData ? currentUserData.username : '') ? (currentUserData ? currentUserData.gender : null) : null;
-
+            const devSvgIcon =
+                `<div class="admin-badge" style="font-size: 10px; padding: 2px 5px; margin-top: 5px; margin-bottom: 5px;"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="vertical-align: middle;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg> المطور</div>`;
+            let genderX = playerXName === (currentUserData ? currentUserData.username : '') ? (currentUserData ?
+                currentUserData.gender : null) : null;
+            let genderO = playerOName === (currentUserData ? currentUserData.username : '') ? (currentUserData ?
+                currentUserData.gender : null) : null;
             let avatarX = generateAvatarURL(playerXName, genderX);
             let avatarO = generateAvatarURL(playerOName, genderO);
-
             let labelXHtml = `
                 <div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
                     <img src="${avatarX}" style="width:35px; height:35px; border-radius:50%; border:2px solid var(--primary-neon); margin-bottom:5px; object-fit:cover; box-shadow: 0 0 8px rgba(255,42,95,0.5);">
                     <span style="display:block; width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${playerXName} (X)</span>
                     ${playerXName === "حمزة الحماده" ? devSvgIcon : ''}
                 </div>`;
-            
             let labelOHtml = `
                 <div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
                     <img src="${avatarO}" style="width:35px; height:35px; border-radius:50%; border:2px solid var(--secondary-neon); margin-bottom:5px; object-fit:cover; box-shadow: 0 0 8px rgba(0,240,255,0.5);">
                     <span style="display:block; width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${playerOName} (O)</span>
                     ${playerOName === "حمزة الحماده" ? devSvgIcon : ''}
                 </div>`;
-
             const labelXElem = document.getElementById('label-x');
             const labelOElem = document.getElementById('label-o');
-            
-            labelXElem.style.whiteSpace = "normal"; 
-            labelOElem.style.whiteSpace = "normal"; 
+            labelXElem.style.whiteSpace = "normal";
+            labelOElem.style.whiteSpace = "normal";
             labelXElem.style.overflow = "visible";
             labelOElem.style.overflow = "visible";
-
             labelXElem.innerHTML = labelXHtml;
             labelOElem.innerHTML = labelOHtml;
         }
@@ -1138,17 +1743,22 @@
         }
 
         const winConditions = [
-            [0, 1, 2], [3, 4, 5], [6, 7, 8], 
-            [0, 3, 6], [1, 4, 7], [2, 5, 8], 
-            [0, 4, 8], [2, 4, 6]             
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
         ];
 
         function checkWin(board) {
             for (let condition of winConditions) {
                 let [a, b, c] = condition;
-                if (board[a] && board[a] === board[b] && board[a] === board[c]) return board[a]; 
+                if (board[a] && board[a] === board[b] && board[a] === board[c]) return board[a];
             }
-            if (!board.includes("")) return 'Draw'; 
+            if (!board.includes("")) return 'Draw';
             return null;
         }
 
@@ -1184,8 +1794,8 @@
         }
 
         function exitGame() {
-            if(isOnline && gameId) {
-                db.ref('games/' + gameId).remove(); 
+            if (isOnline && gameId) {
+                db.ref('games/' + gameId).remove();
                 db.ref('games/' + gameId).off();
             }
             showSection('menu-section');
@@ -1193,18 +1803,21 @@
 
         function saveUserStats(isWin) {
             if (!currentUserData || !currentUserId || hasLoggedStatThisGame) return;
-            hasLoggedStatThisGame = true; 
+            hasLoggedStatThisGame = true;
             currentUserData.played = (currentUserData.played || 0) + 1;
             if (isWin) currentUserData.wins = (currentUserData.wins || 0) + 1;
-            
             db.ref('users/' + currentUserId).update({
                 played: currentUserData.played,
                 wins: currentUserData.wins
             });
-            
             document.getElementById('display-played').innerText = `🎮 لعب: ${currentUserData.played}`;
             document.getElementById('display-wins').innerText = `🏆 فاز: ${currentUserData.wins}`;
         }
+
+        // إغلاق مودال الإعدادات عند النقر خارجها
+        document.getElementById('settings-modal-overlay').addEventListener('click', function(e) {
+            if (e.target === this) closeSettings();
+        });
     </script>
 </body>
 </html>
