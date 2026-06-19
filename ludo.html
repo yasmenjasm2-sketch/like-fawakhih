@@ -3,147 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>لودو أونلاين | حمزة الحماده</title>
+    <title>ميدان معركة اللودو الحية | تطوير حمزة الحماده</title>
     <style>
         :root {
-            --bg-color: #0f0f1a;
-            --container-bg: rgba(26, 26, 46, 0.9);
-            --primary-neon: #ff2a5f;
+            --bg-color: #080810;
+            --panel-bg: rgba(22, 22, 40, 0.9);
             --secondary-neon: #00f0ff;
-            --ludo-red: #ff3366;
-            --ludo-green: #00e676;
-            --ludo-yellow: #ffea00;
-            --ludo-blue: #2979ff;
+            --ludo-red: #ff2a5f;
+            --ludo-green: #10b981;
+            --ludo-yellow: #ffd700;
+            --ludo-blue: #00f0ff;
         }
 
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; transition: all 0.2s ease; }
+
         body {
-            font-family: 'Segoe UI', Tahoma, sans-serif; background: linear-gradient(135deg, #090910 0%, #1a0f2e 100%);
-            color: #fff; text-align: center; margin: 0; padding: 15px; min-height: 100dvh; 
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(circle at center, #150d2a 0%, #05050b 100%);
+            color: #fff;
+            text-align: center;
+            margin: 0; padding: 15px;
+            min-height: 100dvh;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
         }
 
-        .container {
-            background: var(--container-bg); padding: 25px 20px; border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5); max-width: 450px; width: 100%;
-            border: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(5px);
+        .ludo-container {
+            background: var(--panel-bg);
+            padding: 25px;
+            border-radius: 24px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6), 0 0 30px rgba(0, 240, 255, 0.15);
+            max-width: 450px; width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
         }
 
-        h1 { font-size: 26px; background: linear-gradient(90deg, var(--ludo-red), var(--ludo-blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        h1 {
+            font-size: 24px; margin-top: 0; margin-bottom: 5px;
+            background: linear-gradient(90deg, #ff2a5f, #ffd700);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        #ludo-grid {
+            display: grid;
+            grid-template-columns: repeat(15, 1fr);
+            grid-template-rows: repeat(15, 1fr);
+            width: 100%; max-width: 380px; aspect-ratio: 1;
+            background: #111; gap: 2px;
+            border: 6px solid #1a1a2e; border-radius: 16px;
+            margin: 20px auto; overflow: hidden;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.7);
+        }
+
+        .ludo-cell {
+            background: #222538; width: 100%; height: 100%;
+            position: relative; display: flex; justify-content: center; align-items: center;
+            border-radius: 2px;
+        }
         
-        button {
-            background: linear-gradient(90deg, #511fff, #7000ff); color: white; border: none;
-            padding: 14px 20px; margin: 8px 0; font-size: 15px; font-weight: bold;
+        .ludo-red-bg { background-color: var(--ludo-red) !important; }
+        .ludo-green-bg { background-color: var(--ludo-green) !important; }
+        .ludo-yellow-bg { background-color: var(--ludo-yellow) !important; }
+        .ludo-blue-bg { background-color: var(--ludo-blue) !important; }
+        .ludo-safe { font-size: 14px; filter: drop-shadow(0 0 4px #000); }
+        
+        .ludo-home-area {
+            grid-column: span 6; grid-row: span 6;
+            display: flex; justify-content: center; align-items: center;
+            background: #1a1c2e; border: 1px solid #2d325a;
+        }
+        .ludo-home-inner {
+            width: 80%; height: 80%; border-radius: 12px;
+            display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr;
+            gap: 12px; padding: 12px; background: rgba(0,0,0,0.3);
+            box-shadow: inset 0 0 12px rgba(0,0,0,0.6);
+        }
+        .ludo-token-slot { width: 100%; height: 100%; border-radius: 50%; background: rgba(255,255,255,0.05); }
+        
+        .ludo-token {
+            width: 85%; height: 85%; border-radius: 50%;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.6), inset 0 -3px 6px rgba(0,0,0,0.3);
+            position: absolute; z-index: 100; border: 2px solid white;
+            cursor: pointer;
+        }
+        .token-red { background: radial-gradient(circle, #ff6b8b, var(--ludo-red)); }
+        .token-green { background: radial-gradient(circle, #52e5b1, var(--ludo-green)); }
+        .token-yellow { background: radial-gradient(circle, #fff07c, var(--ludo-yellow)); }
+        .token-blue { background: radial-gradient(circle, #7ee8fa, var(--ludo-blue)); }
+        
+        .dice-container {
+            display: flex; justify-content: center; align-items: center;
+            margin: 20px 0; gap: 20px; background: rgba(0,0,0,0.3);
+            padding: 12px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05);
+        }
+        .dice-box {
+            width: 55px; height: 55px; background: #fff; border-radius: 14px;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 28px; font-weight: bold; color: #111;
+            box-shadow: 0 6px 20px rgba(255,255,255,0.15), inset 0 -4px 8px #ccc;
+            cursor: pointer; transform-style: preserve-3d;
+        }
+        .dice-box.rolling { animation: shake 0.4s infinite alternate; }
+        @keyframes shake { 0% { transform: rotate(0deg) scale(0.9); } 100% { transform: rotate(25deg) scale(1.1); } }
+
+        button.exit-btn {
+            background: linear-gradient(90deg, #ff2a5f, #b5002e); color: white;
+            border: none; padding: 12px 24px; font-size: 14px; font-weight: bold;
             border-radius: 10px; cursor: pointer; width: 100%;
+            box-shadow: 0 4px 12px rgba(255, 42, 95, 0.3);
         }
-        button.secondary-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
-        button.ludo-btn { background: linear-gradient(90deg, var(--ludo-green), #059669); }
-        
-        .room-types { display: flex; gap: 10px; margin: 20px 0; }
-        .room-card {
-            flex: 1; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1);
-            padding: 20px 10px; border-radius: 15px; cursor: pointer; transition: 0.3s;
-        }
-        .room-card:hover, .room-card.selected { border-color: var(--secondary-neon); background: rgba(0, 240, 255, 0.1); }
-        .room-card h3 { margin: 5px 0; color: var(--secondary-neon); }
-
-        .friends-list {
-            background: rgba(0,0,0,0.3); border-radius: 10px; max-height: 200px;
-            overflow-y: auto; margin: 15px 0; padding: 5px; border: 1px solid rgba(255,255,255,0.05); text-align: right;
-        }
-        .friend-item {
-            display: flex; justify-content: space-between; align-items: center;
-            background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; margin-bottom: 5px;
-        }
-        
-        /* شكل مبسط للوحة اللودو */
-        .ludo-board-visual {
-            width: 100%; aspect-ratio: 1; max-width: 300px; margin: 20px auto;
-            background: #fff; border-radius: 15px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr;
-            gap: 15px; padding: 15px; position: relative;
-        }
-        .home { border-radius: 10px; display:flex; justify-content:center; align-items:center; }
-        .home.red { background: var(--ludo-red); }
-        .home.green { background: var(--ludo-green); }
-        .home.yellow { background: var(--ludo-yellow); }
-        .home.blue { background: var(--ludo-blue); }
-        .home-inner { width: 60%; height: 60%; background: #fff; border-radius: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 5px; padding: 5px; }
-        .token { background: inherit; border-radius: 50%; width: 100%; height: 100%; box-shadow: inset 0 0 5px rgba(0,0,0,0.5); }
-        .center-box { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 20%; height: 20%; background: #222; border-radius: 5px; }
-
-        section { display: none; }
-        section.active { display: block; animation: fadeIn 0.3s; }
-        @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
-        
-        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
-        .status-online { background-color: #10b981; }
-        .status-offline { background-color: #6b7280; }
-
-        .toast {
-            position: fixed; bottom: 20px; background: #10b981; color: white; padding: 12px 25px;
-            border-radius: 30px; font-size: 14px; font-weight: bold; transition: 0.3s;
-            transform: translateY(100px); opacity: 0; pointer-events: none;
-        }
-        .toast.show { transform: translateY(0); opacity: 1; }
+        button:active { transform: scale(0.98); }
     </style>
-
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
 
-    <div class="container">
-        <h1>🎲 لعبة لودو أونلاين</h1>
-
-        <section id="lobby-section" class="active">
-            <h2 style="font-size: 16px; color:#ccc;">تحميل وإنشاء الغرفة</h2>
-            <div class="room-types">
-                <div class="room-card selected" id="mode-2" onclick="selectMode(2)">
-                    <h3>لاعبين (1v1)</h3>
-                    <p style="font-size: 12px; color:#888;">استدعاء صديق واحد</p>
-                </div>
-                <div class="room-card" id="mode-4" onclick="selectMode(4)">
-                    <h3>4 لاعبين</h3>
-                    <p style="font-size: 12px; color:#888;">استدعاء 3 أصدقاء</p>
-                </div>
+    <div class="ludo-container">
+        <h1>ميدان معركة اللودو الحية</h1>
+        <div id="ludo-role-text" style="font-size: 13px; color: #aaa; margin-bottom: 5px;">أنت: جاري التحقق...</div>
+        <div id="ludo-status-text" style="color: var(--secondary-neon); font-size: 16px; font-weight: bold; margin-bottom: 15px;">جاري الاتصال بالمشرف الدولي...</div>
+        
+        <div id="ludo-grid"></div>
+        
+        <div class="dice-container">
+            <div id="ludo-dice" class="dice-box" onclick="rollLudoDice()">🎲</div>
+            <div style="text-align: right; margin-right: 10px;">
+                <div style="font-size: 11px; color: #aaa;">رقم الزهر الأخير:</div>
+                <div id="dice-result-text" style="font-size: 24px; font-weight: 900; color: var(--ludo-yellow);">0</div>
             </div>
-
-            <h3 style="font-size: 15px; text-align:right;">استدعاء الأصدقاء:</h3>
-            <div class="friends-list" id="ludo-friends">
-                <div style="text-align:center;color:#666;padding:10px;">جاري التحميل...</div>
-            </div>
-
-            <button onclick="window.location.href='index.html'" class="secondary-btn">العودة للعبة X O</button>
-        </section>
-
-        <section id="waiting-section">
-            <h2>جاري دعوة اللاعبين...</h2>
-            <div style="margin: 20px auto; width: 40px; height: 40px; border: 4px solid #333; border-top: 4px solid var(--secondary-neon); border-radius: 50%; animation: spin 1s linear infinite;"></div>
-            <style>@keyframes spin { 100% { transform: rotate(360deg); } }</style>
-            <p id="waiting-details" style="color:#aaa; font-size:14px;"></p>
-            <button class="secondary-btn" onclick="cancelLudoInvite()">إلغاء</button>
-        </section>
-
-        <section id="game-section">
-            <div style="display:flex; justify-content:space-between; font-size:12px; color:#aaa;">
-                <span id="p1-name" style="color:var(--ludo-red);">أنت</span>
-                <span id="p2-name" style="color:var(--ludo-blue);">الخصم</span>
-            </div>
-            
-            <div class="ludo-board-visual">
-                <div class="home red"><div class="home-inner"><div class="token"></div><div class="token"></div><div class="token"></div><div class="token"></div></div></div>
-                <div class="home green"><div class="home-inner"><div class="token"></div><div class="token"></div><div class="token"></div><div class="token"></div></div></div>
-                <div class="home blue"><div class="home-inner"><div class="token"></div><div class="token"></div><div class="token"></div><div class="token"></div></div></div>
-                <div class="home yellow"><div class="home-inner"><div class="token"></div><div class="token"></div><div class="token"></div><div class="token"></div></div></div>
-                <div class="center-box"></div>
-            </div>
-            
-            <h3 id="game-status" style="color:var(--secondary-neon);">بانتظار إكتمال اللاعبين...</h3>
-            <button class="secondary-btn" onclick="exitLudo()">خروج من الغرفة</button>
-        </section>
+        </div>
+        
+        <button onclick="exitGame()" class="exit-btn">انسحاب والعودة للمنصة</button>
     </div>
-
-    <div id="toast" class="toast"></div>
 
     <script>
         const firebaseConfig = {
@@ -156,99 +148,126 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        let uid = localStorage.getItem('xo_uid');
-        let uname = localStorage.getItem('xo_username');
-        let selectedMode = 2;
-        let ludoGameId = null;
+        // التقاط بيانات التحكم من خلال الروابط المشفرة المتصلة بالملف الرئيسي
+        const urlParams = new URLSearchParams(window.location.search);
+        const gameId = urlParams.get('gameId');
+        const myRole = urlParams.get('role'); // Red أو Yellow
+        const currentUserId = urlParams.get('uid');
+        const currentUsername = urlParams.get('username');
+        const gameType = urlParams.get('type') || 'ludo2';
 
-        if (!uid) { window.location.href = 'index.html'; } // حماية: يجب تسجيل الدخول من الملف الأول
-
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            t.innerText = msg; t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 2500);
-        }
-
-        function showSec(id) {
-            document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-        }
-
-        function selectMode(num) {
-            selectedMode = num;
-            document.getElementById('mode-2').classList.remove('selected');
-            document.getElementById('mode-4').classList.remove('selected');
-            document.getElementById(`mode-${num}`).classList.add('selected');
-            showToast(`تم اختيار وضع ${num} لاعبين`);
-        }
-
-        // جلب الأصدقاء
-        db.ref('users/' + uid + '/friends').on('value', snap => {
-            const friends = snap.val();
-            document.getElementById('ludo-friends').innerHTML = '';
-            if (friends) {
-                for (let fid in friends) {
-                    let fName = friends[fid].name || friends[fid];
-                    db.ref('users/' + fid + '/online').on('value', oSnap => {
-                        let isOnline = oSnap.val() === true;
-                        let statusColor = isOnline ? 'status-online' : 'status-offline';
-                        
-                        let html = `
-                        <div class="friend-item" id="ludo-f-${fid}">
-                            <span><span class="status-dot ${statusColor}"></span> ${fName}</span>
-                            <button onclick="inviteLudo('${fid}', '${fName}')" style="width:auto; padding:6px 12px; margin:0; background:${isOnline?'#10b981':'#555'};">استدعاء</button>
-                        </div>`;
-                        
-                        let ex = document.getElementById(`ludo-f-${fid}`);
-                        if(ex) ex.outerHTML = html; else document.getElementById('ludo-friends').innerHTML += html;
-                    });
-                }
-            } else {
-                document.getElementById('ludo-friends').innerHTML = '<div style="color:#666;">لا يوجد أصدقاء. أضف أصدقاء من لعبة X O أولاً.</div>';
+        window.onload = () => {
+            if(!gameId || !myRole) {
+                alert("خطأ أمنّي: لم يتم العثور على مفتاح الغرفة!"); window.location.href = 'index.html'; return;
             }
-        });
+            renderLudoBoard();
+            startLudoOnline();
+        };
 
-        // إرسال دعوة اللودو
-        function inviteLudo(fid, fname) {
-            db.ref('users/' + fid + '/online').once('value').then(snap => {
-                if(snap.val() !== true) {
-                    return showToast("⚠️ لا يمكن دعوة صديق غير متصل!");
-                }
-                
-                ludoGameId = Math.random().toString(36).substring(2, 10);
-                db.ref('ludo_games/' + ludoGameId).set({
-                    host: uname, mode: selectedMode, players: { [uid]: uname }, status: 'waiting'
-                });
-                
-                // إرسال الإشعار للصديق (يصل له في شاشة XO أو هنا)
-                db.ref('users/' + fid + '/ludo_invite').set({ gameId: ludoGameId, senderName: uname });
-                
-                document.getElementById('waiting-details').innerText = `بانتظار قبول ${fname}...`;
-                showSec('waiting-section');
-                
-                db.ref('ludo_games/' + ludoGameId + '/players').on('value', pSnap => {
-                    let pCount = Object.keys(pSnap.val() || {}).length;
-                    if(pCount === selectedMode) {
-                        db.ref('ludo_games/' + ludoGameId + '/status').set('playing');
-                        startLudoMatch();
+        function renderLudoBoard() {
+            const grid = document.getElementById('ludo-grid');
+            grid.innerHTML = '';
+            
+            for(let row = 0; row < 15; row++) {
+                for(let col = 0; col < 15; col++) {
+                    if(row < 6 && col < 6) { if(row===0 && col===0) addHomeArea(grid, 'green', 1, 1); continue; }
+                    if(row < 6 && col > 8) { if(row===0 && col===9) addHomeArea(grid, 'yellow', 1, 10); continue; }
+                    if(row > 8 && col < 6) { if(row===9 && col===0) addHomeArea(grid, 'red', 10, 1); continue; }
+                    if(row > 8 && col > 8) { if(row===9 && col===9) addHomeArea(grid, 'blue', 10, 10); continue; }
+                    
+                    const cell = document.createElement('div');
+                    cell.className = 'ludo-cell';
+                    
+                    if(row === 7 && col >= 1 && col <= 5) cell.classList.add('ludo-green-bg');
+                    else if(row === 7 && col >= 9 && col <= 13) cell.classList.add('ludo-blue-bg');
+                    else if(col === 7 && row >= 1 && row <= 5) cell.classList.add('ludo-yellow-bg');
+                    else if(col === 7 && row >= 9 && row <= 13) cell.classList.add('ludo-red-bg');
+                    else if(row === 6 && col === 1) cell.classList.add('ludo-green-bg');
+                    else if(row === 1 && col === 8) cell.classList.add('ludo-yellow-bg');
+                    else if(row === 8 && col === 13) cell.classList.add('ludo-blue-bg');
+                    else if(row === 13 && col === 6) cell.classList.add('ludo-red-bg');
+                    
+                    if(row >= 6 && row <= 8 && col >= 6 && col <= 8) {
+                        cell.style.background = 'linear-gradient(45deg, var(--ludo-red) 25%, var(--ludo-blue) 25%, var(--ludo-blue) 50%, var(--ludo-yellow) 50%, var(--ludo-yellow) 75%, var(--ludo-green) 75%)';
                     }
-                });
+
+                    if((row===6 && col===2) || (row===2 && col===6) || (row===8 && col===12) || (row===12 && col===8)) {
+                        cell.innerHTML = '<span class="ludo-safe">⭐</span>';
+                    }
+                    grid.appendChild(cell);
+                }
+            }
+            addTokensToHome('red'); addTokensToHome('yellow');
+        }
+
+        function addHomeArea(grid, color, gridRow, gridCol) {
+            const area = document.createElement('div');
+            area.className = `ludo-home-area ludo-${color}-bg`;
+            area.style.gridRow = `${gridRow} / span 6`; area.style.gridColumn = `${gridCol} / span 6`;
+            const inner = document.createElement('div');
+            inner.className = 'ludo-home-inner'; inner.id = `ludo-home-${color}`;
+            for(let i=0; i<4; i++) {
+                const slot = document.createElement('div'); slot.className = 'ludo-token-slot'; inner.appendChild(slot);
+            }
+            area.appendChild(inner); grid.appendChild(area);
+        }
+
+        function addTokensToHome(color) {
+            const home = document.getElementById(`ludo-home-${color}`); if(!home) return;
+            const slots = home.querySelectorAll('.ludo-token-slot');
+            slots.forEach(slot => {
+                const token = document.createElement('div'); token.className = `ludo-token token-${color}`; slot.appendChild(token);
             });
         }
 
-        function cancelLudoInvite() {
-            if(ludoGameId) db.ref('ludo_games/' + ludoGameId).remove();
-            showSec('lobby-section');
+        function startLudoOnline() {
+            let roleDisplay = myRole === 'Red' ? "الفريق الأحمر (المستضيف)" : "الفريق الأصفر (الضيف)";
+            if(gameType === 'ludo4') roleDisplay += " [تحالف 4 لاعبين]";
+            document.getElementById('ludo-role-text').innerText = `المقعد الحالي: ${roleDisplay}`;
+            
+            db.ref('games/' + gameId).on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    let currentPlayerName = data.turn === 'Red' ? data.hostName : data.guestName;
+                    if (data.turn === myRole) {
+                        document.getElementById('ludo-status-text').innerText = "🟢 دورك الآن لرمي الزهر!";
+                        document.getElementById('ludo-status-text').style.color = "var(--ludo-green)";
+                        document.getElementById('ludo-dice').style.pointerEvents = "auto";
+                        document.getElementById('ludo-dice').style.opacity = "1";
+                    } else {
+                        document.getElementById('ludo-status-text').innerText = `⏳ انتظار حركة اللاعب: ${currentPlayerName}...`;
+                        document.getElementById('ludo-status-text').style.color = "#888";
+                        document.getElementById('ludo-dice').style.pointerEvents = "none";
+                        document.getElementById('ludo-dice').style.opacity = "0.4";
+                    }
+                    if(data.dice > 0) document.getElementById('dice-result-text').innerText = data.dice;
+                } else {
+                    alert("🚪 تم إغلاق قاعة اللودو من الطرف الآخر."); exitGame();
+                }
+            });
         }
 
-        function startLudoMatch() {
-            showSec('game-section');
-            document.getElementById('game-status').innerText = "تم الاتصال! اللعبة قيد التطوير...";
+        function rollLudoDice() {
+            const diceEl = document.getElementById('ludo-dice');
+            diceEl.classList.add('rolling');
+            
+            setTimeout(() => {
+                diceEl.classList.remove('rolling');
+                const result = Math.floor(Math.random() * 6) + 1;
+                db.ref('games/' + gameId).once('value').then((snap) => {
+                    let data = snap.val();
+                    if(data && data.turn === myRole) {
+                        data.dice = result;
+                        data.turn = myRole === 'Red' ? 'Yellow' : 'Red';
+                        db.ref('games/' + gameId).update(data);
+                    }
+                });
+            }, 500);
         }
 
-        function exitLudo() {
-            if(ludoGameId) db.ref('ludo_games/' + ludoGameId).remove();
-            showSec('lobby-section');
+        function exitGame() {
+            if(gameId) { db.ref('games/' + gameId).remove(); db.ref('games/' + gameId).off(); }
+            window.location.href = 'index.html';
         }
     </script>
 </body>
