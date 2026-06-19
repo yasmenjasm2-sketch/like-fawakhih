@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ميدان معركة اللودو الحية | تطوير حمزة الحماده</title>
+    <title>ميدان معركة اللودو الاحترافية المتقدمة | تطوير حمزة الحماده</title>
     <style>
         :root {
-            --bg-color: #080810;
-            --panel-bg: rgba(22, 22, 40, 0.9);
+            --bg-color: #06060c;
+            --panel-bg: rgba(18, 18, 32, 0.95);
             --secondary-neon: #00f0ff;
             --ludo-red: #ff2a5f;
             --ludo-green: #10b981;
@@ -15,27 +15,35 @@
             --ludo-blue: #00f0ff;
         }
 
-        * { box-sizing: border-box; transition: all 0.2s ease; }
+        /* منع التحديد والنسخ نهائياً */
+        * { 
+            box-sizing: border-box; 
+            user-select: none; 
+            -webkit-user-select: none; 
+            -moz-user-select: none; 
+            -ms-user-select: none;
+        }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: radial-gradient(circle at center, #150d2a 0%, #05050b 100%);
+            background: radial-gradient(circle at center, #1a0f3c 0%, #030307 100%);
             color: #fff;
             text-align: center;
-            margin: 0; padding: 15px;
+            margin: 0; padding: 10px;
             min-height: 100dvh;
             display: flex; flex-direction: column;
             justify-content: center; align-items: center;
+            overflow-x: hidden;
         }
 
         .ludo-container {
             background: var(--panel-bg);
             padding: 20px;
             border-radius: 24px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.6), 0 0 30px rgba(0, 240, 255, 0.15);
-            max-width: 450px; width: 100%;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 40px rgba(0, 240, 255, 0.2);
+            max-width: 500px; width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
             position: relative;
         }
 
@@ -45,109 +53,155 @@
         }
 
         h1 {
-            font-size: 20px; margin: 0;
-            background: linear-gradient(90deg, #ff2a5f, #ffd700);
+            font-size: 22px; margin: 0; font-weight: 900;
+            background: linear-gradient(90deg, var(--ludo-red), var(--ludo-yellow));
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
         .invite-btn {
             background: linear-gradient(90deg, #10b981, #059669); color: white;
-            border: none; padding: 6px 12px; font-size: 12px; font-weight: bold;
-            border-radius: 8px; cursor: pointer; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
-            display: flex; align-items: center; gap: 5px;
+            border: none; padding: 8px 14px; font-size: 12px; font-weight: bold;
+            border-radius: 10px; cursor: pointer; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
         }
 
+        /* شبكة اللعبة المحدثة المحمية */
         #ludo-grid {
             display: grid;
             grid-template-columns: repeat(15, 1fr);
             grid-template-rows: repeat(15, 1fr);
-            width: 100%; max-width: 380px; aspect-ratio: 1;
-            background: #111; gap: 2px;
-            border: 6px solid #1a1a2e; border-radius: 16px;
+            width: 100%; max-width: 420px; aspect-ratio: 1;
+            background: #0f1015; gap: 2px;
+            border: 6px solid #1a1a2e; border-radius: 18px;
             margin: 15px auto; overflow: hidden;
-            box-shadow: 0 12px 30px rgba(0,0,0,0.7);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+            position: relative;
         }
 
         .ludo-cell {
-            background: #222538; width: 100%; height: 100%;
+            background: #1f2136; width: 100%; height: 100%;
             position: relative; display: flex; justify-content: center; align-items: center;
-            border-radius: 2px; flex-wrap: wrap; align-content: center;
+            border-radius: 2px;
         }
         
         .ludo-red-bg { background-color: var(--ludo-red) !important; }
         .ludo-green-bg { background-color: var(--ludo-green) !important; }
         .ludo-yellow-bg { background-color: var(--ludo-yellow) !important; }
         .ludo-blue-bg { background-color: var(--ludo-blue) !important; }
-        .ludo-safe { font-size: 14px; filter: drop-shadow(0 0 4px #000); position: absolute; z-index: 1;}
+        .ludo-safe { font-size: 13px; filter: drop-shadow(0 0 3px #000); position: absolute; z-index: 2; }
         
         .ludo-home-area {
             grid-column: span 6; grid-row: span 6;
             display: flex; justify-content: center; align-items: center;
-            background: #1a1c2e; border: 1px solid #2d325a;
+            background: #151728; border: 1px solid #252a4a;
         }
         .ludo-home-inner {
-            width: 80%; height: 80%; border-radius: 12px;
+            width: 85%; height: 85%; border-radius: 14px;
             display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr;
-            gap: 10px; padding: 10px; background: rgba(0,0,0,0.3);
-            box-shadow: inset 0 0 12px rgba(0,0,0,0.6);
+            gap: 8px; padding: 8px; background: rgba(0,0,0,0.4);
         }
-        /* حل المشكلة: إضافة relative للحاضن */
         .ludo-token-slot { 
-            width: 100%; height: 100%; border-radius: 50%; background: rgba(255,255,255,0.05); 
+            width: 100%; height: 100%; border-radius: 50%; background: rgba(255,255,255,0.03); 
             position: relative; display: flex; justify-content: center; align-items: center;
         }
         
-        /* حل المشكلة: تحديد الحجم بدقة وإزالة الـ absolute المؤذي */
+        /* تصميم الأحجار وتأثيرات الأنيميشن الخطوي */
         .ludo-token {
-            width: 80%; height: 80%; border-radius: 50%;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.6), inset 0 -3px 6px rgba(0,0,0,0.3);
+            width: 85%; height: 85%; border-radius: 50%;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.6), inset 0 -4px 6px rgba(0,0,0,0.4);
             border: 2px solid white; cursor: pointer; z-index: 10;
-            position: relative; transition: transform 0.2s;
+            position: relative; transform: scale(1);
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), top 0.15s linear, left 0.15s linear;
         }
-        .ludo-token:hover { transform: scale(1.15); }
-        .ludo-token.active-turn { animation: pulse 1s infinite; border: 2px solid #fff; box-shadow: 0 0 15px #fff; }
+        .ludo-token.active-turn { animation: pulseGlow 1s infinite alternate; border: 2px solid #fff; }
+        @keyframes pulseGlow { 0% { transform: scale(1); box-shadow: 0 0 8px #fff; } 100% { transform: scale(1.15); box-shadow: 0 0 20px var(--secondary-neon); } }
 
-        /* تصغير الحجم عندما يكون في مسار اللعب */
-        .ludo-cell .ludo-token { width: 60%; height: 60%; position: absolute; }
-        .ludo-cell .ludo-token:nth-child(2) { transform: translate(-5px, -5px) scale(0.8); z-index: 11; }
-        .ludo-cell .ludo-token:nth-child(3) { transform: translate(5px, 5px) scale(0.8); z-index: 12; }
+        /* تنظيم التكديس عند وقوف أكثر من حجر بمربع واحد */
+        .ludo-cell .ludo-token { width: 70%; height: 70%; position: absolute; }
+        .ludo-cell .ludo-token:nth-child(2) { transform: translate(-4px, -4px) scale(0.85); z-index: 11; }
+        .ludo-cell .ludo-token:nth-child(3) { transform: translate(4px, 4px) scale(0.85); z-index: 12; }
+        .ludo-cell .ludo-token:nth-child(4) { transform: translate(-4px, 4px) scale(0.75); z-index: 13; }
 
-        .token-red { background: radial-gradient(circle, #ff6b8b, var(--ludo-red)); }
-        .token-green { background: radial-gradient(circle, #52e5b1, var(--ludo-green)); }
-        .token-yellow { background: radial-gradient(circle, #fff07c, var(--ludo-yellow)); }
-        .token-blue { background: radial-gradient(circle, #7ee8fa, var(--ludo-blue)); }
+        .token-red { background: radial-gradient(circle, #ff6b9d, var(--ludo-red)); }
+        .token-green { background: radial-gradient(circle, #62f2bd, var(--ludo-green)); }
+        .token-yellow { background: radial-gradient(circle, #fff38a, var(--ludo-yellow)); }
+        .token-blue { background: radial-gradient(circle, #8ae0ff, var(--ludo-blue)); }
         
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
+        /* لوحة التحكم والتحضير للزهر المتعدد */
+        .control-panel {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 18px; padding: 15px; margin-top: 15px;
+            border: 1px solid rgba(255,255,255,0.06);
+            display: flex; justify-content: space-around; align-items: center; gap: 10px;
+        }
 
-        .dice-container {
-            display: flex; justify-content: center; align-items: center;
-            margin: 15px 0; gap: 20px; background: rgba(0,0,0,0.3);
-            padding: 10px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05);
+        .player-dice-zone {
+            display: flex; flex-direction: column; align-items: center; gap: 5px;
         }
-        .dice-box {
-            width: 50px; height: 50px; background: #fff; border-radius: 12px;
-            display: flex; justify-content: center; align-items: center;
-            font-size: 24px; font-weight: bold; color: #111;
-            box-shadow: 0 6px 20px rgba(255,255,255,0.15), inset 0 -4px 8px #ccc;
-            cursor: pointer;
+
+        /* الـ 3D لرمي النرد والمزامنة الفورية للخصم */
+        .scene-dice {
+            width: 50px; height: 50px; perspective: 300px; cursor: pointer;
         }
-        .dice-box.disabled { opacity: 0.5; pointer-events: none; }
-        .dice-box.rolling { animation: shake 0.3s infinite alternate; }
-        @keyframes shake { 0% { transform: rotate(-15deg) scale(0.9); } 100% { transform: rotate(15deg) scale(1.1); } }
+        .cube-dice {
+            width: 100%; height: 100%; position: relative; transform-style: preserve-3d;
+            transform: rotateX(-20deg) rotateY(20deg); transition: transform 0.1s linear;
+        }
+        .cube-face {
+            position: absolute; width: 50px; height: 50px; background: #fff;
+            border: 2px solid #ccc; border-radius: 10px; font-size: 24px; font-weight: bold;
+            color: #111; display: flex; justify-content: center; align-items: center;
+            box-shadow: inset 0 0 10px #ddd;
+        }
+        .face-1  { transform: rotateY(0deg) translateZ(25px); }
+        .face-2  { transform: rotateY(90deg) translateZ(25px); }
+        .face-3  { transform: rotateX(90deg) translateZ(25px); }
+        .face-4  { transform: rotateX(-90deg) translateZ(25px); }
+        .face-5  { transform: rotateY(-90deg) translateZ(25px); }
+        .face-6  { transform: rotateY(180deg) translateZ(25px); }
+
+        .cube-dice.rolling { animation: spinCube 0.5s linear infinite; }
+        @keyframes spinCube {
+            0% { transform: rotateX(0deg) rotateY(0deg); }
+            100% { transform: rotateX(360deg) rotateY(360deg); }
+        }
+
+        .pool-badge {
+            background: #252a44; border: 1px solid var(--ludo-yellow);
+            border-radius: 8px; padding: 4px 8px; font-size: 13px; font-weight: bold;
+            color: var(--ludo-yellow); max-width: 100px; min-height: 26px;
+        }
+
+        /* نافذة الاختيار المنبثقة لاختيار عدد خطوات التحريك الاستراتيجي */
+        .choice-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75); z-index: 5000;
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+            border-radius: 14px; backdrop-filter: blur(5px);
+        }
+        .choice-overlay.active { display: flex; }
+        .choice-box {
+            background: #18192a; border: 2px solid var(--secondary-neon);
+            padding: 20px; border-radius: 16px; width: 80%; max-width: 280px;
+        }
+        .choice-btn {
+            background: linear-gradient(90deg, #511fff, var(--secondary-neon));
+            color: #fff; border: none; padding: 12px; margin: 6px 0; width: 100%;
+            font-weight: bold; border-radius: 10px; cursor: pointer; font-size: 15px;
+        }
 
         button.exit-btn {
-            background: linear-gradient(90deg, #ff2a5f, #b5002e); color: white;
+            background: linear-gradient(90deg, var(--ludo-red), #b5002e); color: white;
             border: none; padding: 12px 24px; font-size: 14px; font-weight: bold;
-            border-radius: 10px; cursor: pointer; width: 100%;
+            border-radius: 12px; cursor: pointer; width: 100%; margin-top: 15px;
         }
         
         #toast {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px);
-            background: #10b981; color: white; padding: 10px 20px; border-radius: 20px;
-            font-size: 13px; opacity: 0; transition: all 0.3s ease; z-index: 9999;
+            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: #10b981; color: white; padding: 12px 24px; border-radius: 30px;
+            font-size: 14px; opacity: 0; transition: all 0.3s ease; z-index: 99999;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
         }
         #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-
     </style>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -156,20 +210,52 @@
 
     <div class="ludo-container">
         <div class="header-actions">
-            <h1>ميدان اللودو</h1>
+            <h1>ميدان معركة اللودو الحية</h1>
             <button class="invite-btn" onclick="copyInviteLink()">📩 دعوة صديق</button>
         </div>
 
-        <div id="ludo-role-text" style="font-size: 13px; color: #aaa; margin-bottom: 5px;">أنت: جاري التحقق...</div>
-        <div id="ludo-status-text" style="color: var(--secondary-neon); font-size: 15px; font-weight: bold; margin-bottom: 10px;">جاري تحميل الغرفة...</div>
+        <div id="ludo-role-text" style="font-size: 13px; color: #b1b1c7; margin-bottom: 5px;">جاري الفحص المزامني...</div>
+        <div id="ludo-status-text" style="color: var(--secondary-neon); font-size: 15px; font-weight: bold; margin-bottom: 10px;">تحميل قواعد اللعبة...</div>
         
-        <div id="ludo-grid"></div>
+        <div id="ludo-grid">
+            <!-- الواجهة الاختيارية للزهر الاستراتيجي المتعدد -->
+            <div class="choice-overlay" id="choice-overlay">
+                <div class="choice-box">
+                    <h4 style="margin:0 0 12px 0; font-size:15px; color:#fff;">اختر كم مربع تود التحريك:</h4>
+                    <div id="choice-buttons-container"></div>
+                </div>
+            </div>
+        </div>
         
-        <div class="dice-container">
-            <div id="ludo-dice" class="dice-box disabled" onclick="rollDice()">🎲</div>
-            <div style="text-align: right; margin-right: 10px;">
-                <div style="font-size: 11px; color: #aaa;">نتجية الزهر:</div>
-                <div id="dice-result-text" style="font-size: 22px; font-weight: 900; color: var(--ludo-yellow);">-</div>
+        <div class="control-panel">
+            <div class="player-dice-zone">
+                <span style="font-size: 11px; color:#aaa;">زهرك الخاص</span>
+                <div class="scene-dice" onclick="rollDiceProcess()">
+                    <div id="my-cube" class="cube-dice">
+                        <div class="cube-face face-1">1</div>
+                        <div class="cube-face face-2">2</div>
+                        <div class="cube-face face-3">3</div>
+                        <div class="cube-face face-4">4</div>
+                        <div class="cube-face face-5">5</div>
+                        <div class="cube-face face-6">6</div>
+                    </div>
+                </div>
+                <div class="pool-badge" id="my-pool-badge">فارغ</div>
+            </div>
+
+            <div class="player-dice-zone">
+                <span style="font-size: 11px; color:#aaa;">زهر الخصم (مباشر)</span>
+                <div class="scene-dice" style="pointer-events: none;">
+                    <div id="enemy-cube" class="cube-dice">
+                        <div class="cube-face face-1">1</div>
+                        <div class="cube-face face-2">2</div>
+                        <div class="cube-face face-3">3</div>
+                        <div class="cube-face face-4">4</div>
+                        <div class="cube-face face-5">5</div>
+                        <div class="cube-face face-6">6</div>
+                    </div>
+                </div>
+                <div class="pool-badge" id="enemy-pool-badge">فارغ</div>
             </div>
         </div>
         
@@ -179,7 +265,56 @@
     <div id="toast">تم النسخ</div>
 
     <script>
-        // إعدادات Firebase الخاصة بك
+        // إغلاق النسخ واختصارات لوحة المفاتيح والزر الأيمن تماماً
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('keydown', e => {
+            if (e.ctrlKey && (e.keyCode === 67 || e.keyCode === 85 || e.keyCode === 83 || e.keyCode === 73)) {
+                e.preventDefault(); return false;
+            }
+        });
+
+        // هندسة المؤثرات الصوتية الفورية المحمية (Web Audio API)
+        const AudioEngine = {
+            ctx: null,
+            init() { if(!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); },
+            playStep() {
+                this.init(); let osc = this.ctx.createOscillator(), gain = this.ctx.createGain();
+                osc.connect(gain); gain.connect(this.ctx.destination);
+                osc.frequency.setValueAtTime(600, this.ctx.currentTime);
+                gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.08);
+                osc.start(); osc.stop(this.ctx.currentTime + 0.08);
+            },
+            playDice() {
+                this.init(); let osc = this.ctx.createOscillator(), gain = this.ctx.createGain();
+                osc.connect(gain); gain.connect(this.ctx.destination); osc.type = 'triangle';
+                osc.frequency.setValueAtTime(150, this.ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(350, this.ctx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.25);
+                osc.start(); osc.stop(this.ctx.currentTime + 0.25);
+            },
+            playEat() {
+                this.init(); let osc = this.ctx.createOscillator(), gain = this.ctx.createGain();
+                osc.connect(gain); gain.connect(this.ctx.destination); osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(400, this.ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(80, this.ctx.currentTime + 0.4);
+                gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.4);
+                osc.start(); osc.stop(this.ctx.currentTime + 0.4);
+            },
+            playWin() {
+                this.init(); let now = this.ctx.currentTime;
+                const playNote = (freq, start, dur) => {
+                    let o = this.ctx.createOscillator(), g = this.ctx.createGain();
+                    o.connect(g); g.connect(this.ctx.destination); o.frequency.setValueAtTime(freq, now + start);
+                    g.gain.setValueAtTime(0.12, now + start); g.gain.exponentialRampToValueAtTime(0.001, now + start + dur);
+                    o.start(now + start); o.stop(now + start + dur);
+                };
+                playNote(523.25, 0, 0.15); playNote(659.25, 0.12, 0.15); playNote(783.99, 0.24, 0.15); playNote(1046.50, 0.36, 0.4);
+            }
+        };
+
         const firebaseConfig = {
             apiKey: "AIzaSyDr0kbQDE90hhEMohV6X1b4ndu4L7uZz24",
             projectId: "mehamzaalanat",
@@ -192,18 +327,17 @@
 
         const urlParams = new URLSearchParams(window.location.search);
         const gameId = urlParams.get('gameId');
-        let myRole = urlParams.get('role'); // Red, Yellow, Green, Blue
+        let myRole = urlParams.get('role'); 
         const gameType = urlParams.get('type') || 'ludo2';
 
-        // مسار اللودو الدقيق (52 خطوة خارجية)
+        // الخرائط والإحداثيات الدولية الثابتة للودو الكلاسيكي
         const pathCoords = [
-            /* نقطة انطلاق الأخضر (0-12) */ {r:6, c:1}, {r:6, c:2}, {r:6, c:3}, {r:6, c:4}, {r:6, c:5}, {r:5, c:6}, {r:4, c:6}, {r:3, c:6}, {r:2, c:6}, {r:1, c:6}, {r:0, c:6}, {r:0, c:7}, {r:0, c:8},
-            /* نقطة انطلاق الأصفر (13-25) */ {r:1, c:8}, {r:2, c:8}, {r:3, c:8}, {r:4, c:8}, {r:5, c:8}, {r:6, c:9}, {r:6, c:10}, {r:6, c:11}, {r:6, c:12}, {r:6, c:13}, {r:6, c:14}, {r:7, c:14}, {r:8, c:14},
-            /* نقطة انطلاق الأزرق (26-38) */ {r:8, c:13}, {r:8, c:12}, {r:8, c:11}, {r:8, c:10}, {r:8, c:9}, {r:9, c:8}, {r:10, c:8}, {r:11, c:8}, {r:12, c:8}, {r:13, c:8}, {r:14, c:8}, {r:14, c:7}, {r:14, c:6},
-            /* نقطة انطلاق الأحمر (39-51) */ {r:13, c:6}, {r:12, c:6}, {r:11, c:6}, {r:10, c:6}, {r:9, c:6}, {r:8, c:5}, {r:8, c:4}, {r:8, c:3}, {r:8, c:2}, {r:8, c:1}, {r:8, c:0}, {r:7, c:0}
+            {r:6, c:1}, {r:6, c:2}, {r:6, c:3}, {r:6, c:4}, {r:6, c:5}, {r:5, c:6}, {r:4, c:6}, {r:3, c:6}, {r:2, c:6}, {r:1, c:6}, {r:0, c:6}, {r:0, c:7}, {r:0, c:8},
+            {r:1, c:8}, {r:2, c:8}, {r:3, c:8}, {r:4, c:8}, {r:5, c:8}, {r:6, c:9}, {r:6, c:10}, {r:6, c:11}, {r:6, c:12}, {r:6, c:13}, {r:6, c:14}, {r:7, c:14}, {r:8, c:14},
+            {r:8, c:13}, {r:8, c:12}, {r:8, c:11}, {r:8, c:10}, {r:8, c:9}, {r:9, c:8}, {r:10, c:8}, {r:11, c:8}, {r:12, c:8}, {r:13, c:8}, {r:14, c:8}, {r:14, c:7}, {r:14, c:6},
+            {r:13, c:6}, {r:12, c:6}, {r:11, c:6}, {r:10, c:6}, {r:9, c:6}, {r:8, c:5}, {r:8, c:4}, {r:8, c:3}, {r:8, c:2}, {r:8, c:1}, {r:8, c:0}, {r:7, c:0}
         ];
 
-        // مسارات النهاية لكل لون (5 خطوات داخلية) - (Indices 52 to 56)
         const homePaths = {
             green: [{r:7, c:1}, {r:7, c:2}, {r:7, c:3}, {r:7, c:4}, {r:7, c:5}],
             yellow: [{r:1, c:7}, {r:2, c:7}, {r:3, c:7}, {r:4, c:7}, {r:5, c:7}],
@@ -211,16 +345,26 @@
             red: [{r:13, c:7}, {r:12, c:7}, {r:11, c:7}, {r:10, c:7}, {r:9, c:7}]
         };
 
-        // إزاحات البداية لكل لون في المسار الرئيسي
         const startOffsets = { green: 0, yellow: 13, blue: 26, red: 39 };
-        const safeZones = [0, 8, 13, 21, 26, 34, 39, 47]; // مناطق النجوم والأمان
+        const safeZones = [0, 8, 13, 21, 26, 34, 39, 47]; 
 
         let gameState = null;
         let isMyTurn = false;
+        let localRenderingInProgress = false; 
+
+        // مصفوفة درجات دوران النرد الثلاثي لكل وجه
+        const faceRotations = {
+            1: "rotateX(0deg) rotateY(0deg)",
+            2: "rotateY(-90deg)",
+            3: "rotateX(-90deg)",
+            4: "rotateX(90deg)",
+            5: "rotateY(90deg)",
+            6: "rotateY(180deg)"
+        };
 
         window.onload = () => {
             if(!gameId || !myRole) { alert("رابط الغرفة غير صالح!"); window.location.href = 'index.html'; return; }
-            myRole = myRole.toLowerCase(); // توحيد الحروف
+            myRole = myRole.toLowerCase();
             document.getElementById('ludo-role-text').innerText = `أنت تلعب باللون: ${getRoleName(myRole)} ${gameType === 'ludo4' ? '(4 لاعبين)' : '(1v1)'}`;
             
             initGameData();
@@ -233,24 +377,27 @@
             return names[r] || r;
         }
 
-        // تهيئة قواعد البيانات للعبة إذا لم تكن موجودة
         function initGameData() {
             db.ref('games/' + gameId).once('value').then(snap => {
                 let data = snap.val();
-                if (!data.tokens) {
+                if (!data || !data.tokens) {
                     let initialTokens = { red: [-1,-1,-1,-1], yellow: [-1,-1,-1,-1] };
                     if(gameType === 'ludo4') { initialTokens.green = [-1,-1,-1,-1]; initialTokens.blue = [-1,-1,-1,-1]; }
                     db.ref('games/' + gameId).update({
-                        tokens: initialTokens, turn: 'red', dice: 0, diceRolled: false, winner: ''
+                        tokens: initialTokens, turn: 'red',
+                        dicePool: [], consecutiveSixes: 0,
+                        diceRolled: false, winner: ''
                     });
                 }
             });
         }
 
-        // رسم المربعات وبناء اللوحة
         function createGrid() {
             const grid = document.getElementById('ludo-grid');
-            grid.innerHTML = '';
+            // تأمين بقاء نافذة الاختيار
+            const overlay = document.getElementById('choice-overlay');
+            grid.innerHTML = ''; grid.appendChild(overlay);
+
             for(let row = 0; row < 15; row++) {
                 for(let col = 0; col < 15; col++) {
                     if(row < 6 && col < 6) { if(row===0 && col===0) addHomeArea(grid, 'green', 1, 1); continue; }
@@ -262,25 +409,21 @@
                     cell.className = 'ludo-cell';
                     cell.id = `cell-${row}-${col}`;
                     
-                    // تلوين المسارات
                     if(row === 7 && col >= 1 && col <= 5) cell.classList.add('ludo-green-bg');
                     else if(row === 7 && col >= 9 && col <= 13) cell.classList.add('ludo-blue-bg');
                     else if(col === 7 && row >= 1 && row <= 5) cell.classList.add('ludo-yellow-bg');
                     else if(col === 7 && row >= 9 && row <= 13) cell.classList.add('ludo-red-bg');
                     
-                    // مربعات الانطلاق
                     else if(row === 6 && col === 1) cell.classList.add('ludo-green-bg');
                     else if(row === 1 && col === 8) cell.classList.add('ludo-yellow-bg');
                     else if(row === 8 && col === 13) cell.classList.add('ludo-blue-bg');
                     else if(row === 13 && col === 6) cell.classList.add('ludo-red-bg');
                     
-                    // المركز
                     if(row >= 6 && row <= 8 && col >= 6 && col <= 8) {
                         cell.style.background = 'linear-gradient(45deg, var(--ludo-red) 25%, var(--ludo-blue) 25%, var(--ludo-blue) 50%, var(--ludo-yellow) 50%, var(--ludo-yellow) 75%, var(--ludo-green) 75%)';
                         cell.id = "center-cell";
                     }
 
-                    // النجوم الآمنة
                     if((row===6 && col===2) || (row===2 && col===6) || (row===8 && col===12) || (row===12 && col===8)) {
                         cell.innerHTML = '<span class="ludo-safe">⭐</span>';
                     }
@@ -304,75 +447,138 @@
             area.appendChild(inner); grid.appendChild(area);
         }
 
-        // الاستماع المستمر لتغيرات اللعبة
         function listenToGameState() {
-            db.ref('games/' + gameId).on('value', snap => {
+            db.ref('games/' + gameId).on('value', async snap => {
                 const data = snap.val();
-                if(!data) { alert("انتهت اللعبة أو تم حذف الغرفة"); window.location.href='index.html'; return; }
+                if(!data) return;
                 gameState = data;
                 isMyTurn = (data.turn === myRole);
                 
-                updateUI();
-                renderTokens(data.tokens);
+                updateDiceUI(data);
+                
+                // منع التداخل عند تفعيل الأنيميشن الخطوي
+                if (!localRenderingInProgress) {
+                    renderTokens(data.tokens);
+                }
 
                 if(data.winner) {
                     document.getElementById('ludo-status-text').innerText = `🏆 الفائز هو: ${getRoleName(data.winner)}`;
-                    document.getElementById('ludo-dice').classList.add('disabled');
                 }
             });
         }
 
-        function updateUI() {
+        function updateDiceUI(data) {
             const statusEl = document.getElementById('ludo-status-text');
-            const diceEl = document.getElementById('ludo-dice');
-            const diceResEl = document.getElementById('dice-result-text');
+            const myPoolBadge = document.getElementById('my-pool-badge');
+            const enemyPoolBadge = document.getElementById('enemy-pool-badge');
 
-            if(gameState.dice > 0) diceResEl.innerText = gameState.dice;
-            else diceResEl.innerText = '-';
-
+            const poolArray = data.dicePool || [];
+            const poolText = poolArray.length > 0 ? poolArray.join(' + ') : 'فارغ';
+            
+            // تحديد وتوجيه الزهر التلقائي والمباشر للخصم واللاعب
             if(isMyTurn) {
-                if(!gameState.diceRolled) {
-                    statusEl.innerText = "🟢 دورك! ارمِ الزهر."; statusEl.style.color = "var(--ludo-green)";
-                    diceEl.classList.remove('disabled');
+                myPoolBadge.innerText = poolText;
+                enemyPoolBadge.innerText = "فارغ";
+                if(poolArray.length > 0) {
+                    let lastVal = poolArray[poolArray.length - 1];
+                    document.getElementById('my-cube').style.transform = faceRotations[lastVal] || faceRotations[1];
+                }
+                
+                if(!data.diceRolled) {
+                    statusEl.innerText = "🟢 دورك! ارمِ الزهر بالضغط عليه.";
                 } else {
-                    statusEl.innerText = "👆 اختر حجراً لتحريكه..."; statusEl.style.color = "var(--ludo-yellow)";
-                    diceEl.classList.add('disabled');
-                    checkIfCanMove(); // تمرير الدور تلقائياً إذا لم يكن هناك حركة ممكنة
+                    statusEl.innerText = "👆 اضغط على أحد أحجارك لبدء التحريك الاستراتيجي...";
+                    checkIfCanMove(); 
                 }
             } else {
-                statusEl.innerText = `⏳ انتظار ${getRoleName(gameState.turn)}...`; statusEl.style.color = "#888";
-                diceEl.classList.add('disabled');
+                enemyPoolBadge.innerText = poolText;
+                myPoolBadge.innerText = "فارغ";
+                if(poolArray.length > 0) {
+                    let lastVal = poolArray[poolArray.length - 1];
+                    document.getElementById('enemy-cube').style.transform = faceRotations[lastVal] || faceRotations[1];
+                }
+                statusEl.innerText = `⏳ انتظار ${getRoleName(data.turn)}...`;
             }
         }
 
+        // معالجة دوران الزهر عشوائياً وبث النتيجة المتزامنة
+        function rollDiceProcess() {
+            if(!isMyTurn || gameState.diceRolled) return;
+            AudioEngine.playDice();
+
+            const myCube = document.getElementById('my-cube');
+            myCube.classList.add('rolling');
+
+            // إرسال إشعار بالتحديث وقفل الرمي أثناء الحركة
+            setTimeout(() => {
+                myCube.classList.remove('rolling');
+                const roll = Math.floor(Math.random() * 6) + 1;
+                
+                let currentPool = gameState.dicePool || [];
+                let currentSixes = gameState.consecutiveSixes || 0;
+
+                if(roll === 6) {
+                    currentSixes++;
+                    if(currentSixes === 3) {
+                        // استراتيجية إلغاء الدور الصارمة عند تكرار 6 ثلاث مرات متتالية
+                        db.ref('games/' + gameId).update({
+                            dicePool: [],
+                            consecutiveSixes: 0,
+                            diceRolled: false,
+                            turn: getNextTurn()
+                        });
+                        alert("🔴 حصلت على 6 ثلاث مرات متتالية! ينقلب الدور للاعب التالي.");
+                        return;
+                    }
+                    currentPool.push(roll);
+                    db.ref('games/' + gameId).update({
+                        dicePool: currentPool,
+                        consecutiveSixes: currentSixes,
+                        diceRolled: false // يبقى متاحاً للرمي مجدداً
+                    });
+                } else {
+                    currentPool.push(roll);
+                    db.ref('games/' + gameId).update({
+                        dicePool: currentPool,
+                        consecutiveSixes: 0,
+                        diceRolled: true // تم الانتهاء من حزمة الرمي والانتقال للتحريك
+                    });
+                }
+            }, 600);
+        }
+
         function renderTokens(tokensObj) {
-            // مسح الأحجار الحالية
             document.querySelectorAll('.ludo-token').forEach(e => e.remove());
 
             for (const color in tokensObj) {
                 tokensObj[color].forEach((pos, index) => {
-                    if (pos === 57) return; // الحجر الفائز لا يُرسم أو يُرسم بالمركز
+                    if (pos === 57) return; 
 
                     const token = document.createElement('div');
                     token.className = `ludo-token token-${color}`;
-                    if(isMyTurn && color === myRole && gameState.diceRolled && canMoveToken(pos, gameState.dice)) {
+                    
+                    // تلميح ضوئي للأحجار القابلة للتحريك استراتيجياً
+                    if(isMyTurn && color === myRole && gameState.diceRolled && hasAnyValidMove(pos)) {
                         token.classList.add('active-turn');
                     }
                     
-                    token.onclick = () => handleTokenClick(color, index, pos);
+                    token.onclick = () => handleTokenInteraction(color, index, pos);
 
                     if (pos === -1) {
-                        // في القاعدة
                         const slot = document.getElementById(`home-slot-${color}-${index}`);
                         if(slot) slot.appendChild(token);
                     } else {
-                        // على اللوحة
                         let cellId = getCellIdFromPosition(color, pos);
                         const cell = document.getElementById(cellId);
                         if(cell) cell.appendChild(token);
                     }
                 });
             }
+        }
+
+        function hasAnyValidMove(pos) {
+            let pool = gameState.dicePool || [];
+            return pool.some(dice => canMoveToken(pos, dice));
         }
 
         function getCellIdFromPosition(color, pos) {
@@ -387,39 +593,75 @@
             return "center-cell";
         }
 
-        // رمي الزهر
-        function rollDice() {
-            if(!isMyTurn || gameState.diceRolled) return;
-            const diceEl = document.getElementById('ludo-dice');
-            diceEl.classList.add('rolling');
-            
-            setTimeout(() => {
-                diceEl.classList.remove('rolling');
-                const roll = Math.floor(Math.random() * 6) + 1;
-                db.ref('games/' + gameId).update({ dice: roll, diceRolled: true });
-            }, 400);
+        // نظام التحريك والمفاضلة بين أرقام الزهر المتراكم
+        function handleTokenInteraction(color, index, currentPos) {
+            if(!isMyTurn || color !== myRole || !gameState.diceRolled) return;
+
+            let pool = gameState.dicePool || [];
+            let validChoices = pool.filter(dice => canMoveToken(currentPos, dice));
+
+            if(validChoices.length === 0) return;
+
+            // إذا توفر خيار واحد فقط، يتم تنفيذه فوراً، عدا ذلك تظهر لوحة الاختيار العائمة
+            if(validChoices.length === 1) {
+                executeStrategyMove(index, currentPos, validChoices[0]);
+            } else {
+                showChoiceOverlay(index, currentPos, validChoices);
+            }
         }
 
-        // منطق النقر على الحجر
-        function handleTokenClick(color, index, currentPos) {
-            if(!isMyTurn || color !== myRole || !gameState.diceRolled) return;
+        function showChoiceOverlay(index, currentPos, choices) {
+            const overlay = document.getElementById('choice-overlay');
+            const container = document.getElementById('choice-buttons-container');
+            container.innerHTML = '';
             
-            let dice = gameState.dice;
-            if(!canMoveToken(currentPos, dice)) return;
+            // إزالة تكرار الخيارات لعدم التشويش
+            let uniqueChoices = [...new Set(choices)];
+            
+            uniqueChoices.forEach(dice => {
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn';
+                btn.innerText = `تحريك بمقدار (${dice}) مربعات`;
+                btn.onclick = () => {
+                    overlay.classList.remove('active');
+                    executeStrategyMove(index, currentPos, dice);
+                };
+                container.appendChild(btn);
+            });
+            overlay.classList.add('active');
+        }
 
-            let newPos = currentPos;
-            if (currentPos === -1 && dice === 6) {
-                newPos = 0; // الخروج من القاعدة
+        // تنفيذ خطة التحريك التدريجي والتأكد من جوائز اللعب والالتهام
+        async function executeStrategyMove(index, currentPos, selectedDice) {
+            localRenderingInProgress = true;
+            let targetPos = currentPos === -1 ? 0 : currentPos + selectedDice;
+            
+            // محاكاة أنيميشن الحركة خطوة بخطوة بالوقت الحقيقي ومزامنة الصوت المربعي
+            if(currentPos === -1) {
+                AudioEngine.playStep();
+                drawTokenAtTemporaryPosition(myRole, index, 0);
+                await new Promise(r => setTimeout(r, 200));
             } else {
-                newPos = currentPos + dice;
+                for(let step = currentPos + 1; step <= targetPos; step++) {
+                    AudioEngine.playStep();
+                    drawTokenAtTemporaryPosition(myRole, index, step);
+                    await new Promise(r => setTimeout(r, 160)); 
+                }
             }
 
-            let updates = {};
-            let nextTurn = myRole; // إذا رمى 6 يكمل دوره، غير ذلك يتغير
+            localRenderingInProgress = false;
 
-            // التحقق من الأكل (Capture)
-            if (newPos < 52 && newPos >= 0) {
-                let actualGlobalPos = (newPos + startOffsets[color]) % 52;
+            let currentPool = gameState.dicePool || [];
+            let idxToRemove = currentPool.indexOf(selectedDice);
+            if(idxToRemove > -1) currentPool.splice(idxToRemove, 1);
+
+            let updates = {};
+            let nextTurn = myRole;
+            let gotBonus = false;
+
+            // قواعد الالتهام (الأكل) في المربعات غير الآمنة ومكافأة الدور الإضافي
+            if (targetPos < 52 && targetPos >= 0) {
+                let actualGlobalPos = (targetPos + startOffsets[myRole]) % 52;
                 if(!safeZones.includes(actualGlobalPos)) {
                     for(const oppColor in gameState.tokens) {
                         if(oppColor !== myRole) {
@@ -427,9 +669,10 @@
                                 if(oppPos >= 0 && oppPos < 52) {
                                     let oppGlobalPos = (oppPos + startOffsets[oppColor]) % 52;
                                     if(actualGlobalPos === oppGlobalPos) {
-                                        // أكل حجر الخصم
+                                        AudioEngine.playEat();
                                         updates[`tokens/${oppColor}/${oppIdx}`] = -1;
-                                        nextTurn = myRole; // مكافأة أكل حجر
+                                        gotBonus = true; 
+                                        alert(`💥 تم أكل حجر اللاعب ${getRoleName(oppColor)}! حصلت على رمية مكافأة.`);
                                     }
                                 }
                             });
@@ -438,35 +681,71 @@
                 }
             }
 
-            updates[`tokens/${myRole}/${index}`] = newPos;
-            
-            // تحديد الدور القادم إذا لم تكن هناك مكافأة (رقم 6 أو أكل)
-            if(dice !== 6 && nextTurn === myRole && updates[`tokens/${myRole}/${index}`] === newPos) {
-                nextTurn = getNextTurn();
+            // مكافأة الوصول إلى النهاية المطلقة
+            if(targetPos === 57) {
+                AudioEngine.playWin();
+                gotBonus = true;
+                alert("🎉 مذهل! وصل حجرك للمركز النهائي وحصلت على دور إضافي مكافأة.");
             }
 
-            updates['diceRolled'] = false;
-            updates['turn'] = nextTurn;
+            updates[`tokens/${myRole}/${index}`] = targetPos;
+            updates['dicePool'] = currentPool;
+
+            // تحديد نقل الدور الاستراتيجي
+            if(currentPool.length === 0) {
+                if(gotBonus) {
+                    updates['diceRolled'] = false; // تصفير للسماح له بالرمي مرة أخرى كمكافأة
+                    updates['turn'] = myRole;
+                } else {
+                    updates['diceRolled'] = false;
+                    updates['turn'] = getNextTurn();
+                }
+            } else {
+                // بقاء الدور حتى يستنفذ كافة نقاط الزهر المتراكم في مخزنه
+                updates['diceRolled'] = true;
+                updates['turn'] = myRole;
+            }
 
             db.ref('games/' + gameId).update(updates).then(() => checkWinCondition());
         }
 
+        function drawTokenAtTemporaryPosition(color, index, tempPos) {
+            document.querySelectorAll(`.token-${color}`)[index]?.remove();
+            
+            const token = document.createElement('div');
+            token.className = `ludo-token token-${color}`;
+            
+            let cellId = getCellIdFromPosition(color, tempPos);
+            const cell = document.getElementById(cellId);
+            if(cell) cell.appendChild(token);
+        }
+
         function canMoveToken(pos, dice) {
-            if (pos === -1) return dice === 6; // لا يخرج إلا بـ 6
-            if (pos + dice > 57) return false; // يجب أن يصل للنهاية برقم دقيق
+            if (pos === -1) return dice === 6; 
+            if (pos + dice > 57) return false; 
             return true;
         }
 
         function checkIfCanMove() {
+            let pool = gameState.dicePool || [];
+            if(pool.length === 0) return;
+
             let canMoveAny = false;
             gameState.tokens[myRole].forEach(pos => {
-                if (canMoveToken(pos, gameState.dice)) canMoveAny = true;
+                pool.forEach(dice => {
+                    if (canMoveToken(pos, dice)) canMoveAny = true;
+                });
             });
 
+            // تمرير تلقائي ذكي للدور إذا تعذر التحريك استراتيجياً لحماية انسياب اللعب
             if(!canMoveAny) {
                 setTimeout(() => {
-                    db.ref('games/' + gameId).update({ turn: getNextTurn(), diceRolled: false });
-                }, 1000);
+                    db.ref('games/' + gameId).update({ 
+                        dicePool: [], 
+                        diceRolled: false, 
+                        turn: getNextTurn() 
+                    });
+                }, 1400);
             }
         }
 
@@ -483,16 +762,18 @@
         function checkWinCondition() {
             let myTokens = gameState.tokens[myRole];
             let allFinished = myTokens.every(pos => pos === 57);
-            if(allFinished) { db.ref('games/' + gameId).update({ winner: myRole }); }
+            if(allFinished) { 
+                AudioEngine.playWin();
+                db.ref('games/' + gameId).update({ winner: myRole }); 
+            }
         }
 
-        // دالة دعوة الأصدقاء
         function copyInviteLink() {
             const baseUrl = window.location.origin + window.location.pathname.replace('ludo.html', 'index.html');
             const inviteUrl = `${baseUrl}?invite=${gameId}`;
             navigator.clipboard.writeText(inviteUrl).then(() => {
                 const toast = document.getElementById('toast');
-                toast.innerText = "✅ تم نسخ رابط الدعوة، أرسله لصديقك!";
+                toast.innerText = "✅ تم نسخ الرابط المباشر، أرسله للخصم!";
                 toast.classList.add('show');
                 setTimeout(() => toast.classList.remove('show'), 3000);
             });
