@@ -107,6 +107,11 @@
         .ludo-blue-bg { background-color: var(--ludo-blue) !important; }
         .ludo-safe { font-size: 13px; filter: drop-shadow(0 0 3px #000); position: absolute; z-index: 2; }
         
+        #center-finish-zone {
+            position: relative;
+            z-index: 20;
+        }
+
         .ludo-home-area {
             grid-column: span 6; grid-row: span 6;
             display: flex; justify-content: center; align-items: center;
@@ -152,11 +157,18 @@
         .ludo-token.active-turn { animation: pulseGlow 1s infinite alternate; border: 2px solid #fff; }
         @keyframes pulseGlow { 0% { transform: scale(1); box-shadow: 0 0 8px #fff; } 100% { transform: scale(1.15); box-shadow: 0 0 20px var(--secondary-neon); } }
 
-        /* تنظيم التكديس عند وقوف أكثر من حجر بمربع واحد */
+        /* تنظيم التكديس عند وقوف أكثر من حجر بمربع واحد وتجمعهم في المنتصف */
         .ludo-cell .ludo-token { width: 70%; height: 70%; position: absolute; }
+        .ludo-cell .ludo-token:nth-child(1) { transform: scale(0.9); z-index: 10; }
         .ludo-cell .ludo-token:nth-child(2) { transform: translate(-4px, -4px) scale(0.85); z-index: 11; }
         .ludo-cell .ludo-token:nth-child(3) { transform: translate(4px, 4px) scale(0.85); z-index: 12; }
         .ludo-cell .ludo-token:nth-child(4) { transform: translate(-4px, 4px) scale(0.75); z-index: 13; }
+        
+        #center-finish-zone .ludo-token { transform: scale(0.6) !important; margin: 2px; }
+        #center-finish-zone .ludo-token:nth-child(1) { transform: translate(-8px, -8px) scale(0.6) !important; }
+        #center-finish-zone .ludo-token:nth-child(2) { transform: translate(8px, -8px) scale(0.6) !important; }
+        #center-finish-zone .ludo-token:nth-child(3) { transform: translate(-8px, 8px) scale(0.6) !important; }
+        #center-finish-zone .ludo-token:nth-child(4) { transform: translate(8px, 8px) scale(0.6) !important; }
 
         .token-red { background: radial-gradient(circle, #ff6b9d, var(--ludo-red)); }
         .token-green { background: radial-gradient(circle, #62f2bd, var(--ludo-green)); }
@@ -313,13 +325,11 @@
         <div id="ludo-status-text" style="color: var(--secondary-neon); font-size: 15px; font-weight: bold; margin-bottom: 10px;">تحميل قواعد اللعبة...</div>
         
         <div id="ludo-grid">
-            <!-- الواجهة الاختيارية للزهر الاستراتيجي المتعدد (يتم عرضها برمجيا) -->
-        </div>
+            </div>
         
         <button onclick="exitGame()" class="exit-btn">انسحاب والعودة للمنصة</button>
     </div>
 
-    <!-- نافذة تحريك الجنود الاستراتيجية -->
     <div class="custom-overlay" id="choice-overlay" style="z-index: 5001;">
         <div class="custom-box">
             <h4 style="margin:0 0 12px 0; font-size:15px; color:#fff;">اختر كم مربع تود التحريك:</h4>
@@ -327,7 +337,6 @@
         </div>
     </div>
 
-    <!-- نافذة الأصدقاء الاحترافية -->
     <div class="custom-overlay" id="friends-modal">
         <div class="custom-box">
             <h3>قائمة الأصدقاء</h3>
@@ -340,7 +349,6 @@
         </div>
     </div>
 
-    <!-- نافذة المشاهدين -->
     <div class="custom-overlay" id="spectators-modal">
         <div class="custom-box">
             <h3>قائمة المشاهدين 👁️</h3>
@@ -351,7 +359,6 @@
         </div>
     </div>
 
-    <!-- نافذة الفوز الفاخرة المدمجة ونظام تصويت جميع اللاعبين للإعادة -->
     <div class="win-overlay" id="win-overlay">
         <div class="win-box">
             <h2 id="win-title" style="color: var(--ludo-yellow); margin-top: 0;">🏆 مبروك الفوز! 🏆</h2>
@@ -435,6 +442,9 @@
         let myRole = 'spectator';
         let isSpectator = true;
         let spectatorName = "مشاهد_" + Math.floor(Math.random() * 9999);
+
+        // قفل برمجي محلي لمنع السبام على النرد
+        let isRollingDice = false;
 
         // تحديد ما إذا كان اللاعب مشارك أم مشاهد
         if (rawRole) {
@@ -593,7 +603,12 @@
                     
                     if(row >= 6 && row <= 8 && col >= 6 && col <= 8) {
                         cell.style.background = 'linear-gradient(45deg, var(--ludo-red) 25%, var(--ludo-blue) 25%, var(--ludo-blue) 50%, var(--ludo-yellow) 50%, var(--ludo-yellow) 75%, var(--ludo-green) 75%)';
-                        cell.id = "center-cell";
+                        // تحديد مربع المنتصف المطلق لتجمع الجنود
+                        if (row === 7 && col === 7) {
+                            cell.id = "center-finish-zone";
+                        } else {
+                            cell.id = "center-cell";
+                        }
                     }
 
                     if((row===6 && col===2) || (row===2 && col===6) || (row===8 && col===12) || (row===12 && col===8)) {
@@ -752,11 +767,12 @@
             }
         }
 
-        // معالجة دوران الزهر عشوائياً وبث النتيجة المتزامنة
+        // معالجة دوران الزهر عشوائياً وبث النتيجة المتزامنة مع الحماية من التكرار (Spam)
         function rollDiceProcess(clickedRole) {
-            // منع المشاهد أو أي شخص آخر من رمي نرد غيره
-            if(isSpectator || !isMyTurn || gameState.diceRolled || clickedRole !== myRole) return;
+            // منع المشاهد أو أي شخص آخر من رمي نرد غيره، وأيضاً منع الضغط المتكرر
+            if(isSpectator || !isMyTurn || gameState.diceRolled || clickedRole !== myRole || isRollingDice) return;
             
+            isRollingDice = true; // تفعيل قفل الزهر فوراً
             AudioEngine.playDice();
 
             const myCube = document.getElementById(`cube-${myRole}`);
@@ -777,7 +793,7 @@
                             consecutiveSixes: 0,
                             diceRolled: false,
                             turn: getNextTurn()
-                        });
+                        }).finally(() => { isRollingDice = false; }); // فتح القفل
                         showToast("🔴 حصلت على رقم 6 ثلاث مرات متتالية! ينقلب الدور.");
                         return;
                     }
@@ -786,14 +802,14 @@
                         dicePool: currentPool,
                         consecutiveSixes: currentSixes,
                         diceRolled: false 
-                    });
+                    }).finally(() => { isRollingDice = false; });
                 } else {
                     currentPool.push(roll);
                     db.ref('games/' + gameId).update({
                         dicePool: currentPool,
                         consecutiveSixes: 0,
                         diceRolled: true 
-                    });
+                    }).finally(() => { isRollingDice = false; });
                 }
             }, 600);
         }
@@ -804,7 +820,7 @@
 
             for (const color in tokensObj) {
                 tokensObj[color].forEach((pos, index) => {
-                    if (pos === 57) return; 
+                    // تم إزالة (if pos === 57 return) ليتم تجميع الجنود في المركز
 
                     const token = document.createElement('div');
                     token.className = `ludo-token token-${color}`;
@@ -835,7 +851,15 @@
             return pool.some(dice => canMoveToken(pos, dice));
         }
 
+        // إصلاح مسار الخروج (خاصة الجليتش القطري للون الأحمر) و توجيه الفائز للمركز المطلق
         function getCellIdFromPosition(color, pos) {
+            if (pos === 57) return "center-finish-zone";
+
+            // تصحيح النقلة رقم 51 للون الأحمر لمنع قفز الجندي إلى مربع خارجي والعودة للبيت
+            if(color === 'red' && pos === 51) {
+                return "cell-14-7"; 
+            }
+
             if(pos < 52) {
                 let actualIndex = (pos + startOffsets[color]) % 52;
                 let coord = pathCoords[actualIndex];
@@ -945,7 +969,7 @@
             if(targetPos === 57) {
                 AudioEngine.playWin();
                 gotBonus = true;
-                showToast("🎉 مذهل! وصل حجرك للنهاية وحصلت على دور إضافي.");
+                showToast("🎉 مذهل! وصل حجرك للنهاية وتجمع في المركز.");
             }
 
             updates[`tokens/${myRole}/${index}`] = targetPos;
