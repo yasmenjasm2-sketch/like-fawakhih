@@ -65,6 +65,15 @@
             display: flex; align-items: center; gap: 5px;
         }
 
+        /* ستايل زر تشغيل البوت */
+        .bot-btn {
+            background: linear-gradient(90deg, #ff007a, #7a00ff); color: white;
+            border: none; padding: 8px 14px; font-size: 12px; font-weight: bold;
+            border-radius: 10px; cursor: pointer; box-shadow: 0 4px 12px rgba(122, 0, 255, 0.4);
+            display: flex; align-items: center; gap: 5px; margin-right: 8px; transition: transform 0.2s;
+        }
+        .bot-btn:active { transform: scale(0.95); }
+
         .spectator-btn {
             background: rgba(255,255,255,0.1); color: #00f0ff;
             border: 1px solid #00f0ff; padding: 6px 12px; font-size: 12px; font-weight: bold;
@@ -91,7 +100,8 @@
         .perspective-yellow .player-dice-zone,
         .perspective-yellow .choice-box,
         .perspective-yellow .ludo-safe,
-        .perspective-yellow .ludo-token::after {
+        .perspective-yellow .ludo-token::after,
+        .perspective-yellow #bot-profile {
             transform: rotate(180deg);
         }
 
@@ -315,7 +325,10 @@
 
     <div class="ludo-container">
         <div class="header-actions">
-            <button class="invite-btn" onclick="openModal('friends-modal')">📩 قائمة الأصدقاء</button>
+            <div style="display:flex; align-items:center;">
+                <button class="invite-btn" onclick="openModal('friends-modal')">📩 قائمة الأصدقاء</button>
+                <button class="bot-btn" onclick="toggleBot()">🤖 تفعيل بوت نبراس</button>
+            </div>
             <button class="spectator-btn" onclick="openModal('spectators-modal')">
                 👁️ <span id="spectator-count">0</span>
             </button>
@@ -443,6 +456,11 @@
         let isSpectator = true;
         let spectatorName = "مشاهد_" + Math.floor(Math.random() * 9999);
 
+        // متغيرات إضافة البوت
+        let isBotActive = false;
+        let botRole = 'yellow';
+        let isBotThinking = false;
+
         // قفل برمجي محلي لمنع السبام على النرد
         let isRollingDice = false;
 
@@ -533,6 +551,240 @@
             showToast("✅ تم إرسال دعوة اللعب لصديقك!");
             setTimeout(() => closeModal('friends-modal'), 1000);
         }
+
+        // --- نظام البوت الذكي ---
+        function toggleBot() {
+            if (isBotActive) return;
+            if (isSpectator) {
+                showToast("يجب أن تكون لاعباً أساسياً لتفعيل البوت!");
+                return;
+            }
+            
+            isBotActive = true;
+            // تعيين دور البوت ليكون الخصم
+            botRole = (myRole === 'red') ? 'yellow' : 'red'; 
+            
+            showToast("🤖 تم تفعيل بوت نبراس الاحترافي للمواجهة!");
+            
+            const botZone = document.getElementById(`dice-zone-${botRole}`);
+            if(botZone && !document.getElementById('bot-profile')) {
+                const botUI = document.createElement('div');
+                botUI.id = 'bot-profile';
+                botUI.style.cssText = "position:absolute; top:-40px; left:50%; transform:translateX(-50%); text-align:center; z-index:2000; width:100%; display:flex; flex-direction:column; align-items:center;";
+                botUI.innerHTML = `<img src="nbras.jpg" style="width:36px; height:36px; border-radius:50%; border:2px solid #00f0ff; object-fit:cover; box-shadow:0 0 15px rgba(0, 240, 255, 0.8);">
+                                   <div style="font-size:10px; color:#fff; font-weight:bold; background:rgba(0,0,0,0.8); padding:2px 6px; border-radius:6px; margin-top:-6px; position:relative; z-index:2; border:1px solid #00f0ff; white-space:nowrap;">البوت نبراس</div>`;
+                botZone.appendChild(botUI);
+                const label = botZone.querySelector('.dice-label');
+                if(label) label.style.display = 'none';
+            }
+            
+            if (gameState && gameState.turn === botRole && !localRenderingInProgress) {
+                playBotLogic();
+            }
+        }
+
+        function playBotLogic() {
+            if (!isBotActive || gameState.turn !== botRole || gameState.winner || localRenderingInProgress || isBotThinking) return;
+            isBotThinking = true;
+
+            setTimeout(() => {
+                if (!gameState.diceRolled) {
+                    if (isRollingDice) { isBotThinking = false; return; }
+                    isRollingDice = true;
+                    AudioEngine.playDice();
+
+                    const botCube = document.getElementById(`cube-${botRole}`);
+                    if(botCube) botCube.classList.add('rolling');
+
+                    setTimeout(() => {
+                        if(botCube) botCube.classList.remove('rolling');
+                        const roll = Math.floor(Math.random() * 6) + 1;
+                        
+                        let currentPool = gameState.dicePool || [];
+                        let currentSixes = gameState.consecutiveSixes || 0;
+
+                        if(roll === 6) {
+                            currentSixes++;
+                            if(currentSixes === 3) {
+                                db.ref('games/' + gameId).update({
+                                    dicePool: [], consecutiveSixes: 0, diceRolled: false,
+                                    turn: getNextTurnBot(botRole)
+                                }).finally(() => { isRollingDice = false; isBotThinking = false; });
+                                showToast("🤖 بوت نبراس حصل على 3 ستات متتالية! خسر دوره.");
+                                return;
+                            }
+                            currentPool.push(roll);
+                            db.ref('games/' + gameId).update({
+                                dicePool: currentPool, consecutiveSixes: currentSixes, diceRolled: false 
+                            }).finally(() => { isRollingDice = false; isBotThinking = false; });
+                        } else {
+                            currentPool.push(roll);
+                            db.ref('games/' + gameId).update({
+                                dicePool: currentPool, consecutiveSixes: 0, diceRolled: true 
+                            }).finally(() => { isRollingDice = false; isBotThinking = false; });
+                        }
+                    }, 600);
+                } else {
+                    let pool = [...(gameState.dicePool || [])]; 
+                    if(pool.length === 0) { isBotThinking = false; return; }
+
+                    let tokens = gameState.tokens[botRole];
+                    let bestMove = null;
+                    let bestScore = -999;
+
+                    for (let i = 0; i < 4; i++) {
+                        let pos = tokens[i];
+                        for (let d = 0; d < pool.length; d++) {
+                            let dice = pool[d];
+                            if (canBotMove(pos, dice)) {
+                                let score = evaluateBotMove(botRole, pos, dice);
+                                if (score > bestScore) {
+                                    bestScore = score;
+                                    bestMove = { index: i, pos: pos, dice: dice };
+                                }
+                            }
+                        }
+                    }
+
+                    if (bestMove) {
+                        executeBotMove(bestMove.index, bestMove.pos, bestMove.dice).then(() => {
+                            isBotThinking = false;
+                        });
+                    } else {
+                        setTimeout(() => {
+                            db.ref('games/' + gameId).update({ 
+                                dicePool: [], diceRolled: false, turn: getNextTurnBot(botRole) 
+                            }).finally(() => { isBotThinking = false; });
+                        }, 1400);
+                    }
+                }
+            }, 600); 
+        }
+
+        function canBotMove(pos, dice) {
+            if (pos === -1) return dice === 6; 
+            if (pos + dice > 57) return false; 
+            return true;
+        }
+
+        function evaluateBotMove(color, pos, dice) {
+            if (pos === -1) return dice === 6 ? 1000 : -1000; 
+            
+            let targetPos = pos + dice;
+            if (targetPos === 57) return 2000; 
+
+            let actualGlobalPos = (targetPos + startOffsets[color]) % 52;
+            let score = targetPos; 
+
+            if (targetPos < 52 && !safeZones.includes(actualGlobalPos)) {
+                for (const oppColor in gameState.tokens) {
+                    if (oppColor !== color) {
+                        gameState.tokens[oppColor].forEach(oppPos => {
+                            if (oppPos >= 0 && oppPos < 52) {
+                                let oppGlobalPos = (oppPos + startOffsets[oppColor]) % 52;
+                                if (actualGlobalPos === oppGlobalPos) {
+                                    score += 5000; 
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+
+            if (targetPos < 52 && safeZones.includes(actualGlobalPos)) {
+                score += 300;
+            }
+
+            return score;
+        }
+
+        async function executeBotMove(index, currentPos, selectedDice) {
+            localRenderingInProgress = true;
+            let targetPos = currentPos === -1 ? 0 : currentPos + selectedDice;
+            
+            if(currentPos === -1) {
+                AudioEngine.playStep();
+                drawTokenAtTemporaryPosition(botRole, index, 0);
+                await new Promise(r => setTimeout(r, 200));
+            } else {
+                for(let step = currentPos + 1; step <= targetPos; step++) {
+                    AudioEngine.playStep();
+                    drawTokenAtTemporaryPosition(botRole, index, step);
+                    await new Promise(r => setTimeout(r, 160)); 
+                }
+            }
+
+            localRenderingInProgress = false;
+
+            let currentPool = gameState.dicePool || [];
+            let idxToRemove = currentPool.indexOf(selectedDice);
+            if(idxToRemove > -1) currentPool.splice(idxToRemove, 1);
+
+            let updates = {};
+            let gotBonus = false;
+
+            if (targetPos < 52 && targetPos >= 0) {
+                let actualGlobalPos = (targetPos + startOffsets[botRole]) % 52;
+                if(!safeZones.includes(actualGlobalPos)) {
+                    for(const oppColor in gameState.tokens) {
+                        if(oppColor !== botRole) {
+                            gameState.tokens[oppColor].forEach((oppPos, oppIdx) => {
+                                if(oppPos >= 0 && oppPos < 52) {
+                                    let oppGlobalPos = (oppPos + startOffsets[oppColor]) % 52;
+                                    if(actualGlobalPos === oppGlobalPos) {
+                                        AudioEngine.playEat();
+                                        updates[`tokens/${oppColor}/${oppIdx}`] = -1;
+                                        gotBonus = true; 
+                                        showToast(`💥 بوت نبراس قام بأكل حجرك!`);
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+
+            if(targetPos === 57) {
+                AudioEngine.playWin();
+                gotBonus = true;
+            }
+
+            updates[`tokens/${botRole}/${index}`] = targetPos;
+            updates['dicePool'] = currentPool;
+
+            if(currentPool.length === 0) {
+                if(gotBonus) {
+                    updates['diceRolled'] = false; 
+                    updates['turn'] = botRole;
+                } else {
+                    updates['diceRolled'] = false;
+                    updates['turn'] = getNextTurnBot(botRole);
+                }
+            } else {
+                updates['diceRolled'] = true;
+                updates['turn'] = botRole;
+            }
+
+            return db.ref('games/' + gameId).update(updates).then(() => {
+                let tokens = gameState.tokens[botRole];
+                let allFinished = tokens.every(pos => pos === 57);
+                if(allFinished) { 
+                    AudioEngine.playWin();
+                    db.ref('games/' + gameId).update({ winner: botRole }); 
+                }
+            });
+        }
+
+        function getNextTurnBot(currentTurn) {
+            if(gameType === 'ludo2') {
+                return currentTurn === 'red' ? 'yellow' : 'red';
+            } else {
+                const order = ['red', 'green', 'yellow', 'blue'];
+                let idx = order.indexOf(currentTurn);
+                return order[(idx + 1) % 4];
+            }
+        }
+        // --- نهاية نظام البوت ---
 
         function initGameData() {
             db.ref('games/' + gameId).once('value').then(snap => {
@@ -717,6 +969,11 @@
                     }
                 } else {
                     winOverlay.classList.remove('active');
+                }
+
+                // نداء منطق البوت إذا كان دوره
+                if (isBotActive && data.turn === botRole && !data.winner && !localRenderingInProgress) {
+                    playBotLogic();
                 }
             });
         }
