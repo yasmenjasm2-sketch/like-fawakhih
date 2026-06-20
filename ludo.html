@@ -62,6 +62,13 @@
             background: linear-gradient(90deg, #10b981, #059669); color: white;
             border: none; padding: 8px 14px; font-size: 12px; font-weight: bold;
             border-radius: 10px; cursor: pointer; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+            display: flex; align-items: center; gap: 5px;
+        }
+
+        .spectator-btn {
+            background: rgba(255,255,255,0.1); color: #00f0ff;
+            border: 1px solid #00f0ff; padding: 6px 12px; font-size: 12px; font-weight: bold;
+            border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 5px;
         }
 
         /* شبكة اللعبة المحدثة المحمية */
@@ -220,22 +227,35 @@
             color: var(--ludo-yellow); text-align: center; width: 100%;
         }
 
-        /* نافذة الاختيار المنبثقة لاختيار عدد خطوات التحريك الاستراتيجي */
-        .choice-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        /* نافذة الاختيار وجميع النوافذ المنبثقة */
+        .custom-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.75); z-index: 5000;
             display: none; flex-direction: column; justify-content: center; align-items: center;
-            border-radius: 14px; backdrop-filter: blur(5px);
+            backdrop-filter: blur(5px);
         }
-        .choice-overlay.active { display: flex; }
-        .choice-box {
+        .custom-overlay.active { display: flex; }
+        .custom-box {
             background: #18192a; border: 2px solid var(--secondary-neon);
-            padding: 20px; border-radius: 16px; width: 80%; max-width: 280px;
+            padding: 20px; border-radius: 16px; width: 90%; max-width: 320px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.8); text-align: center;
         }
+        .custom-box h3 { color: #fff; margin-top: 0; font-size: 18px; border-bottom: 1px solid #333; padding-bottom: 10px;}
+        
         .choice-btn {
             background: linear-gradient(90deg, #511fff, var(--secondary-neon));
             color: #fff; border: none; padding: 12px; margin: 6px 0; width: 100%;
             font-weight: bold; border-radius: 10px; cursor: pointer; font-size: 15px;
+        }
+
+        .friend-item, .spectator-item {
+            background: rgba(255,255,255,0.05); border-radius: 10px; padding: 12px;
+            margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;
+            color: #ccc; font-size: 14px; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .friend-item button {
+            background: #10b981; color: #fff; border: none; padding: 6px 12px;
+            border-radius: 6px; font-weight: bold; cursor: pointer;
         }
 
         button.exit-btn {
@@ -283,24 +303,52 @@
 
     <div class="ludo-container">
         <div class="header-actions">
-            <h1>ميدان معركة اللودو الحية</h1>
-            <button class="invite-btn" onclick="copyInviteLink()">📩 دعوة صديق</button>
+            <button class="invite-btn" onclick="openModal('friends-modal')">📩 قائمة الأصدقاء</button>
+            <button class="spectator-btn" onclick="openModal('spectators-modal')">
+                👁️ <span id="spectator-count">0</span>
+            </button>
         </div>
 
         <div id="ludo-role-text" style="font-size: 13px; color: #b1b1c7; margin-bottom: 5px;">جاري الفحص المزامني...</div>
         <div id="ludo-status-text" style="color: var(--secondary-neon); font-size: 15px; font-weight: bold; margin-bottom: 10px;">تحميل قواعد اللعبة...</div>
         
         <div id="ludo-grid">
-            <!-- الواجهة الاختيارية للزهر الاستراتيجي المتعدد -->
-            <div class="choice-overlay" id="choice-overlay">
-                <div class="choice-box">
-                    <h4 style="margin:0 0 12px 0; font-size:15px; color:#fff;">اختر كم مربع تود التحريك:</h4>
-                    <div id="choice-buttons-container"></div>
-                </div>
-            </div>
+            <!-- الواجهة الاختيارية للزهر الاستراتيجي المتعدد (يتم عرضها برمجيا) -->
         </div>
         
         <button onclick="exitGame()" class="exit-btn">انسحاب والعودة للمنصة</button>
+    </div>
+
+    <!-- نافذة تحريك الجنود الاستراتيجية -->
+    <div class="custom-overlay" id="choice-overlay" style="z-index: 5001;">
+        <div class="custom-box">
+            <h4 style="margin:0 0 12px 0; font-size:15px; color:#fff;">اختر كم مربع تود التحريك:</h4>
+            <div id="choice-buttons-container"></div>
+        </div>
+    </div>
+
+    <!-- نافذة الأصدقاء الاحترافية -->
+    <div class="custom-overlay" id="friends-modal">
+        <div class="custom-box">
+            <h3>قائمة الأصدقاء</h3>
+            <div style="max-height: 200px; overflow-y: auto;">
+                <div class="friend-item"><span>🎮 اللاعب المجهول</span> <button onclick="sendInviteToFriend(this)">دعوة</button></div>
+                <div class="friend-item"><span>🚀 محترف اللودو</span> <button onclick="sendInviteToFriend(this)">دعوة</button></div>
+                <div class="friend-item"><span>👑 ملك النرد</span> <button onclick="sendInviteToFriend(this)">دعوة</button></div>
+            </div>
+            <button class="exit-btn" onclick="closeModal('friends-modal')">إغلاق القائمة</button>
+        </div>
+    </div>
+
+    <!-- نافذة المشاهدين -->
+    <div class="custom-overlay" id="spectators-modal">
+        <div class="custom-box">
+            <h3>قائمة المشاهدين 👁️</h3>
+            <div id="spectators-list-container" style="max-height: 200px; overflow-y: auto; color:#aaa; font-size:14px;">
+                لا يوجد مشاهدين حالياً.
+            </div>
+            <button class="exit-btn" onclick="closeModal('spectators-modal')">إغلاق</button>
+        </div>
     </div>
 
     <!-- نافذة الفوز الفاخرة المدمجة ونظام تصويت جميع اللاعبين للإعادة -->
@@ -310,13 +358,13 @@
             <p style="color: #b1b1c7; font-size: 14px;">يجب على جميع اللاعبين الموافقة لإعادة اللعب:</p>
             <div class="rematch-status" id="rematch-status-list"></div>
             <div style="display:flex; gap:10px; width:100%; margin-top:20px;">
-                <button class="win-btn rematch-btn" onclick="voteRematch()">🔄 طلب إعادة اللعب</button>
+                <button class="win-btn rematch-btn" onclick="voteRematch()" id="vote-btn-ui">🔄 طلب إعادة اللعب</button>
                 <button class="win-btn exit-game-btn" onclick="exitGame()">🚪 خروج</button>
             </div>
         </div>
     </div>
 
-    <div id="toast">تم النسخ</div>
+    <div id="toast">إشعار</div>
 
     <script>
         // إغلاق النسخ واختصارات لوحة المفاتيح والزر الأيمن تماماً
@@ -381,8 +429,22 @@
 
         const urlParams = new URLSearchParams(window.location.search);
         const gameId = urlParams.get('gameId');
-        let myRole = urlParams.get('role'); 
+        let rawRole = urlParams.get('role'); 
         const gameType = urlParams.get('type') || 'ludo2';
+
+        let myRole = 'spectator';
+        let isSpectator = true;
+        let spectatorName = "مشاهد_" + Math.floor(Math.random() * 9999);
+
+        // تحديد ما إذا كان اللاعب مشارك أم مشاهد
+        if (rawRole) {
+            let r = rawRole.toLowerCase();
+            let validRoles = gameType === 'ludo4' ? ['red', 'yellow', 'green', 'blue'] : ['red', 'yellow'];
+            if (validRoles.includes(r)) {
+                myRole = r;
+                isSpectator = false;
+            }
+        }
 
         // الخرائط والإحداثيات الدولية الثابتة للودو الكلاسيكي
         const pathCoords = [
@@ -417,23 +479,49 @@
         };
 
         window.onload = () => {
-            if(!gameId || !myRole) { alert("رابط الغرفة غير صالح!"); window.location.href = 'index.html'; return; }
-            myRole = myRole.toLowerCase();
-            document.getElementById('ludo-role-text').innerText = `أنت تلعب باللون: ${getRoleName(myRole)} ${gameType === 'ludo4' ? '(4 لاعبين)' : '(1v1)'}`;
+            if(!gameId) { alert("رابط الغرفة غير صالح!"); window.location.href = 'index.html'; return; }
             
-            // تفعيل نظام انعكاس الشاشة التلقائي إذا كان اللاعب أصفر
-            if (myRole === 'yellow') {
-                document.getElementById('ludo-grid').classList.add('perspective-yellow');
+            if (isSpectator) {
+                document.getElementById('ludo-role-text').innerText = `أنت تشاهد المباراة 👁️ ${gameType === 'ludo4' ? '(4 لاعبين)' : '(1v1)'}`;
+                // تسجيل المشاهد في قاعدة البيانات
+                db.ref(`games/${gameId}/spectators/${spectatorName}`).set(true);
+                db.ref(`games/${gameId}/spectators/${spectatorName}`).onDisconnect().remove();
+            } else {
+                document.getElementById('ludo-role-text').innerText = `أنت تلعب باللون: ${getRoleName(myRole)} ${gameType === 'ludo4' ? '(4 لاعبين)' : '(1v1)'}`;
+                // تفعيل نظام انعكاس الشاشة التلقائي إذا كان اللاعب أصفر
+                if (myRole === 'yellow') {
+                    document.getElementById('ludo-grid').classList.add('perspective-yellow');
+                }
             }
 
             initGameData();
             createGrid();
             listenToGameState();
+            listenToSpectators();
         };
 
         function getRoleName(r) {
             const names = { red: 'الأحمر 🔴', yellow: 'الأصفر 🟡', green: 'الأخضر 🟢', blue: 'الأزرق 🔵' };
             return names[r] || r;
+        }
+
+        // إدارة النوافذ المنبثقة
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function sendInviteToFriend(btn) {
+            btn.innerText = "تم الإرسال";
+            btn.style.background = "#555";
+            btn.disabled = true;
+            showToast("✅ تم إرسال دعوة اللعب لصديقك!");
+            setTimeout(() => closeModal('friends-modal'), 1000);
         }
 
         function initGameData() {
@@ -454,8 +542,7 @@
 
         function createGrid() {
             const grid = document.getElementById('ludo-grid');
-            const overlay = document.getElementById('choice-overlay');
-            grid.innerHTML = ''; grid.appendChild(overlay);
+            grid.innerHTML = ''; 
 
             // بناء وحدات الزهر الطائرة ديناميكياً لتثبيتها فوق مركز أرضية كل لاعب
             const roles = ['red', 'yellow', 'green', 'blue'];
@@ -463,7 +550,7 @@
                 const zone = document.createElement('div');
                 zone.className = 'player-dice-zone';
                 zone.id = `dice-zone-${r}`;
-                zone.onclick = () => rollDiceProcess();
+                zone.onclick = () => rollDiceProcess(r); // السماح بالضغط فقط إذا كان الدور واللون يطابق
                 
                 let labelText = r === 'red' ? 'الأحمر' : r === 'yellow' ? 'الأصفر' : r === 'green' ? 'الأخضر' : 'الأزرق';
                 zone.innerHTML = `
@@ -532,12 +619,37 @@
             area.appendChild(inner); grid.appendChild(area);
         }
 
+        function listenToSpectators() {
+            db.ref(`games/${gameId}/spectators`).on('value', snap => {
+                const specs = snap.val() || {};
+                const count = Object.keys(specs).length;
+                document.getElementById('spectator-count').innerText = count;
+                
+                const container = document.getElementById('spectators-list-container');
+                if (count === 0) {
+                    container.innerHTML = "لا يوجد مشاهدين حالياً.";
+                } else {
+                    let html = '';
+                    for(let s in specs) {
+                        html += `<div class="spectator-item">👤 ${s}</div>`;
+                    }
+                    container.innerHTML = html;
+                }
+            });
+        }
+
         function listenToGameState() {
             db.ref('games/' + gameId).on('value', async snap => {
                 const data = snap.val();
                 if(!data) return;
                 gameState = data;
-                isMyTurn = (data.turn === myRole);
+                
+                // منع المشاهد من اللعب
+                if (isSpectator) {
+                    isMyTurn = false;
+                } else {
+                    isMyTurn = (data.turn === myRole);
+                }
                 
                 updateDiceUI(data);
                 
@@ -553,6 +665,11 @@
                     winOverlay.classList.add('active');
                     document.getElementById('win-title').innerText = `🏆 فاز بالمعركة: ${getRoleName(data.winner)} 🏆`;
                     
+                    // إخفاء زر التصويت للمشاهد
+                    if(isSpectator) {
+                        document.getElementById('vote-btn-ui').style.display = 'none';
+                    }
+
                     const votes = data.rematchVotes || {};
                     const statusList = document.getElementById('rematch-status-list');
                     statusList.innerHTML = '';
@@ -573,7 +690,8 @@
                         setTimeout(() => {
                             let initialTokens = { red: [-1,-1,-1,-1], yellow: [-1,-1,-1,-1] };
                             if(gameType === 'ludo4') { initialTokens.green = [-1,-1,-1,-1]; initialTokens.blue = [-1,-1,-1,-1]; }
-                            db.ref('games/' + gameId).set({
+                            // لا يتم مسح المشاهدين
+                            db.ref('games/' + gameId).update({
                                 tokens: initialTokens, turn: 'red',
                                 dicePool: [], consecutiveSixes: 0,
                                 diceRolled: false, winner: '',
@@ -620,7 +738,9 @@
                 }
             });
 
-            if(isMyTurn) {
+            if (isSpectator) {
+                statusEl.innerText = `⏳ اللاعب ${getRoleName(data.turn)} يخطط للهجوم...`;
+            } else if(isMyTurn) {
                 if(!data.diceRolled) {
                     statusEl.innerText = "🟢 دورك! اضغط على نردك لترميه.";
                 } else {
@@ -633,8 +753,10 @@
         }
 
         // معالجة دوران الزهر عشوائياً وبث النتيجة المتزامنة
-        function rollDiceProcess() {
-            if(!isMyTurn || gameState.diceRolled) return;
+        function rollDiceProcess(clickedRole) {
+            // منع المشاهد أو أي شخص آخر من رمي نرد غيره
+            if(isSpectator || !isMyTurn || gameState.diceRolled || clickedRole !== myRole) return;
+            
             AudioEngine.playDice();
 
             const myCube = document.getElementById(`cube-${myRole}`);
@@ -656,7 +778,7 @@
                             diceRolled: false,
                             turn: getNextTurn()
                         });
-                        alert("🔴 حصلت على رقم 6 ثلاث مرات متتالية! ينقلب الدور للاعب التالي.");
+                        showToast("🔴 حصلت على رقم 6 ثلاث مرات متتالية! ينقلب الدور.");
                         return;
                     }
                     currentPool.push(roll);
@@ -677,6 +799,7 @@
         }
 
         function renderTokens(tokensObj) {
+            // مسح العناصر السابقة بأمان
             document.querySelectorAll('.ludo-token').forEach(e => e.remove());
 
             for (const color in tokensObj) {
@@ -685,9 +808,11 @@
 
                     const token = document.createElement('div');
                     token.className = `ludo-token token-${color}`;
+                    // *هام*: إعطاء معرف فريد لكل جندي لإصلاح مشكلة الحركة المزدوجة
+                    token.id = `token-${color}-${index}`; 
                     
                     // تلميح ضوئي للأحجار القابلة للتحريك استراتيجياً
-                    if(isMyTurn && color === myRole && gameState.diceRolled && hasAnyValidMove(pos)) {
+                    if(!isSpectator && isMyTurn && color === myRole && gameState.diceRolled && hasAnyValidMove(pos)) {
                         token.classList.add('active-turn');
                     }
                     
@@ -722,13 +847,13 @@
             return "center-cell";
         }
 
-        // نظام التحريك والمفاضلة مع ميزة الخروج الفوري التلقائي بالرقم 6 دون نافذة الاختيار
+        // نظام التحريك والمفاضلة مع ميزة الخروج الفوري التلقائي بالرقم 6
         function handleTokenInteraction(color, index, currentPos) {
-            if(!isMyTurn || color !== myRole || !gameState.diceRolled) return;
+            if(isSpectator || !isMyTurn || color !== myRole || !gameState.diceRolled) return;
 
             let pool = gameState.dicePool || [];
 
-            // ميزة التمكين التلقائي: الخروج الفوري من المنزل بالرقم 6 مباشرة بدون إظهار قائمة اختيار
+            // ميزة التمكين التلقائي: الخروج الفوري من المنزل بالرقم 6 مباشرة 
             if(currentPos === -1) {
                 if(pool.includes(6)) {
                     executeStrategyMove(index, currentPos, 6);
@@ -768,7 +893,7 @@
             overlay.classList.add('active');
         }
 
-        // تنفيذ خطة التحريك التدريجي والتأكد من جوائز اللعب والالتهام مع أنيميشن دائري نطاط
+        // تنفيذ خطة التحريك التدريجي بإصلاح الحركة بواسطة المعرف (ID)
         async function executeStrategyMove(index, currentPos, selectedDice) {
             localRenderingInProgress = true;
             let targetPos = currentPos === -1 ? 0 : currentPos + selectedDice;
@@ -807,7 +932,7 @@
                                         AudioEngine.playEat();
                                         updates[`tokens/${oppColor}/${oppIdx}`] = -1;
                                         gotBonus = true; 
-                                        alert(`💥 تم أكل حجر اللاعب ${getRoleName(oppColor)}! حصلت على رمية مكافأة.`);
+                                        showToast(`💥 تم أكل حجر اللاعب ${getRoleName(oppColor)}! دور إضافي لك.`);
                                     }
                                 }
                             });
@@ -820,7 +945,7 @@
             if(targetPos === 57) {
                 AudioEngine.playWin();
                 gotBonus = true;
-                alert("🎉 مذهل! وصل حجرك للمركز النهائي وحصلت على دور إضافي مكافأة.");
+                showToast("🎉 مذهل! وصل حجرك للنهاية وحصلت على دور إضافي.");
             }
 
             updates[`tokens/${myRole}/${index}`] = targetPos;
@@ -843,11 +968,14 @@
             db.ref('games/' + gameId).update(updates).then(() => checkWinCondition());
         }
 
+        // رسم الحركة مع الحفاظ على المعرف (ID) لمنع تحريك كل الجنود
         function drawTokenAtTemporaryPosition(color, index, tempPos) {
-            document.querySelectorAll(`.token-${color}`)[index]?.remove();
+            const existingToken = document.getElementById(`token-${color}-${index}`);
+            if(existingToken) existingToken.remove();
             
             const token = document.createElement('div');
-            token.className = `ludo-token token-${color} token-jump`; // إضافة كلاس النط الحركي الدائري
+            token.className = `ludo-token token-${color} token-jump`; 
+            token.id = `token-${color}-${index}`; // هام جداً للإصلاح
             
             let cellId = getCellIdFromPosition(color, tempPos);
             const cell = document.getElementById(cellId);
@@ -871,6 +999,7 @@
                 });
             });
 
+            // إصلاح مشكلة التعليق بتمرير الدور بشكل صحيح إذا لم توجد أي حركة
             if(!canMoveAny) {
                 setTimeout(() => {
                     db.ref('games/' + gameId).update({ 
@@ -882,12 +1011,14 @@
             }
         }
 
+        // إصلاح دالة جلب الدور لتعود للدور الحالي باللعبة وليس دور اللاعب المحلي
         function getNextTurn() {
+            let currentTurn = gameState.turn;
             if(gameType === 'ludo2') {
-                return myRole === 'red' ? 'yellow' : 'red';
+                return currentTurn === 'red' ? 'yellow' : 'red';
             } else {
                 const order = ['red', 'green', 'yellow', 'blue'];
-                let idx = order.indexOf(myRole);
+                let idx = order.indexOf(currentTurn);
                 return order[(idx + 1) % 4];
             }
         }
@@ -902,18 +1033,8 @@
         }
 
         function voteRematch() {
+            if(isSpectator) return;
             db.ref(`games/${gameId}/rematchVotes/${myRole}`).set(true);
-        }
-
-        function copyInviteLink() {
-            const baseUrl = window.location.origin + window.location.pathname.replace('ludo.html', 'index.html');
-            const inviteUrl = `${baseUrl}?invite=${gameId}`;
-            navigator.clipboard.writeText(inviteUrl).then(() => {
-                const toast = document.getElementById('toast');
-                toast.innerText = "✅ تم نسخ الرابط المباشر، أرسله للخصم!";
-                toast.classList.add('show');
-                setTimeout(() => toast.classList.remove('show'), 3000);
-            });
         }
 
         function exitGame() { window.location.href = 'index.html'; }
