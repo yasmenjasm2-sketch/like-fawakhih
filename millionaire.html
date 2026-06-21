@@ -19,214 +19,110 @@
             --btn-wrong: linear-gradient(180deg, #ff0000 0%, #990000 100%);
         }
 
-        * {
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            transition: all 0.3s ease;
-        }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; transition: all 0.3s ease; }
 
         body {
-            margin: 0;
-            padding: 10px;
+            margin: 0; padding: 10px;
             background: radial-gradient(circle at center, #0a1a4a 0%, var(--bg-dark) 100%);
-            color: var(--text-light);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            overflow-x: hidden;
+            color: var(--text-light); min-height: 100vh;
+            display: flex; flex-direction: column; align-items: center; overflow-x: hidden;
         }
 
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-            text-shadow: 0 0 20px var(--border-glow);
-        }
+        .header { text-align: center; margin-bottom: 10px; text-shadow: 0 0 20px var(--border-glow); }
+        .header h1 { color: var(--gold); font-size: 26px; margin: 5px 0; }
 
-        .header h1 {
-            color: var(--gold);
-            font-size: 28px;
-            margin: 10px 0;
-        }
-
-        .game-container {
-            width: 100%;
-            max-width: 600px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
+        .game-container { width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 15px; }
 
         .top-panel {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--bg-panel);
-            padding: 15px;
-            border-radius: 16px;
-            border: 2px solid var(--gold);
-            box-shadow: 0 0 15px var(--border-glow);
+            display: flex; justify-content: space-between; align-items: center;
+            background: var(--bg-panel); padding: 15px; border-radius: 16px;
+            border: 2px solid var(--gold); box-shadow: 0 0 15px var(--border-glow);
         }
 
-        .lifelines {
-            display: flex;
-            gap: 10px;
+        /* تنسيق العداد */
+        .timer-circle {
+            width: 60px; height: 60px; border-radius: 50%;
+            background: radial-gradient(circle, #1a3399, #0a1133);
+            border: 3px solid var(--gold);
+            display: flex; justify-content: center; align-items: center;
+            font-size: 24px; font-weight: bold; color: #fff;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
         }
+        .timer-circle.warning {
+            background: radial-gradient(circle, #ff2a5f, #990000);
+            border-color: #ff2a5f; animation: pulse-timer 0.8s infinite; color: #fff;
+            box-shadow: 0 0 20px #ff2a5f;
+        }
+        @keyframes pulse-timer { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
+        .lifelines { display: flex; gap: 8px; flex-direction: column;}
+        .lifelines-row { display: flex; gap: 8px;}
         .lifeline-btn {
-            background: var(--btn-normal);
-            border: 1px solid var(--gold);
-            color: var(--gold);
-            width: 45px;
-            height: 35px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 14px;
-            cursor: pointer;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            background: var(--btn-normal); border: 1px solid var(--gold); color: var(--gold);
+            width: 45px; height: 35px; border-radius: 20px; font-weight: bold; font-size: 14px;
+            cursor: pointer; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center;
         }
+        .lifeline-btn:hover:not(:disabled) { background: var(--btn-hover); transform: scale(1.05); }
+        .lifeline-btn:disabled { opacity: 0.3; cursor: not-allowed; border-color: #555; color: #555; transform: none; }
 
-        .lifeline-btn:hover:not(:disabled) {
-            background: var(--btn-hover);
-            transform: scale(1.05);
-        }
-
-        .lifeline-btn:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-            border-color: #555;
-            color: #555;
-        }
-
-        .current-prize {
-            font-size: 20px;
-            font-weight: bold;
-            color: var(--gold);
-            text-shadow: 0 0 10px rgba(255, 188, 0, 0.8);
-        }
+        .current-prize { font-size: 22px; font-weight: bold; color: var(--gold); text-shadow: 0 0 10px rgba(255, 188, 0, 0.8); text-align: center;}
 
         .question-box {
-            background: var(--bg-panel);
-            border: 2px solid var(--gold);
-            border-radius: 50px;
-            padding: 25px 20px;
-            text-align: center;
-            font-size: 20px;
-            font-weight: bold;
-            box-shadow: 0 0 20px var(--border-glow);
-            position: relative;
+            background: var(--bg-panel); border: 2px solid var(--gold); border-radius: 30px;
+            padding: 20px 15px; text-align: center; font-size: 19px; font-weight: bold;
+            box-shadow: 0 0 20px var(--border-glow); position: relative; line-height: 1.4;
         }
 
-        .question-box::before, .question-box::after {
-            content: ''; position: absolute; top: 50%; width: 30px; height: 2px; background: var(--gold);
-        }
-        .question-box::before { left: -30px; }
-        .question-box::after { right: -30px; }
-
-        .answers-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 10px;
-        }
+        .answers-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 5px; }
 
         .answer-btn {
-            background: var(--btn-normal);
-            border: 2px solid var(--gold);
-            border-radius: 40px;
-            color: white;
-            padding: 15px 10px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            position: relative;
-            text-align: right;
-            display: flex;
-            align-items: center;
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.6);
+            background: var(--btn-normal); border: 2px solid var(--gold); border-radius: 40px;
+            color: white; padding: 12px 10px; font-size: 16px; font-weight: bold; cursor: pointer;
+            position: relative; text-align: right; display: flex; align-items: center; box-shadow: inset 0 0 15px rgba(0,0,0,0.6);
         }
-
         .answer-btn span { color: var(--gold); margin-left: 10px; font-size: 18px; width: 20px; text-align: center; }
-
         .answer-btn:hover:not(:disabled) { background: var(--btn-hover); }
-        
         .answer-btn.correct { background: var(--btn-correct); border-color: #00ff00; animation: pulse 0.5s infinite; }
         .answer-btn.wrong { background: var(--btn-wrong); border-color: #ff0000; }
         .answer-btn:disabled { cursor: default; }
         .answer-btn.hidden { visibility: hidden; }
 
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(0, 255, 0, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0); }
-        }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(0, 255, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0); } }
 
         .levels-container {
-            background: var(--bg-panel);
-            border: 1px solid rgba(255, 188, 0, 0.3);
-            border-radius: 16px;
-            padding: 15px;
-            margin-top: 10px;
-            display: flex;
-            flex-direction: column-reverse;
-            gap: 5px;
-            font-size: 14px;
-            max-height: 180px;
-            overflow-y: auto;
+            background: var(--bg-panel); border: 1px solid rgba(255, 188, 0, 0.3); border-radius: 16px;
+            padding: 10px; display: flex; flex-direction: column-reverse; gap: 4px; font-size: 14px; max-height: 160px; overflow-y: auto;
         }
-
-        .level-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 5px 10px;
-            border-radius: 8px;
-            color: #aaa;
-        }
-
+        .level-item { display: flex; justify-content: space-between; padding: 4px 10px; border-radius: 8px; color: #aaa; }
         .level-item.active { background: var(--gold); color: #000; font-weight: bold; }
         .level-item.safe-zone { color: var(--text-light); font-weight: bold; }
 
-        .back-btn {
-            margin-top: 20px;
-            background: transparent;
-            border: 1px solid #aaa;
-            color: #aaa;
-            padding: 8px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-        }
+        .back-btn { margin-top: 15px; background: transparent; border: 1px solid #aaa; color: #aaa; padding: 8px 20px; border-radius: 20px; cursor: pointer; text-decoration: none; display: inline-block; }
         .back-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
 
-        /* Modal / Alerts */
         .modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); z-index: 999;
-            display: none; justify-content: center; align-items: center;
-            backdrop-filter: blur(5px);
+            background: rgba(0,0,0,0.9); z-index: 999; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px);
         }
         .modal.active { display: flex; }
         .modal-content {
             background: var(--btn-normal); border: 2px solid var(--gold);
-            padding: 30px; border-radius: 20px; text-align: center; max-width: 320px; width: 90%;
+            padding: 25px; border-radius: 20px; text-align: center; max-width: 320px; width: 90%;
         }
         .modal-content h2 { color: var(--gold); margin-top: 0; }
         .modal-btn {
-            background: linear-gradient(90deg, #ffbc00, #ff8c00);
-            border: none; color: #000; padding: 10px 25px; font-weight: bold; border-radius: 10px;
-            margin-top: 15px; cursor: pointer; font-size: 16px;
+            background: linear-gradient(90deg, #ffbc00, #ff8c00); border: none; color: #000;
+            padding: 10px 25px; font-weight: bold; border-radius: 10px; margin-top: 15px; cursor: pointer; font-size: 16px;
         }
 
         @media (max-width: 480px) {
             .answers-grid { grid-template-columns: 1fr; }
-            .question-box { font-size: 17px; }
-            .question-box::before, .question-box::after { display: none; }
+            .top-panel { padding: 10px; }
         }
     </style>
+
+    <!-- استدعاء ملف الأسئلة المستقل -->
+    <script src="questions.js"></script>
 </head>
 <body>
 
@@ -235,19 +131,24 @@
     </div>
 
     <div class="game-container">
-        
         <div class="top-panel">
             <div class="lifelines">
-                <button class="lifeline-btn" id="btn-50" onclick="useFiftyFifty()" title="حذف إجابتين">50:50</button>
-                <button class="lifeline-btn" id="btn-aud" onclick="useAudience()" title="مساعدة الجمهور">👥</button>
-                <button class="lifeline-btn" id="btn-call" onclick="useCallFriend()" title="الاتصال بصديق">📞</button>
+                <div class="lifelines-row">
+                    <button class="lifeline-btn" id="btn-50" onclick="useFiftyFifty()" title="حذف إجابتين">50:50</button>
+                    <button class="lifeline-btn" id="btn-aud" onclick="useAudience()" title="مساعدة الجمهور">👥</button>
+                </div>
+                <button class="lifeline-btn" id="btn-call" style="width: 100%;" onclick="useCallFriend()" title="الاتصال بصديق">📞 اتصال بـ صديق</button>
             </div>
-            <div class="current-prize" id="current-prize-display">0 $</div>
+            
+            <div class="timer-circle" id="timer-display">40</div>
+
+            <div class="current-prize">
+                <span style="font-size: 12px; color: #ccc; display:block;">الرصيد</span>
+                <span id="current-prize-display">0 $</span>
+            </div>
         </div>
 
-        <div class="question-box" id="question-text">
-            جاري تحميل السؤال...
-        </div>
+        <div class="question-box" id="question-text">جاري تحميل السؤال...</div>
 
         <div class="answers-grid">
             <button class="answer-btn" id="ans-0" onclick="checkAnswer(0)"><span>A</span> <div id="text-0"></div></button>
@@ -256,9 +157,7 @@
             <button class="answer-btn" id="ans-3" onclick="checkAnswer(3)"><span>D</span> <div id="text-3"></div></button>
         </div>
 
-        <div class="levels-container" id="levels-list">
-            </div>
-
+        <div class="levels-container" id="levels-list"></div>
     </div>
 
     <a href="index.html" class="back-btn">⬅ العودة للقائمة الرئيسية</a>
@@ -275,41 +174,115 @@
         <div class="modal-content">
             <h2 id="info-title">مساعدة</h2>
             <p id="info-desc" style="font-size: 16px; margin: 20px 0; line-height: 1.6;"></p>
-            <button class="modal-btn" onclick="document.getElementById('info-modal').classList.remove('active')">حسناً</button>
+            <button class="modal-btn" onclick="closeInfoModal()">متابعة اللعب</button>
         </div>
     </div>
 
     <script>
-        const prizes = [
-            "100", "200", "300", "500", "1,000", 
-            "2,000", "4,000", "8,000", "16,000", "32,000",
-            "64,000", "125,000", "250,000", "500,000", "1,000,000"
-        ];
+        // الأصوات المبرمجة (بدون ملفات خارجية لضمان عملها دائماً)
+        // إذا أردت استخدام ملفاتك الخاصة، يمكنك تغيير الأكواد داخل هذه الدالة لتصبح: new Audio('link.mp3').play();
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            
+            if (type === 'tick') {
+                osc.type = 'sine'; osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+            } 
+            else if (type === 'correct') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime + 0.1);
+                osc.frequency.setValueAtTime(800, audioCtx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 1);
+                osc.start(); osc.stop(audioCtx.currentTime + 1);
+            } 
+            else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(50, audioCtx.currentTime + 0.5);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.5);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.5);
+            } 
+            else if (type === 'ring') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(800, audioCtx.currentTime + 0.05);
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 1.5);
+                osc.start(); osc.stop(audioCtx.currentTime + 1.5);
+            }
+        }
 
-        // 15 سؤال متدرجة الصعوبة
-        const allQuestions = [
-            { q: "ما هو لون الدم في جسم الإنسان الطبيعي؟", options: ["أحمر", "أزرق", "أخضر", "أصفر"], correct: 0 },
-            { q: "كم عدد فصول السنة؟", options: ["ثلاثة", "أربعة", "خمسة", "ستة"], correct: 1 },
-            { q: "ما هي عاصمة المملكة العربية السعودية؟", options: ["جدة", "مكة المكرمة", "الرياض", "الدمام"], correct: 2 },
-            { q: "حيوان يلقب بـ 'سفينة الصحراء'؟", options: ["الحصان", "الفيل", "الأسد", "الجمل"], correct: 3 },
-            { q: "ما هو أقرب كوكب إلى الشمس؟", options: ["عطارد", "الزهرة", "الأرض", "المريخ"], correct: 0 },
-            { q: "من هو مخترع المصباح الكهربائي؟", options: ["أينشتاين", "توماس إديسون", "نيوتن", "جاليليو"], correct: 1 },
-            { q: "ما هو أطول نهر في العالم؟", options: ["الأمازون", "المسيسيبي", "النيل", "الفرات"], correct: 2 },
-            { q: "كم عدد القارات في العالم؟", options: ["خمسة", "ستة", "ثمانية", "سبعة"], correct: 3 },
-            { q: "ما هو الغاز الذي تمتصه النباتات في عملية البناء الضوئي؟", options: ["ثاني أكسيد الكربون", "الأكسجين", "النيتروجين", "الهيليوم"], correct: 0 },
-            { q: "في أي قارة تقع دولة البرازيل؟", options: ["أمريكا الشمالية", "أمريكا الجنوبية", "أفريقيا", "أوروبا"], correct: 1 },
-            { q: "من هو مؤلف مسرحية 'روميو وجولييت'؟", options: ["تشارلز ديكنز", "فيكتور هوغو", "وليم شكسبير", "نجيب محفوظ"], correct: 2 },
-            { q: "ما هو المعدن السائل في درجة الحرارة العادية؟", options: ["الحديد", "النحاس", "الذهب", "الزئبق"], correct: 3 },
-            { q: "ما هي وحدة قياس شدة الصوت؟", options: ["الديسيبل", "الوات", "الفولت", "الأمبير"], correct: 0 },
-            { q: "ما هي أصغر دولة في العالم من حيث المساحة؟", options: ["موناكو", "الفاتيكان", "سان مارينو", "ناورو"], correct: 1 },
-            { q: "من هو القائد المسلم الذي فتح الأندلس؟", options: ["خالد بن الوليد", "صلاح الدين الأيوبي", "طارق بن زياد", "عقبة بن نافع"], correct: 2 }
-        ];
+        const prizes = ["100", "200", "300", "500", "1,000", "2,000", "4,000", "8,000", "16,000", "32,000", "64,000", "125,000", "250,000", "500,000", "1,000,000"];
 
         let currentLevel = 0;
         let isWaitingForAnimation = false;
         let guaranteedPrize = "0";
 
+        // متغيرات المؤقت
+        let timeLeft = 40;
+        let timerInterval;
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timeLeft = 40;
+            updateTimerUI();
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerUI();
+                playSound('tick'); // صوت التيك توك مع كل ثانية
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    handleTimeout();
+                }
+            }, 1000);
+        }
+
+        function pauseTimer() { clearInterval(timerInterval); }
+        function resumeTimer() {
+            if(!isWaitingForAnimation) {
+                timerInterval = setInterval(() => {
+                    timeLeft--; updateTimerUI(); playSound('tick');
+                    if (timeLeft <= 0) { clearInterval(timerInterval); handleTimeout(); }
+                }, 1000);
+            }
+        }
+
+        function updateTimerUI() {
+            const timerEl = document.getElementById('timer-display');
+            timerEl.innerText = timeLeft;
+            if (timeLeft <= 10) timerEl.classList.add('warning');
+            else timerEl.classList.remove('warning');
+        }
+
+        function handleTimeout() {
+            playSound('wrong');
+            isWaitingForAnimation = true;
+            for(let i=0; i<4; i++) document.getElementById(`ans-${i}`).disabled = true;
+            document.getElementById(`ans-${allQuestions[currentLevel].correct}`).classList.add('correct');
+            
+            setTimeout(() => {
+                document.getElementById('modal-title').innerText = "انتهى الوقت!";
+                document.getElementById('modal-desc').innerText = `لقد تأخرت في الإجابة. رصيدك المضمون: $ ${guaranteedPrize}`;
+                document.getElementById('game-modal').classList.add('active');
+            }, 2000);
+        }
+
         function initGame() {
+            // التحقق من وجود ملف الأسئلة
+            if(typeof allQuestions === 'undefined') {
+                alert("تنبيه: ملف الأسئلة questions.js غير موجود! تأكد من إنشاء الملف.");
+                return;
+            }
             renderLevels();
             loadQuestion();
         }
@@ -322,11 +295,9 @@
                 div.className = "level-item";
                 if(i === currentLevel) div.classList.add('active');
                 if(i === 4 || i === 9 || i === 14) div.classList.add('safe-zone'); // محطات الأمان
-                
                 div.innerHTML = `<span>${i+1}</span> <span>$ ${prizes[i]}</span>`;
                 list.appendChild(div);
             }
-            // التمرير التلقائي للتركيز على المستوى الحالي
             setTimeout(() => {
                 const activeEl = list.querySelector('.active');
                 if(activeEl) activeEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -345,52 +316,44 @@
                 btn.disabled = false;
                 document.getElementById(`text-${i}`).innerText = qData.options[i];
             }
+            startTimer(); // بدء المؤقت الجديد
         }
 
         function checkAnswer(selectedIndex) {
             if(isWaitingForAnimation) return;
             isWaitingForAnimation = true;
+            pauseTimer(); // إيقاف المؤقت فور الاختيار
 
             let correctIndex = allQuestions[currentLevel].correct;
             let selectedBtn = document.getElementById(`ans-${selectedIndex}`);
             let correctBtn = document.getElementById(`ans-${correctIndex}`);
 
-            // إيقاف جميع الأزرار
             for(let i=0; i<4; i++) document.getElementById(`ans-${i}`).disabled = true;
 
             if(selectedIndex === correctIndex) {
+                playSound('correct');
                 selectedBtn.classList.add('correct');
                 setTimeout(() => {
                     if(currentLevel === 4) guaranteedPrize = prizes[4];
                     if(currentLevel === 9) guaranteedPrize = prizes[9];
 
-                    if(currentLevel === 14) {
-                        winMillion();
-                    } else {
-                        currentLevel++;
-                        renderLevels();
-                        loadQuestion();
-                    }
-                }, 1500);
+                    if(currentLevel === 14) winMillion();
+                    else { currentLevel++; renderLevels(); loadQuestion(); }
+                }, 2000);
             } else {
+                playSound('wrong');
                 selectedBtn.classList.add('wrong');
                 correctBtn.classList.add('correct');
-                setTimeout(() => {
-                    endGameLoss();
-                }, 2000);
+                setTimeout(() => { endGameLoss(); }, 2500);
             }
         }
 
         function useFiftyFifty() {
             if(isWaitingForAnimation) return;
             document.getElementById('btn-50').disabled = true;
-            
             let correctIndex = allQuestions[currentLevel].correct;
             let wrongIndexes = [0, 1, 2, 3].filter(i => i !== correctIndex);
-            
-            // خلط المصفوفة لحذف اثنين عشوائيين
             wrongIndexes.sort(() => Math.random() - 0.5);
-            
             document.getElementById(`ans-${wrongIndexes[0]}`).classList.add('hidden');
             document.getElementById(`ans-${wrongIndexes[1]}`).classList.add('hidden');
         }
@@ -398,14 +361,13 @@
         function useAudience() {
             if(isWaitingForAnimation) return;
             document.getElementById('btn-aud').disabled = true;
+            pauseTimer(); // إيقاف العداد أثناء المساعدة
+            playSound('correct'); // صوت تحفيزي للجمهور
             
             let correctIndex = allQuestions[currentLevel].correct;
             let percentages = [0, 0, 0, 0];
-            
-            // إعطاء الإجابة الصحيحة نسبة أعلى
-            percentages[correctIndex] = Math.floor(Math.random() * 40) + 50; // 50% إلى 90%
+            percentages[correctIndex] = Math.floor(Math.random() * 40) + 50; 
             let remaining = 100 - percentages[correctIndex];
-            
             let others = [0, 1, 2, 3].filter(i => i !== correctIndex);
             percentages[others[0]] = Math.floor(Math.random() * (remaining - 5));
             remaining -= percentages[others[0]];
@@ -413,26 +375,24 @@
             percentages[others[2]] = remaining - percentages[others[1]];
 
             let msg = `تصويت الجمهور جاء كالتالي:<br><br>
-                       A: ${percentages[0]}%<br>
-                       B: ${percentages[1]}%<br>
-                       C: ${percentages[2]}%<br>
-                       D: ${percentages[3]}%`;
-            
+                       A: ${percentages[0]}%<br> B: ${percentages[1]}%<br> C: ${percentages[2]}%<br> D: ${percentages[3]}%`;
             showInfoModal("رأي الجمهور", msg);
         }
 
         function useCallFriend() {
             if(isWaitingForAnimation) return;
             document.getElementById('btn-call').disabled = true;
+            pauseTimer(); // إيقاف العداد أثناء المكالمة
+            playSound('ring'); // صوت رنين الهاتف
             
             let correctIndex = allQuestions[currentLevel].correct;
             let letters = ["A", "B", "C", "D"];
-            
-            // الصديق يجاوب صح بنسبة كبيرة
             let guess = (Math.random() > 0.2) ? letters[correctIndex] : letters[Math.floor(Math.random() * 4)];
             
-            let msg = `📞 صديقك يقول:<br>"أهلاً يا صديقي، أعتقد وبنسبة كبيرة أن الإجابة الصحيحة هي (${guess})، بالتوفيق!"`;
-            showInfoModal("مكالمة هاتفية", msg);
+            setTimeout(() => {
+                let msg = `📞 صديقك يقول:<br>"أهلاً يا صديقي، أعتقد وبنسبة كبيرة أن الإجابة الصحيحة هي (${guess})، بالتوفيق!"`;
+                showInfoModal("مكالمة هاتفية", msg);
+            }, 1000); // تأخير بسيط لمحاكاة الرد
         }
 
         function winMillion() {
@@ -444,7 +404,7 @@
 
         function endGameLoss() {
             document.getElementById('modal-title').innerText = "للأسف إجابة خاطئة!";
-            document.getElementById('modal-desc').innerText = `لقد خسرت. جائزتك المضمونة هي: $ ${guaranteedPrize}`;
+            document.getElementById('modal-desc').innerText = `لقد خسرت. رصيدك المضمون هو: $ ${guaranteedPrize}`;
             document.getElementById('game-modal').classList.add('active');
         }
 
@@ -453,10 +413,14 @@
             document.getElementById('info-desc').innerHTML = text;
             document.getElementById('info-modal').classList.add('active');
         }
+        
+        function closeInfoModal() {
+            document.getElementById('info-modal').classList.remove('active');
+            resumeTimer(); // إكمال العداد بعد إغلاق المساعدة
+        }
 
         function restartGame() {
-            currentLevel = 0;
-            guaranteedPrize = "0";
+            currentLevel = 0; guaranteedPrize = "0";
             document.getElementById('btn-50').disabled = false;
             document.getElementById('btn-aud').disabled = false;
             document.getElementById('btn-call').disabled = false;
@@ -477,9 +441,13 @@
             }, 250);
         }
 
-        // بدء اللعبة
-        initGame();
+        // تهيئة النظام الصوتي عند أول ضغطة للمستخدم (سياسة المتصفحات الحديثة)
+        document.body.addEventListener('click', function() {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+        }, { once: true });
 
+        // بدء اللعبة
+        window.onload = () => { initGame(); };
     </script>
 </body>
 </html>
