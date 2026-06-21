@@ -121,7 +121,6 @@
         }
     </style>
 
-    <!-- استدعاء ملف الأسئلة المستقل -->
     <script src="questions.js"></script>
 </head>
 <body>
@@ -179,8 +178,6 @@
     </div>
 
     <script>
-        // الأصوات المبرمجة (بدون ملفات خارجية لضمان عملها دائماً)
-        // إذا أردت استخدام ملفاتك الخاصة، يمكنك تغيير الأكواد داخل هذه الدالة لتصبح: new Audio('link.mp3').play();
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         function playSound(type) {
             if(audioCtx.state === 'suspended') audioCtx.resume();
@@ -227,8 +224,8 @@
         let currentLevel = 0;
         let isWaitingForAnimation = false;
         let guaranteedPrize = "0";
+        let currentQuestionData = null; // المتغير الجديد لحمل بيانات السؤال الحالي
 
-        // متغيرات المؤقت
         let timeLeft = 40;
         let timerInterval;
 
@@ -239,7 +236,7 @@
             timerInterval = setInterval(() => {
                 timeLeft--;
                 updateTimerUI();
-                playSound('tick'); // صوت التيك توك مع كل ثانية
+                playSound('tick'); 
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
                     handleTimeout();
@@ -268,7 +265,8 @@
             playSound('wrong');
             isWaitingForAnimation = true;
             for(let i=0; i<4; i++) document.getElementById(`ans-${i}`).disabled = true;
-            document.getElementById(`ans-${allQuestions[currentLevel].correct}`).classList.add('correct');
+            // استخدام السؤال الحالي من المتغير الذكي
+            document.getElementById(`ans-${currentQuestionData.correct}`).classList.add('correct');
             
             setTimeout(() => {
                 document.getElementById('modal-title').innerText = "انتهى الوقت!";
@@ -278,7 +276,6 @@
         }
 
         function initGame() {
-            // التحقق من وجود ملف الأسئلة
             if(typeof allQuestions === 'undefined') {
                 alert("تنبيه: ملف الأسئلة questions.js غير موجود! تأكد من إنشاء الملف.");
                 return;
@@ -294,7 +291,7 @@
                 let div = document.createElement('div');
                 div.className = "level-item";
                 if(i === currentLevel) div.classList.add('active');
-                if(i === 4 || i === 9 || i === 14) div.classList.add('safe-zone'); // محطات الأمان
+                if(i === 4 || i === 9 || i === 14) div.classList.add('safe-zone');
                 div.innerHTML = `<span>${i+1}</span> <span>$ ${prizes[i]}</span>`;
                 list.appendChild(div);
             }
@@ -306,31 +303,58 @@
 
         function loadQuestion() {
             isWaitingForAnimation = false;
-            let qData = allQuestions[currentLevel];
-            document.getElementById('question-text').innerText = qData.q;
+            
+            // --- بداية المنطق الذكي (تحديد المستوى وقراءة الذاكرة) ---
+            let requiredTier = "easy";
+            if (currentLevel >= 5 && currentLevel <= 9) requiredTier = "medium";
+            else if (currentLevel >= 10) requiredTier = "hard";
+
+            let playedIds = JSON.parse(localStorage.getItem('millionaire_played_questions')) || [];
+            let available = allQuestions.filter(q => q.tier === requiredTier && !playedIds.includes(q.id));
+
+            // إعادة ضبط ذاكرة هذا المستوى فقط في حال انتهاء أسئلته
+            if (available.length === 0) {
+                let tierIds = allQuestions.filter(q => q.tier === requiredTier).map(q => q.id);
+                playedIds = playedIds.filter(id => !tierIds.includes(id));
+                localStorage.setItem('millionaire_played_questions', JSON.stringify(playedIds));
+                available = allQuestions.filter(q => q.tier === requiredTier);
+            }
+
+            // اختيار سؤال عشوائي
+            currentQuestionData = available[Math.floor(Math.random() * available.length)];
+            // --- نهاية المنطق الذكي ---
+
+            document.getElementById('question-text').innerText = currentQuestionData.q;
             document.getElementById('current-prize-display').innerText = currentLevel > 0 ? `$ ${prizes[currentLevel-1]}` : "0 $";
 
             for(let i=0; i<4; i++) {
                 let btn = document.getElementById(`ans-${i}`);
                 btn.classList.remove('correct', 'wrong', 'hidden');
                 btn.disabled = false;
-                document.getElementById(`text-${i}`).innerText = qData.options[i];
+                document.getElementById(`text-${i}`).innerText = currentQuestionData.options[i];
             }
-            startTimer(); // بدء المؤقت الجديد
+            startTimer();
         }
 
         function checkAnswer(selectedIndex) {
             if(isWaitingForAnimation) return;
             isWaitingForAnimation = true;
-            pauseTimer(); // إيقاف المؤقت فور الاختيار
+            pauseTimer(); 
 
-            let correctIndex = allQuestions[currentLevel].correct;
+            let correctIndex = currentQuestionData.correct;
             let selectedBtn = document.getElementById(`ans-${selectedIndex}`);
             let correctBtn = document.getElementById(`ans-${correctIndex}`);
 
             for(let i=0; i<4; i++) document.getElementById(`ans-${i}`).disabled = true;
 
             if(selectedIndex === correctIndex) {
+                // حفظ ID السؤال في جهاز المستخدم
+                let playedIds = JSON.parse(localStorage.getItem('millionaire_played_questions')) || [];
+                if(!playedIds.includes(currentQuestionData.id)) {
+                    playedIds.push(currentQuestionData.id);
+                    localStorage.setItem('millionaire_played_questions', JSON.stringify(playedIds));
+                }
+
                 playSound('correct');
                 selectedBtn.classList.add('correct');
                 setTimeout(() => {
@@ -351,7 +375,7 @@
         function useFiftyFifty() {
             if(isWaitingForAnimation) return;
             document.getElementById('btn-50').disabled = true;
-            let correctIndex = allQuestions[currentLevel].correct;
+            let correctIndex = currentQuestionData.correct;
             let wrongIndexes = [0, 1, 2, 3].filter(i => i !== correctIndex);
             wrongIndexes.sort(() => Math.random() - 0.5);
             document.getElementById(`ans-${wrongIndexes[0]}`).classList.add('hidden');
@@ -361,10 +385,10 @@
         function useAudience() {
             if(isWaitingForAnimation) return;
             document.getElementById('btn-aud').disabled = true;
-            pauseTimer(); // إيقاف العداد أثناء المساعدة
-            playSound('correct'); // صوت تحفيزي للجمهور
+            pauseTimer();
+            playSound('correct'); 
             
-            let correctIndex = allQuestions[currentLevel].correct;
+            let correctIndex = currentQuestionData.correct;
             let percentages = [0, 0, 0, 0];
             percentages[correctIndex] = Math.floor(Math.random() * 40) + 50; 
             let remaining = 100 - percentages[correctIndex];
@@ -382,17 +406,17 @@
         function useCallFriend() {
             if(isWaitingForAnimation) return;
             document.getElementById('btn-call').disabled = true;
-            pauseTimer(); // إيقاف العداد أثناء المكالمة
-            playSound('ring'); // صوت رنين الهاتف
+            pauseTimer(); 
+            playSound('ring'); 
             
-            let correctIndex = allQuestions[currentLevel].correct;
+            let correctIndex = currentQuestionData.correct;
             let letters = ["A", "B", "C", "D"];
             let guess = (Math.random() > 0.2) ? letters[correctIndex] : letters[Math.floor(Math.random() * 4)];
             
             setTimeout(() => {
                 let msg = `📞 صديقك يقول:<br>"أهلاً يا صديقي، أعتقد وبنسبة كبيرة أن الإجابة الصحيحة هي (${guess})، بالتوفيق!"`;
                 showInfoModal("مكالمة هاتفية", msg);
-            }, 1000); // تأخير بسيط لمحاكاة الرد
+            }, 1000); 
         }
 
         function winMillion() {
@@ -416,7 +440,7 @@
         
         function closeInfoModal() {
             document.getElementById('info-modal').classList.remove('active');
-            resumeTimer(); // إكمال العداد بعد إغلاق المساعدة
+            resumeTimer(); 
         }
 
         function restartGame() {
@@ -441,12 +465,10 @@
             }, 250);
         }
 
-        // تهيئة النظام الصوتي عند أول ضغطة للمستخدم (سياسة المتصفحات الحديثة)
         document.body.addEventListener('click', function() {
             if(audioCtx.state === 'suspended') audioCtx.resume();
         }, { once: true });
 
-        // بدء اللعبة
         window.onload = () => { initGame(); };
     </script>
 </body>
