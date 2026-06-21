@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>من سيربح المليون | حمزة الحماده</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <script src="questions.js"></script>
     <style>
         :root {
             --bg-dark: #02021a;
@@ -40,6 +39,7 @@
             border: 2px solid var(--gold); box-shadow: 0 0 15px var(--border-glow);
         }
 
+        /* تنسيق العداد */
         .timer-circle {
             width: 60px; height: 60px; border-radius: 50%;
             background: radial-gradient(circle, #1a3399, #0a1133);
@@ -176,6 +176,7 @@
     </div>
 
     <script>
+        // قاعدة بيانات الأسئلة الشاملة مدمجة بالكامل لمنع أي مشاكل في المسارات
         const allQuestions = [
             // ==================== (1) الأسئلة السهلة: EASY ====================
             { id: 1, tier: "easy", q: "ما هو لون الدم في جسم الإنسان الطبيعي؟", options: ["أحمر", "أزرق", "أخضر", "أصفر"], correct: 0 },
@@ -191,7 +192,7 @@
             { id: 11, tier: "easy", q: "ما هي المادة الأساسية التي يصنع منها الزجاج؟", options: ["الرمل", "الخشب", "الحديد", "البلاستيك"], correct: 0 },
             { id: 12, tier: "easy", q: "ما هو الشيء الذي يتحدث جميع اللغات وليس له لسان؟", options: ["الكتاب", "الصدى", "الهاتف", "التلفاز"], correct: 1 },
             { id: 13, tier: "easy", q: "كم عدد كواكب المجموعة الشمسية؟", options: ["7 كواكب", "8 كواكب", "9 كواكب", "10 كواكب"], correct: 1 },
-            { id: 14, tier: "easy", q: "ما هو الطائر الذي يتخذ كرمز للسلام？", options: ["الحمامة", "الغراب", "الببغاء", "الهدهد"], correct: 0 },
+            { id: 14, tier: "easy", q: "ما هو الطائر الذي يتخذ كرمز للسلام؟", options: ["الحمامة", "الغراب", "الببغاء", "الهدهد"], correct: 0 },
             { id: 15, tier: "easy", q: "أي شهر ميلادي يأتي بعد شهر تموز (يوليو)؟", options: ["حزيران", "أيلول", "آب (أغسطس)", "تشرين الأول"], correct: 2 },
             { id: 16, tier: "easy", q: "ما هو المكون الرئيسي للجليد؟", options: ["الزجاج", "الماء", "الغاز", "التراب"], correct: 1 },
             { id: 17, tier: "easy", q: "كم عدد الحواس الخمس للإنسان؟", options: ["أربعة", "خمسة", "ستة", "سبعة"], correct: 1 },
@@ -206,7 +207,7 @@
             { id: 104, tier: "medium", q: "في أي قارة تقع دولة البرازيل؟", options: ["أمريكا الشمالية", "أمريكا الجنوبية", "أفريقيا", "أوروبا"], correct: 1 },
             { id: 105, tier: "medium", q: "ما هو معدن سائل في درجة الحرارة العادية؟", options: ["الحديد", "النحاس", "الذهب", "الزئبق"], correct: 3 },
             { id: 106, tier: "medium", q: "ما هي أكبر قارة في العالم من حيث المساحة؟", options: ["أفريقيا", "آسيا", "أوروبا", "أمريكا الشمالية"], correct: 1 },
-            { id: 107, tier: "medium", q: "في أي عام اندلعت الحرب العالمية الأولى？", options: ["1914", "1918", "1939", "1945"], correct: 0 },
+            { id: 107, tier: "medium", q: "في أي عام اندلعت الحرب العالمية الأولى؟", options: ["1914", "1918", "1939", "1945"], correct: 0 },
             { id: 108, tier: "medium", q: "من هو الشاعر الملقب بـ 'أمير الشعراء'؟", options: ["حافظ إبراهيم", "المتنبي", "أحمد شوقي", "نزار قباني"], correct: 2 },
             { id: 109, tier: "medium", q: "ما هي عاصمة اليابان؟", options: ["بكين", "سول", "كيوتو", "طوكيو"], correct: 3 },
             { id: 110, tier: "medium", q: "ما هي الدولة العربية التي يمر بها خط الاستواء؟", options: ["السودان", "الصومال", "اليمن", "موريتانيا"], correct: 1 },
@@ -303,9 +304,7 @@
 
         let timeLeft = 40;
         let timerInterval;
-
-        // إدارة وحساب جولات اللعب لمنع التكرار واستدعاء الملف الخارجي
-        let currentRound = parseInt(localStorage.getItem('millionaire_round_count')) || 1;
+        let roundsPlayed = parseInt(localStorage.getItem('millionaire_rounds_played')) || 1;
 
         function startTimer() {
             clearInterval(timerInterval);
@@ -371,7 +370,9 @@
                 alert("تنبيه: قاعدة بيانات الأسئلة فارغة أو غير معرفة!");
                 return;
             }
-            localStorage.setItem('millionaire_round_count', currentRound);
+            if (!localStorage.getItem('millionaire_rounds_played')) {
+                localStorage.setItem('millionaire_rounds_played', 1);
+            }
             renderLevels();
             loadQuestion();
         }
@@ -403,41 +404,63 @@
             let playedIds = JSON.parse(localStorage.getItem('millionaire_played_questions')) || [];
             let lastSeenId = parseInt(localStorage.getItem('millionaire_last_seen_id')) || null;
 
-            let available = [];
-            let usingExternal = false;
+            let availableLocal = allQuestions.filter(q => q.tier === requiredTier && !playedIds.includes(q.id) && q.id !== lastSeenId);
 
-            // شرط استدعاء ملف questions.js الخارجي (إذا تجاوزت الجولات 3 جولات)
-            if (currentRound > 3 && typeof hardQuestions !== 'undefined' && hardQuestions.length > 0) {
-                available = hardQuestions.filter(q => !playedIds.includes(q.id) && q.id !== lastSeenId);
-                usingExternal = true;
+            // استدعاء الملف الخارجي إذا لعبنا أكثر من 3 جولات، أو إذا انتهت الأسئلة المحلية
+            let needExternal = (roundsPlayed > 3) || (availableLocal.length === 0);
+
+            if (needExternal) {
+                loadExternalQuestions(() => {
+                    let pool = (typeof externalQuestions !== 'undefined' && externalQuestions.length > 0) ? externalQuestions : allQuestions;
+                    pickAndRenderQuestion(pool, requiredTier, playedIds, lastSeenId);
+                });
+            } else {
+                pickAndRenderQuestion(allQuestions, requiredTier, playedIds, lastSeenId);
             }
+        }
 
-            // إذا لم يتم تفعيل الملف الخارجي أو انتهت الأسئلة الخارجية، نستخدم المصفوفة المدمجة بالترتيب الطبيعي
-            if (available.length === 0) {
-                available = allQuestions.filter(q => q.tier === requiredTier && !playedIds.includes(q.id) && q.id !== lastSeenId);
-                usingExternal = false;
+        function loadExternalQuestions(callback) {
+            // التحقق مما إذا كان الملف الخارجي محملاً بالفعل
+            if (typeof externalQuestions !== 'undefined') {
+                callback();
+                return;
             }
+            
+            let script = document.createElement('script');
+            script.src = 'questions.js';
+            script.onload = () => {
+                console.log("تم تحميل الأسئلة الإضافية من questions.js بنجاح.");
+                callback();
+            };
+            script.onerror = () => {
+                console.log("تعذر تحميل ملف questions.js، جاري المتابعة بالأسئلة المحلية كاحتياط.");
+                callback();
+            };
+            document.head.appendChild(script);
+        }
 
-            // عند انتهاء الأسئلة في هذا الملف (المدمج) أو الخارجي تماماً دون مكرر، نقوم بتصفير المستهلك للـ Tier الحالي لضمان استمرار اللعب دون توقف
+        function pickAndRenderQuestion(pool, requiredTier, playedIds, lastSeenId) {
+            let available = pool.filter(q => q.tier === requiredTier && !playedIds.includes(q.id) && q.id !== lastSeenId);
+
+            // إذا نفدت الأسئلة كلياً من المستوى الحالي ضمن المصفوفة التي نتعامل معها
             if (available.length === 0) {
-                if (usingExternal || currentRound > 3) {
-                    let externalIds = hardQuestions.map(q => q.id);
-                    playedIds = playedIds.filter(id => !externalIds.includes(id));
-                    localStorage.setItem('millionaire_played_questions', JSON.stringify(playedIds));
-                    available = hardQuestions.filter(q => q.id !== lastSeenId);
-                } else {
-                    let tierIds = allQuestions.filter(q => q.tier === requiredTier).map(q => q.id);
-                    playedIds = playedIds.filter(id => !tierIds.includes(id));
-                    localStorage.setItem('millionaire_played_questions', JSON.stringify(playedIds));
-                    available = allQuestions.filter(q => q.tier === requiredTier && q.id !== lastSeenId);
-                }
+                let tierIds = pool.filter(q => q.tier === requiredTier).map(q => q.id);
+                playedIds = playedIds.filter(id => !tierIds.includes(id));
+                localStorage.setItem('millionaire_played_questions', JSON.stringify(playedIds));
                 
-                // ملاذ أخير إذا تساوت جميع المعطيات
+                available = pool.filter(q => q.tier === requiredTier && q.id !== lastSeenId);
                 if (available.length === 0) {
-                    available = (currentRound > 3 && typeof hardQuestions !== 'undefined') ? hardQuestions : allQuestions.filter(q => q.tier === requiredTier);
+                    available = pool.filter(q => q.tier === requiredTier);
                 }
             }
 
+            // إذا كان الملف الخارجي لا يحتوي على هذا المستوى (مثلاً إذا كان يحتوي فقط على أسئلة صعبة)، سنعود للأسئلة المحلية كحل آمن
+            if (available.length === 0 && pool !== allQuestions) {
+                pickAndRenderQuestion(allQuestions, requiredTier, JSON.parse(localStorage.getItem('millionaire_played_questions')) || [], lastSeenId);
+                return;
+            }
+
+            // اختيار السؤال العشوائي
             currentQuestionData = available[Math.floor(Math.random() * available.length)];
             localStorage.setItem('millionaire_last_seen_id', currentQuestionData.id);
 
@@ -560,9 +583,11 @@
         }
 
         function restartGame() {
+            // تسجيل جولة جديدة في التخزين المحلي
+            roundsPlayed++;
+            localStorage.setItem('millionaire_rounds_played', roundsPlayed);
+            
             currentLevel = 0; guaranteedPrize = "0";
-            currentRound++; // إضافة جولة جديدة عند الضغط على زر اللعب من جديد
-            localStorage.setItem('millionaire_round_count', currentRound);
             document.getElementById('btn-50').disabled = false;
             document.getElementById('btn-aud').disabled = false;
             document.getElementById('btn-call').disabled = false;
