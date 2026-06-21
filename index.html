@@ -195,6 +195,7 @@
         button.secondary-btn { background: linear-gradient(90deg, var(--primary-neon), #d10043); box-shadow: 0 6px 15px rgba(255, 42, 95, 0.3); }
         button.ludo-btn { background: linear-gradient(90deg, #00b4db, #0083b0); box-shadow: 0 6px 15px rgba(0, 180, 219, 0.3); }
         button.friends-panel-btn { background: linear-gradient(90deg, #10b981, #059669); box-shadow: 0 6px 15px rgba(16, 185, 129, 0.3); }
+        button.millionaire-btn { background: linear-gradient(90deg, #ffb400, #ff8c00); box-shadow: 0 6px 15px rgba(255, 140, 0, 0.3); color: #000; text-shadow: none; }
         button.action-btn { width: auto; padding: 6px 14px; font-size: 12px; margin: 0; box-shadow: none; }
         button.small-btn { padding: 10px 20px; font-size:14px; width:auto; }
 
@@ -365,6 +366,7 @@
                 <h2>🎮 ساحات اللعب المتاحة</h2>
                 <button onclick="startLocalGame()">لعب X O محلي (نفس الجهاز)</button>
                 <button class="ludo-btn" onclick="openGameOptionsModalWithoutFriend()">إنشاء غرفة أونلاين (رابط مباشر) 🎲</button>
+                <button class="millionaire-btn" onclick="window.location.href='millionaire.html'">💰 العب من سيربح المليون (فردية)</button>
             </div>
             
             <div class="dashboard-section" style="margin-top: 20px;">
@@ -511,7 +513,6 @@
         let activeFriendIdForInvite = null;
         let activeFriendNameForInvite = null;
 
-        // أوامر الترس
         function openSettings() { document.getElementById('settings-modal').classList.add('active'); }
         function closeSettings() { document.getElementById('settings-modal').classList.remove('active'); }
 
@@ -702,7 +703,7 @@
             navigator.clipboard.writeText(currentUserId).then(() => showToast("📋 تم نسخ الآيدي الخاص بك"));
         }
 
-        let friendStatusListeners = {}; // تم تعيين متغير لتخفيض الاستهلاك ومراقبة كل مستخدم بشكل منفصل
+        let friendStatusListeners = {}; 
 
         function setupRealtimeListeners() {
             db.ref('users/' + currentUserId + '/requests').on('value', snap => {
@@ -721,7 +722,6 @@
                 document.getElementById('requests-list').innerHTML = html;
             });
 
-            // تم استبدال مراقبة كل المستخدمين بمراقبة الأصدقاء فقط لتوفير حزم قاعدة البيانات وتنفيذ أسرع
             db.ref('users/' + currentUserId + '/friends').on('value', snap => {
                 const friends = snap.val(); 
                 let html = '';
@@ -736,7 +736,6 @@
                             <button class="action-btn" id="invite-btn-${id}" style="background:#444; cursor:not-allowed;" disabled>انتظار</button>
                         </div>`;
 
-                        // مراقبة فردية لحالة الصديق لعدم استهلاك قاعدة البيانات
                         if (!friendStatusListeners[id]) {
                             friendStatusListeners[id] = db.ref('users/' + id + '/status').on('value', statusSnap => {
                                 let st = statusSnap.val();
@@ -770,7 +769,6 @@
                 }
                 document.getElementById('friends-list').innerHTML = html;
 
-                // إزالة المراقبة للأشخاص المحذوفين لعدم الاستهلاك
                 Object.keys(friendStatusListeners).forEach(id => {
                     if (!friends || !friends[id]) {
                         db.ref('users/' + id + '/status').off('value', friendStatusListeners[id]);
@@ -866,7 +864,6 @@
                 }
             });
 
-            // إضافة مراقب لحالة الرفض لإنهاء الانتظار فوراً
             db.ref('games/' + gameId + '/rejected').on('value', snap => {
                 if(snap.val() === true) {
                     db.ref('games/' + gameId + '/player2Joined').off();
@@ -940,7 +937,6 @@
             });
         }
 
-        // تم تعيين حالة الرفض لتبليغ المستضيف بالخروج من ساحة الانتظار فوراً
         function rejectGameInvite() {
             if(pendingInviteId) {
                 db.ref('games/' + pendingInviteId + '/rejected').set(true);
@@ -954,7 +950,6 @@
             window.location.href = `ludo.html?gameId=${gameId}&role=${myRole}&uid=${currentUserId}&username=${encodeURIComponent(currentUsername)}&type=${type}`;
         }
 
-        // ================= محرك لعبة X O الممتاز =================
         function startLocalGame() {
             isOnline = false; myRole = 'All'; gameBoard = ["", "", "", "", "", "", "", "", ""];
             isGameOver = false; hasLoggedStatThisGame = false; localTurn = 'X'; scores = { X: 0, O: 0, ties: 0 };
