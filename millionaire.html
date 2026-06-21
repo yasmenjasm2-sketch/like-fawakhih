@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>من سيربح المليون | حمزة الحماده</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --bg-dark: #02021a;
+            --bg-panel: rgba(10, 20, 60, 0.85);
+            --gold: #ffbc00;
+            --gold-hover: #ffd700;
+            --text-light: #ffffff;
+            --border-glow: rgba(255, 188, 0, 0.5);
+            --btn-normal: linear-gradient(180deg, #112266 0%, #0a1133 100%);
+            --btn-hover: linear-gradient(180deg, #1a3399 0%, #0f1a4c 100%);
+            --btn-correct: linear-gradient(180deg, #00b050 0%, #00662a 100%);
+            --btn-wrong: linear-gradient(180deg, #ff0000 0%, #990000 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        body {
+            margin: 0;
+            padding: 10px;
+            background: radial-gradient(circle at center, #0a1a4a 0%, var(--bg-dark) 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px var(--border-glow);
+        }
+
+        .header h1 {
+            color: var(--gold);
+            font-size: 28px;
+            margin: 10px 0;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .top-panel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-panel);
+            padding: 15px;
+            border-radius: 16px;
+            border: 2px solid var(--gold);
+            box-shadow: 0 0 15px var(--border-glow);
+        }
+
+        .lifelines {
+            display: flex;
+            gap: 10px;
+        }
+
+        .lifeline-btn {
+            background: var(--btn-normal);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            width: 45px;
+            height: 35px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .lifeline-btn:hover:not(:disabled) {
+            background: var(--btn-hover);
+            transform: scale(1.05);
+        }
+
+        .lifeline-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            border-color: #555;
+            color: #555;
+        }
+
+        .current-prize {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--gold);
+            text-shadow: 0 0 10px rgba(255, 188, 0, 0.8);
+        }
+
+        .question-box {
+            background: var(--bg-panel);
+            border: 2px solid var(--gold);
+            border-radius: 50px;
+            padding: 25px 20px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 0 20px var(--border-glow);
+            position: relative;
+        }
+
+        .question-box::before, .question-box::after {
+            content: ''; position: absolute; top: 50%; width: 30px; height: 2px; background: var(--gold);
+        }
+        .question-box::before { left: -30px; }
+        .question-box::after { right: -30px; }
+
+        .answers-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .answer-btn {
+            background: var(--btn-normal);
+            border: 2px solid var(--gold);
+            border-radius: 40px;
+            color: white;
+            padding: 15px 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            position: relative;
+            text-align: right;
+            display: flex;
+            align-items: center;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.6);
+        }
+
+        .answer-btn span { color: var(--gold); margin-left: 10px; font-size: 18px; width: 20px; text-align: center; }
+
+        .answer-btn:hover:not(:disabled) { background: var(--btn-hover); }
+        
+        .answer-btn.correct { background: var(--btn-correct); border-color: #00ff00; animation: pulse 0.5s infinite; }
+        .answer-btn.wrong { background: var(--btn-wrong); border-color: #ff0000; }
+        .answer-btn:disabled { cursor: default; }
+        .answer-btn.hidden { visibility: hidden; }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 255, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0); }
+        }
+
+        .levels-container {
+            background: var(--bg-panel);
+            border: 1px solid rgba(255, 188, 0, 0.3);
+            border-radius: 16px;
+            padding: 15px;
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 5px;
+            font-size: 14px;
+            max-height: 180px;
+            overflow-y: auto;
+        }
+
+        .level-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 10px;
+            border-radius: 8px;
+            color: #aaa;
+        }
+
+        .level-item.active { background: var(--gold); color: #000; font-weight: bold; }
+        .level-item.safe-zone { color: var(--text-light); font-weight: bold; }
+
+        .back-btn {
+            margin-top: 20px;
+            background: transparent;
+            border: 1px solid #aaa;
+            color: #aaa;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .back-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+        /* Modal / Alerts */
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 999;
+            display: none; justify-content: center; align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: var(--btn-normal); border: 2px solid var(--gold);
+            padding: 30px; border-radius: 20px; text-align: center; max-width: 320px; width: 90%;
+        }
+        .modal-content h2 { color: var(--gold); margin-top: 0; }
+        .modal-btn {
+            background: linear-gradient(90deg, #ffbc00, #ff8c00);
+            border: none; color: #000; padding: 10px 25px; font-weight: bold; border-radius: 10px;
+            margin-top: 15px; cursor: pointer; font-size: 16px;
+        }
+
+        @media (max-width: 480px) {
+            .answers-grid { grid-template-columns: 1fr; }
+            .question-box { font-size: 17px; }
+            .question-box::before, .question-box::after { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>💰 من سيربح المليون 💰</h1>
+    </div>
+
+    <div class="game-container">
+        
+        <div class="top-panel">
+            <div class="lifelines">
+                <button class="lifeline-btn" id="btn-50" onclick="useFiftyFifty()" title="حذف إجابتين">50:50</button>
+                <button class="lifeline-btn" id="btn-aud" onclick="useAudience()" title="مساعدة الجمهور">👥</button>
+                <button class="lifeline-btn" id="btn-call" onclick="useCallFriend()" title="الاتصال بصديق">📞</button>
+            </div>
+            <div class="current-prize" id="current-prize-display">0 $</div>
+        </div>
+
+        <div class="question-box" id="question-text">
+            جاري تحميل السؤال...
+        </div>
+
+        <div class="answers-grid">
+            <button class="answer-btn" id="ans-0" onclick="checkAnswer(0)"><span>A</span> <div id="text-0"></div></button>
+            <button class="answer-btn" id="ans-1" onclick="checkAnswer(1)"><span>B</span> <div id="text-1"></div></button>
+            <button class="answer-btn" id="ans-2" onclick="checkAnswer(2)"><span>C</span> <div id="text-2"></div></button>
+            <button class="answer-btn" id="ans-3" onclick="checkAnswer(3)"><span>D</span> <div id="text-3"></div></button>
+        </div>
+
+        <div class="levels-container" id="levels-list">
+            </div>
+
+    </div>
+
+    <a href="index.html" class="back-btn">⬅ العودة للقائمة الرئيسية</a>
+
+    <div class="modal" id="game-modal">
+        <div class="modal-content">
+            <h2 id="modal-title">النتيجة</h2>
+            <p id="modal-desc" style="font-size: 18px; margin: 20px 0;"></p>
+            <button class="modal-btn" onclick="restartGame()">العب من جديد</button>
+        </div>
+    </div>
+
+    <div class="modal" id="info-modal">
+        <div class="modal-content">
+            <h2 id="info-title">مساعدة</h2>
+            <p id="info-desc" style="font-size: 16px; margin: 20px 0; line-height: 1.6;"></p>
+            <button class="modal-btn" onclick="document.getElementById('info-modal').classList.remove('active')">حسناً</button>
+        </div>
+    </div>
+
+    <script>
+        const prizes = [
+            "100", "200", "300", "500", "1,000", 
+            "2,000", "4,000", "8,000", "16,000", "32,000",
+            "64,000", "125,000", "250,000", "500,000", "1,000,000"
+        ];
+
+        // 15 سؤال متدرجة الصعوبة
+        const allQuestions = [
+            { q: "ما هو لون الدم في جسم الإنسان الطبيعي؟", options: ["أحمر", "أزرق", "أخضر", "أصفر"], correct: 0 },
+            { q: "كم عدد فصول السنة؟", options: ["ثلاثة", "أربعة", "خمسة", "ستة"], correct: 1 },
+            { q: "ما هي عاصمة المملكة العربية السعودية؟", options: ["جدة", "مكة المكرمة", "الرياض", "الدمام"], correct: 2 },
+            { q: "حيوان يلقب بـ 'سفينة الصحراء'؟", options: ["الحصان", "الفيل", "الأسد", "الجمل"], correct: 3 },
+            { q: "ما هو أقرب كوكب إلى الشمس؟", options: ["عطارد", "الزهرة", "الأرض", "المريخ"], correct: 0 },
+            { q: "من هو مخترع المصباح الكهربائي؟", options: ["أينشتاين", "توماس إديسون", "نيوتن", "جاليليو"], correct: 1 },
+            { q: "ما هو أطول نهر في العالم؟", options: ["الأمازون", "المسيسيبي", "النيل", "الفرات"], correct: 2 },
+            { q: "كم عدد القارات في العالم؟", options: ["خمسة", "ستة", "ثمانية", "سبعة"], correct: 3 },
+            { q: "ما هو الغاز الذي تمتصه النباتات في عملية البناء الضوئي؟", options: ["ثاني أكسيد الكربون", "الأكسجين", "النيتروجين", "الهيليوم"], correct: 0 },
+            { q: "في أي قارة تقع دولة البرازيل؟", options: ["أمريكا الشمالية", "أمريكا الجنوبية", "أفريقيا", "أوروبا"], correct: 1 },
+            { q: "من هو مؤلف مسرحية 'روميو وجولييت'؟", options: ["تشارلز ديكنز", "فيكتور هوغو", "وليم شكسبير", "نجيب محفوظ"], correct: 2 },
+            { q: "ما هو المعدن السائل في درجة الحرارة العادية؟", options: ["الحديد", "النحاس", "الذهب", "الزئبق"], correct: 3 },
+            { q: "ما هي وحدة قياس شدة الصوت؟", options: ["الديسيبل", "الوات", "الفولت", "الأمبير"], correct: 0 },
+            { q: "ما هي أصغر دولة في العالم من حيث المساحة؟", options: ["موناكو", "الفاتيكان", "سان مارينو", "ناورو"], correct: 1 },
+            { q: "من هو القائد المسلم الذي فتح الأندلس؟", options: ["خالد بن الوليد", "صلاح الدين الأيوبي", "طارق بن زياد", "عقبة بن نافع"], correct: 2 }
+        ];
+
+        let currentLevel = 0;
+        let isWaitingForAnimation = false;
+        let guaranteedPrize = "0";
+
+        function initGame() {
+            renderLevels();
+            loadQuestion();
+        }
+
+        function renderLevels() {
+            const list = document.getElementById('levels-list');
+            list.innerHTML = "";
+            for(let i = 0; i < prizes.length; i++) {
+                let div = document.createElement('div');
+                div.className = "level-item";
+                if(i === currentLevel) div.classList.add('active');
+                if(i === 4 || i === 9 || i === 14) div.classList.add('safe-zone'); // محطات الأمان
+                
+                div.innerHTML = `<span>${i+1}</span> <span>$ ${prizes[i]}</span>`;
+                list.appendChild(div);
+            }
+            // التمرير التلقائي للتركيز على المستوى الحالي
+            setTimeout(() => {
+                const activeEl = list.querySelector('.active');
+                if(activeEl) activeEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+        }
+
+        function loadQuestion() {
+            isWaitingForAnimation = false;
+            let qData = allQuestions[currentLevel];
+            document.getElementById('question-text').innerText = qData.q;
+            document.getElementById('current-prize-display').innerText = currentLevel > 0 ? `$ ${prizes[currentLevel-1]}` : "0 $";
+
+            for(let i=0; i<4; i++) {
+                let btn = document.getElementById(`ans-${i}`);
+                btn.classList.remove('correct', 'wrong', 'hidden');
+                btn.disabled = false;
+                document.getElementById(`text-${i}`).innerText = qData.options[i];
+            }
+        }
+
+        function checkAnswer(selectedIndex) {
+            if(isWaitingForAnimation) return;
+            isWaitingForAnimation = true;
+
+            let correctIndex = allQuestions[currentLevel].correct;
+            let selectedBtn = document.getElementById(`ans-${selectedIndex}`);
+            let correctBtn = document.getElementById(`ans-${correctIndex}`);
+
+            // إيقاف جميع الأزرار
+            for(let i=0; i<4; i++) document.getElementById(`ans-${i}`).disabled = true;
+
+            if(selectedIndex === correctIndex) {
+                selectedBtn.classList.add('correct');
+                setTimeout(() => {
+                    if(currentLevel === 4) guaranteedPrize = prizes[4];
+                    if(currentLevel === 9) guaranteedPrize = prizes[9];
+
+                    if(currentLevel === 14) {
+                        winMillion();
+                    } else {
+                        currentLevel++;
+                        renderLevels();
+                        loadQuestion();
+                    }
+                }, 1500);
+            } else {
+                selectedBtn.classList.add('wrong');
+                correctBtn.classList.add('correct');
+                setTimeout(() => {
+                    endGameLoss();
+                }, 2000);
+            }
+        }
+
+        function useFiftyFifty() {
+            if(isWaitingForAnimation) return;
+            document.getElementById('btn-50').disabled = true;
+            
+            let correctIndex = allQuestions[currentLevel].correct;
+            let wrongIndexes = [0, 1, 2, 3].filter(i => i !== correctIndex);
+            
+            // خلط المصفوفة لحذف اثنين عشوائيين
+            wrongIndexes.sort(() => Math.random() - 0.5);
+            
+            document.getElementById(`ans-${wrongIndexes[0]}`).classList.add('hidden');
+            document.getElementById(`ans-${wrongIndexes[1]}`).classList.add('hidden');
+        }
+
+        function useAudience() {
+            if(isWaitingForAnimation) return;
+            document.getElementById('btn-aud').disabled = true;
+            
+            let correctIndex = allQuestions[currentLevel].correct;
+            let percentages = [0, 0, 0, 0];
+            
+            // إعطاء الإجابة الصحيحة نسبة أعلى
+            percentages[correctIndex] = Math.floor(Math.random() * 40) + 50; // 50% إلى 90%
+            let remaining = 100 - percentages[correctIndex];
+            
+            let others = [0, 1, 2, 3].filter(i => i !== correctIndex);
+            percentages[others[0]] = Math.floor(Math.random() * (remaining - 5));
+            remaining -= percentages[others[0]];
+            percentages[others[1]] = Math.floor(Math.random() * remaining);
+            percentages[others[2]] = remaining - percentages[others[1]];
+
+            let msg = `تصويت الجمهور جاء كالتالي:<br><br>
+                       A: ${percentages[0]}%<br>
+                       B: ${percentages[1]}%<br>
+                       C: ${percentages[2]}%<br>
+                       D: ${percentages[3]}%`;
+            
+            showInfoModal("رأي الجمهور", msg);
+        }
+
+        function useCallFriend() {
+            if(isWaitingForAnimation) return;
+            document.getElementById('btn-call').disabled = true;
+            
+            let correctIndex = allQuestions[currentLevel].correct;
+            let letters = ["A", "B", "C", "D"];
+            
+            // الصديق يجاوب صح بنسبة كبيرة
+            let guess = (Math.random() > 0.2) ? letters[correctIndex] : letters[Math.floor(Math.random() * 4)];
+            
+            let msg = `📞 صديقك يقول:<br>"أهلاً يا صديقي، أعتقد وبنسبة كبيرة أن الإجابة الصحيحة هي (${guess})، بالتوفيق!"`;
+            showInfoModal("مكالمة هاتفية", msg);
+        }
+
+        function winMillion() {
+            playConfetti();
+            document.getElementById('modal-title').innerText = "🏆 ألف مبروك 🏆";
+            document.getElementById('modal-desc').innerText = "لقد ربحت المليون دولار! أنت عبقري!";
+            document.getElementById('game-modal').classList.add('active');
+        }
+
+        function endGameLoss() {
+            document.getElementById('modal-title').innerText = "للأسف إجابة خاطئة!";
+            document.getElementById('modal-desc').innerText = `لقد خسرت. جائزتك المضمونة هي: $ ${guaranteedPrize}`;
+            document.getElementById('game-modal').classList.add('active');
+        }
+
+        function showInfoModal(title, text) {
+            document.getElementById('info-title').innerText = title;
+            document.getElementById('info-desc').innerHTML = text;
+            document.getElementById('info-modal').classList.add('active');
+        }
+
+        function restartGame() {
+            currentLevel = 0;
+            guaranteedPrize = "0";
+            document.getElementById('btn-50').disabled = false;
+            document.getElementById('btn-aud').disabled = false;
+            document.getElementById('btn-call').disabled = false;
+            document.getElementById('game-modal').classList.remove('active');
+            initGame();
+        }
+
+        function playConfetti() {
+            var duration = 5 * 1000; var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 99999 };
+            function randomInRange(min, max) { return Math.random() * (max - min) + min; }
+            var interval = setInterval(function() {
+                var timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) { return clearInterval(interval); }
+                var particleCount = 50 * (timeLeft / duration);
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }, colors: ['#ffbc00', '#ffffff', '#ff8c00'] }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }, colors: ['#ffbc00', '#ffffff', '#ff8c00'] }));
+            }, 250);
+        }
+
+        // بدء اللعبة
+        initGame();
+
+    </script>
+</body>
+</html>
