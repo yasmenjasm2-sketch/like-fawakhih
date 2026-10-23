@@ -214,7 +214,7 @@
             border: 2px solid white; cursor: pointer; z-index: 10;
             position: relative; transform: scale(1);
             display: flex; justify-content: center; align-items: center;
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), top 0.15s linear, left 0.15s linear, box-shadow 0.2s ease;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease;
         }
         .ludo-token::after {
             content: "👑";
@@ -224,18 +224,40 @@
             position: absolute;
         }
         
+        /* تمييز القطع الخاصة بك وقطع صديقك */
+        .my-token {
+            box-shadow: 0 0 15px 4px rgba(255, 255, 255, 0.8), 0 5px 10px rgba(0,0,0,0.6) !important;
+            z-index: 100 !important;
+            border: 2px solid #fff !important;
+        }
+        .my-token::after {
+            content: "⭐" !important;
+            font-size: 14px !important;
+            text-shadow: 0 0 10px #fff, 0 0 20px #ffd700 !important;
+        }
+        
+        .teammate-token {
+            box-shadow: 0 0 15px 4px rgba(16, 185, 129, 0.8), 0 5px 10px rgba(0,0,0,0.6) !important;
+            z-index: 99 !important;
+            border: 2px solid #10b981 !important;
+        }
+        .teammate-token::after {
+            content: "🤝" !important;
+            font-size: 14px !important;
+            text-shadow: 0 0 10px #10b981, 0 0 20px #10b981 !important;
+        }
+
         .token-jump {
-            animation: tokenJumpAnim 0.2s ease-in-out;
+            animation: tokenJumpAnim 0.25s ease-in-out;
         }
         @keyframes tokenJumpAnim {
             0% { transform: scale(1) translateY(0); }
-            50% { transform: scale(1.35) translateY(-12px); filter: drop-shadow(0 12px 12px rgba(0,0,0,0.6)); }
+            50% { transform: scale(1.5) translateY(-15px); filter: drop-shadow(0 15px 15px rgba(0,0,0,0.8)); }
             100% { transform: scale(1) translateY(0); }
         }
 
         .ludo-token.active-turn {
             animation: pulseGlow 1s infinite alternate;
-            border: 2px solid #fff;
             cursor: pointer;
         }
         .ludo-token.active-turn::before {
@@ -365,6 +387,17 @@
         .p-yellow.filled { background: var(--ludo-yellow); }
         .p-blue { color: var(--ludo-blue); }
         .p-blue.filled { background: var(--ludo-blue); }
+
+        /* مؤقت الدور */
+        .turn-timer-container {
+            display: flex; justify-content: center; align-items: center; gap: 8px;
+            background: rgba(0,0,0,0.6); padding: 6px 16px; border-radius: 20px;
+            border: 1px solid var(--ludo-yellow); margin: 10px auto; width: fit-content;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+        .turn-timer-text { font-size: 20px; font-weight: bold; color: var(--ludo-yellow); }
+        .bot-indicator { color: #ff2a5f; font-weight: bold; font-size: 13px; margin-bottom: 8px; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
 
         /* نوافذ منبثقة */
         .custom-overlay {
@@ -508,6 +541,18 @@
 
         <div class="progress-panel" id="progress-panel"></div>
         
+        <!-- Turn Timer -->
+        <div id="turn-timer-container" class="turn-timer-container hidden">
+            <span style="font-size: 16px;">⏰</span>
+            <span id="turn-timer-text" class="turn-timer-text">10</span>
+            <span style="font-size: 12px; color: #ccc;">ثواني للرمي</span>
+        </div>
+        
+        <!-- Bot Indicator -->
+        <div id="bot-indicator" class="bot-indicator hidden">
+            🤖 الروبوت يلعب مكانك...
+        </div>
+
         <div id="ludo-grid"></div>
         
         <button onclick="exitGame()" class="exit-btn">انسحاب والعودة للمنصة</button>
@@ -636,6 +681,10 @@
         let rawRole = urlParams.get('role'); 
         const gameType = urlParams.get('type') || 'ludo2';
 
+        // تحديد نمط الفرق (2 ضد 2) إذا كانت اللعبة ludo2v2
+        const isTeamMode = (gameType === 'ludo2v2');
+        const teammates = { red: 'yellow', yellow: 'red', green: 'blue', blue: 'green' };
+
         let myRole = 'spectator';
         let isSpectator = true;
         let spectatorName = "مشاهد_" + Math.floor(Math.random() * 9999);
@@ -643,6 +692,10 @@
         let isRollingDice = false;
         let isMovingToken = false;   
         let noMoveTimerScheduled = false; 
+        
+        let turnTimerInterval = null;
+        let turnTimeLeft = 10;
+        let isBotThinking = false;
 
         // خرائط اللودو
         const pathCoords = [
@@ -687,10 +740,12 @@
                     const data = snap.val();
                     if (data) {
                         const players = data.players || { red: true };
-                        if (gameType === 'ludo4') {
-                            if (!players.green) rawRole = 'green';
+                        
+                        // توزيع الأدوار للفرق (الأحمر والأصفر ضد الأخضر والأزرق)
+                        if (gameType === 'ludo2v2' || gameType === 'ludo4') {
+                            if (!players.yellow) rawRole = 'yellow'; // يدخل الفريق الأول
+                            else if (!players.green) rawRole = 'green'; // يدخل الفريق الثاني
                             else if (!players.blue) rawRole = 'blue';
-                            else if (!players.yellow) rawRole = 'yellow';
                         } else {
                             if (!players.yellow) rawRole = 'yellow';
                         }
@@ -708,7 +763,7 @@
 
             if (rawRole) {
                 let r = rawRole.toLowerCase();
-                let validRoles = gameType === 'ludo4' ? ['red', 'yellow', 'green', 'blue'] : ['red', 'yellow'];
+                let validRoles = (gameType === 'ludo2v2' || gameType === 'ludo4') ? ['red', 'yellow', 'green', 'blue'] : ['red', 'yellow'];
                 if (validRoles.includes(r)) {
                     myRole = r;
                     isSpectator = false;
@@ -717,11 +772,12 @@
             }
             
             if (isSpectator) {
-                document.getElementById('ludo-role-text').innerText = `أنت تشاهد المباراة 👁️ ${gameType === 'ludo4' ? '(4 لاعبين)' : '(1v1)'}`;
+                document.getElementById('ludo-role-text').innerText = `أنت تشاهد المباراة 👁️ ${isTeamMode ? '(فرق 2 ضد 2)' : (gameType === 'ludo4' ? '(4 لاعبين)' : '(1v1)')}`;
                 db.ref(`games/${gameId}/spectators/${spectatorName}`).set(true);
                 db.ref(`games/${gameId}/spectators/${spectatorName}`).onDisconnect().remove();
             } else {
-                document.getElementById('ludo-role-text').innerText = `أنت تلعب باللون: ${getRoleName(myRole)} ${gameType === 'ludo4' ? '(4 لاعبين)' : '(1v1)'}`;
+                let modeText = isTeamMode ? '(فرق 2 ضد 2)' : (gameType === 'ludo4' ? '(4 لاعبين)' : '(1v1)');
+                document.getElementById('ludo-role-text').innerText = `أنت تلعب باللون: ${getRoleName(myRole)} ${modeText}`;
                 if (myRole === 'yellow') {
                     document.getElementById('ludo-grid').classList.add('perspective-yellow');
                 }
@@ -790,16 +846,18 @@
         async function sendGameInvite(friendId, friendName) {
             let availableRole = null;
             const data = gameState;
+            
+            // البحث عن دور شاغر لإرساله للصديق
             if (data && data.players) {
-                if (gameType === 'ludo4') {
-                    if (!data.players.green) availableRole = 'green';
+                if (gameType === 'ludo2v2' || gameType === 'ludo4') {
+                    if (!data.players.yellow) availableRole = 'yellow';
+                    else if (!data.players.green) availableRole = 'green';
                     else if (!data.players.blue) availableRole = 'blue';
-                    else if (!data.players.yellow) availableRole = 'yellow';
                 } else {
                     if (!data.players.yellow) availableRole = 'yellow';
                 }
             } else {
-                if (gameType === 'ludo4') availableRole = 'green';
+                if (gameType === 'ludo2v2' || gameType === 'ludo4') availableRole = 'yellow';
                 else availableRole = 'yellow';
             }
 
@@ -807,7 +865,7 @@
             
             await db.ref(`users/${friendId}/game_invite`).set({
                 gameId: gameId,
-                gameType: gameType === 'ludo4' ? 'ludo4' : 'ludo2',
+                gameType: gameType,
                 senderId: localStorage.getItem('xo_uid'),
                 senderName: localStorage.getItem('xo_username') || 'لاعب'
             });
@@ -828,7 +886,10 @@
                 
                 if (!data || !data.tokens) {
                     let initialTokens = { red: [-1,-1,-1,-1], yellow: [-1,-1,-1,-1] };
-                    if(gameType === 'ludo4') { initialTokens.green = [-1,-1,-1,-1]; initialTokens.blue = [-1,-1,-1,-1]; }
+                    if(gameType === 'ludo4' || gameType === 'ludo2v2') { 
+                        initialTokens.green = [-1,-1,-1,-1]; 
+                        initialTokens.blue = [-1,-1,-1,-1]; 
+                    }
                     
                     let initialPlayers = { red: myUid };
                     if (myRole === 'yellow') { initialPlayers.red = 'host'; initialPlayers.yellow = myUid; }
@@ -855,7 +916,7 @@
 
         function buildProgressPanel() {
             const panel = document.getElementById('progress-panel');
-            const roles = gameType === 'ludo4' ? ['red','green','yellow','blue'] : ['red','yellow'];
+            const roles = (gameType === 'ludo4' || gameType === 'ludo2v2') ? ['red','green','yellow','blue'] : ['red','yellow'];
             panel.innerHTML = '';
             roles.forEach(r => {
                 const item = document.createElement('div');
@@ -890,6 +951,11 @@
                 zone.onclick = () => rollDiceProcess(r);
                 
                 let labelText = r === 'red' ? 'الأحمر' : r === 'yellow' ? 'الأصفر' : r === 'green' ? 'الأخضر' : 'الأزرق';
+                if (isTeamMode) {
+                    if (r === 'red' || r === 'yellow') labelText += ' (ف1)';
+                    else labelText += ' (ف2)';
+                }
+                
                 zone.innerHTML = `
                     <span class="dice-label">${labelText}</span>
                     <div class="scene-dice">
@@ -993,6 +1059,7 @@
                 
                 updateDiceUI(data);
                 updateProgress(data.tokens);
+                checkTurnTimer();
                 
                 if (!localRenderingInProgress) {
                     renderTokens(data.tokens);
@@ -1000,12 +1067,21 @@
 
                 const winOverlay = document.getElementById('win-overlay');
                 if(data.winner) {
-                    document.getElementById('ludo-status-text').innerText = `🏆 الفائز هو: ${getRoleName(data.winner)}`;
+                    let winnerMsg = getRoleName(data.winner);
+                    if (isTeamMode) {
+                        if (data.winner === 'red_yellow' || (data.winner !== 'green_blue' && (data.winner === 'red' || data.winner === 'yellow'))) {
+                            winnerMsg = 'فريق الأحمر والأصفر 🔴🟡';
+                        } else if (data.winner === 'green_blue' || data.winner === 'green' || data.winner === 'blue') {
+                            winnerMsg = 'فريق الأخضر والأزرق 🟢🔵';
+                        }
+                    }
+                    
+                    document.getElementById('ludo-status-text').innerText = `🏆 الفائز هو: ${winnerMsg}`;
                     
                     if (lastWinShownFor !== data.winner) {
                         lastWinShownFor = data.winner;
                         winOverlay.classList.add('active');
-                        document.getElementById('win-title').innerText = `🏆 فاز بالمعركة: ${getRoleName(data.winner)} 🏆`;
+                        document.getElementById('win-title').innerText = `🏆 فاز بالمعركة: ${winnerMsg} 🏆`;
                         launchConfetti();
                         AudioEngine.playWin();
                     }
@@ -1020,7 +1096,7 @@
                     const statusList = document.getElementById('rematch-status-list');
                     statusList.innerHTML = '';
                     
-                    let activeRoles = gameType === 'ludo4' ? ['red', 'green', 'yellow', 'blue'] : ['red', 'yellow'];
+                    let activeRoles = (gameType === 'ludo4' || gameType === 'ludo2v2') ? ['red', 'green', 'yellow', 'blue'] : ['red', 'yellow'];
                     let allPlayersAgreed = true;
                     
                     activeRoles.forEach(role => {
@@ -1047,7 +1123,10 @@
 
         function resetGameState() {
             let initialTokens = { red: [-1,-1,-1,-1], yellow: [-1,-1,-1,-1] };
-            if(gameType === 'ludo4') { initialTokens.green = [-1,-1,-1,-1]; initialTokens.blue = [-1,-1,-1,-1]; }
+            if(gameType === 'ludo4' || gameType === 'ludo2v2') { 
+                initialTokens.green = [-1,-1,-1,-1]; 
+                initialTokens.blue = [-1,-1,-1,-1]; 
+            }
             db.ref('games/' + gameId).update({
                 tokens: initialTokens, turn: 'red',
                 dicePool: [], consecutiveSixes: 0,
@@ -1120,14 +1199,103 @@
             }
         }
 
+        // =============== مؤقت الدور والروبوت ===============
+        function checkTurnTimer() {
+            if (isSpectator || !gameState) return;
+            
+            const timerContainer = document.getElementById('turn-timer-container');
+            const botIndicator = document.getElementById('bot-indicator');
+            
+            if (isMyTurn && !gameState.diceRolled && !gameState.winner) {
+                if (!turnTimerInterval) {
+                    turnTimeLeft = 10;
+                    document.getElementById('turn-timer-text').innerText = turnTimeLeft;
+                    timerContainer.classList.remove('hidden');
+                    
+                    turnTimerInterval = setInterval(() => {
+                        turnTimeLeft--;
+                        document.getElementById('turn-timer-text').innerText = turnTimeLeft;
+                        
+                        if (turnTimeLeft <= 0) {
+                            clearInterval(turnTimerInterval);
+                            turnTimerInterval = null;
+                            timerContainer.classList.add('hidden');
+                            
+                            if (isMyTurn && !gameState.diceRolled && !gameState.winner) {
+                                showToast("⏰ انتهى وقتك! الروبوت سيلعب.");
+                                isBotThinking = true;
+                                botIndicator.classList.remove('hidden');
+                                rollDiceProcess(myRole);
+                            }
+                        }
+                    }, 1000);
+                }
+            } else {
+                clearInterval(turnTimerInterval);
+                turnTimerInterval = null;
+                timerContainer.classList.add('hidden');
+                
+                if (isBotThinking && !isMyTurn) {
+                    isBotThinking = false;
+                    botIndicator.classList.add('hidden');
+                }
+            }
+        }
+
+        function executeBotMove(role) {
+            if (!isMyTurn || !gameState || !gameState.diceRolled || isMovingToken || gameState.winner) return;
+            if (!isBotThinking) return;
+
+            let pool = gameState.dicePool || [];
+            let validMoves = [];
+            
+            gameState.tokens[role].forEach((pos, index) => {
+                pool.forEach(dice => {
+                    if (canMoveToken(pos, dice)) {
+                        validMoves.push({ index, pos, dice });
+                    }
+                });
+            });
+
+            if (validMoves.length === 0) {
+                return; // checkIfCanMove handles it
+            }
+
+            // ترتيب الأولويات: الخروج من المنزل بـ 6، أو تحريك القطعة الأبعد
+            validMoves.sort((a, b) => {
+                if (a.pos === -1 && a.dice === 6) return -1;
+                if (b.pos === -1 && b.dice === 6) return 1;
+                return b.pos - a.pos;
+            });
+
+            let bestMove = validMoves[0];
+            let choicesForMove = pool.filter(d => canMoveToken(bestMove.pos, d));
+            
+            if (choicesForMove.length > 1) {
+                executeStrategyMove(bestMove.index, bestMove.pos, choicesForMove[0]);
+            } else {
+                executeStrategyMove(bestMove.index, bestMove.pos, bestMove.dice);
+            }
+        }
+
         function rollDiceProcess(clickedRole) {
             if(isSpectator || !isMyTurn || gameState.diceRolled || clickedRole !== myRole || isRollingDice) return;
             
+            // إذا ضغط اللاعب الحقيقي أثناء تفكير الروبوت، نلغي الروبوت
+            if (isBotThinking && clickedRole === myRole) {
+                isBotThinking = false;
+                document.getElementById('bot-indicator').classList.add('hidden');
+            }
+
             isRollingDice = true;
             AudioEngine.playDice();
 
             const myCube = document.getElementById(`cube-${myRole}`);
             if(myCube) myCube.classList.add('rolling');
+
+            clearInterval(turnTimerInterval);
+            turnTimerInterval = null;
+            document.getElementById('turn-timer-container').classList.add('hidden');
 
             setTimeout(() => {
                 if(myCube) myCube.classList.remove('rolling');
@@ -1153,14 +1321,32 @@
                         dicePool: currentPool,
                         consecutiveSixes: currentSixes,
                         diceRolled: false 
-                    }).finally(() => { isRollingDice = false; });
+                    }).then(() => {
+                        isRollingDice = false;
+                        if (isBotThinking) {
+                            setTimeout(() => {
+                                if (isBotThinking && isMyTurn && gameState.diceRolled) {
+                                    executeBotMove(myRole);
+                                }
+                            }, 1500);
+                        }
+                    });
                 } else {
                     currentPool.push(roll);
                     db.ref('games/' + gameId).update({
                         dicePool: currentPool,
                         consecutiveSixes: 0,
                         diceRolled: true 
-                    }).finally(() => { isRollingDice = false; });
+                    }).then(() => {
+                        isRollingDice = false;
+                        if (isBotThinking) {
+                            setTimeout(() => {
+                                if (isBotThinking && isMyTurn && gameState.diceRolled) {
+                                    executeBotMove(myRole);
+                                }
+                            }, 1500);
+                        }
+                    });
                 }
             }, 600);
         }
@@ -1174,6 +1360,14 @@
                     const token = document.createElement('div');
                     token.className = `ludo-token token-${color}`;
                     token.id = `token-${color}-${index}`; 
+                    
+                    if(!isSpectator) {
+                        if (color === myRole) {
+                            token.classList.add('my-token');
+                        } else if (isTeamMode && teammates[myRole] === color) {
+                            token.classList.add('teammate-token');
+                        }
+                    }
                     
                     if(!isSpectator && isMyTurn && color === myRole && gameState.diceRolled && hasAnyValidMove(pos)) {
                         token.classList.add('active-turn');
@@ -1222,6 +1416,13 @@
         function handleTokenInteraction(color, index, currentPos) {
             if(isSpectator || !isMyTurn || color !== myRole || !gameState.diceRolled || isMovingToken) return;
 
+            // إذا ضغط اللاعب الحقيقي أثناء تفكير الروبوت، نلغي الروبوت
+            if (isBotThinking) {
+                isBotThinking = false;
+                document.getElementById('bot-indicator').classList.add('hidden');
+                showToast("👤 لقد تدخلت، تم إيقاف الروبوت.");
+            }
+
             let pool = gameState.dicePool || [];
 
             if(currentPos === -1) {
@@ -1265,13 +1466,15 @@
             if (isMovingToken) return;
             isMovingToken = true;
             localRenderingInProgress = true;
+            isBotThinking = false; // إذا تحرك اللاعب، الروبوت يلغي عمله
+            document.getElementById('bot-indicator').classList.add('hidden');
 
             let targetPos = currentPos === -1 ? 0 : currentPos + selectedDice;
             
             if(currentPos === -1) {
                 AudioEngine.playStep();
                 drawTokenAtTemporaryPosition(myRole, index, 0);
-                await new Promise(r => setTimeout(r, 220));
+                await new Promise(r => setTimeout(r, 250));
             } else {
                 for(let step = currentPos + 1; step <= targetPos; step++) {
                     AudioEngine.playStep();
@@ -1294,6 +1497,9 @@
                 if(!safeZones.includes(actualGlobalPos)) {
                     for(const oppColor in gameState.tokens) {
                         if(oppColor !== myRole) {
+                            // في نمط الفرق، لا يمكن أكل زميلك
+                            if (isTeamMode && teammates[myRole] === oppColor) continue;
+
                             gameState.tokens[oppColor].forEach((oppPos, oppIdx) => {
                                 if(oppPos >= 0 && oppPos < 52) {
                                     let oppGlobalPos = (oppPos + startOffsets[oppColor]) % 52;
@@ -1349,6 +1555,11 @@
             const token = document.createElement('div');
             token.className = `ludo-token token-${color} token-jump`; 
             token.id = `token-${color}-${index}`;
+            
+            if(!isSpectator) {
+                if (color === myRole) token.classList.add('my-token');
+                else if (isTeamMode && teammates[myRole] === color) token.classList.add('teammate-token');
+            }
             
             let cellId = getCellIdFromPosition(color, tempPos);
             const cell = document.getElementById(cellId);
@@ -1419,7 +1630,11 @@
                 }
             });
             if(allFinished) { 
-                db.ref('games/' + gameId).update({ winner: myRole });
+                let winner = myRole;
+                if (isTeamMode) {
+                    winner = (myRole === 'red' || myRole === 'yellow') ? 'red_yellow' : 'green_blue';
+                }
+                db.ref('games/' + gameId).update({ winner: winner });
             }
         }
 
