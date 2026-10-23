@@ -793,7 +793,6 @@
         /* =========== شاشة تسجيل الدخول المحسنة =========== */
         /* ========================================= */
 
-        /* رسومات برمجية جميلة للشاشة الدخول */
         .login-hero {
             position: relative;
             height: 110px;
@@ -830,7 +829,6 @@
             50% { transform: translateY(-8px) rotate(2deg); }
         }
 
-        /* أيقونات عائمة حول الشاشة */
         .login-decor {
             position: absolute;
             inset: 0;
@@ -886,7 +884,6 @@
             50% { transform: translateY(-12px) rotate(12deg) scale(1.1); }
         }
 
-        /* تبويبات الدخول / التسجيل */
         .auth-tabs {
             display: flex;
             background: rgba(0, 0, 0, 0.4);
@@ -923,7 +920,6 @@
             transform: none;
         }
 
-        /* نموذج الدخول والتسجيل */
         .auth-form {
             display: none;
             position: relative;
@@ -958,6 +954,26 @@
         }
 
         /* ========================================= */
+        /* ============ صورة Nexus الثابتة ============ */
+        /* ========================================= */
+        .ad-static-nexus {
+            margin-top: 25px;
+            width: 100%;
+            height: 140px;
+            border-radius: 18px;
+            overflow: hidden;
+            position: relative;
+            border: 1.5px solid rgba(0, 240, 255, 0.32);
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 5;
+            animation: adContainerPulse 4s ease-in-out infinite alternate;
+        }
+        .ad-static-nexus .ad-slide {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* ========================================= */
         /* ============ شريط الإعلانات الجديد ============ */
         /* ========================================= */
         .ad-slider-container {
@@ -979,14 +995,14 @@
         
         .ad-slider-track {
             display: flex;
-            width: 400%;
+            width: 200%;
             height: 100%;
             animation: scrollAds 20s linear infinite;
             will-change: transform;
         }
         
         .ad-slide {
-            width: 25%;
+            width: 50%;
             height: 100%;
             position: relative;
             overflow: hidden;
@@ -1145,6 +1161,7 @@
             .game-title { font-size: 13px; }
             .game-play-btn { font-size: 12px; padding: 8px; }
             .ad-slider-container { height: 120px; }
+            .ad-static-nexus { height: 120px; }
             .ad-title { font-size: 15px; }
             .ad-subtitle { font-size: 10px; }
             .ad-content { padding: 0 16px; }
@@ -1197,7 +1214,6 @@
         <!-- ====== شاشة تسجيل الدخول / إنشاء حساب ====== -->
         <section id="login-section" class="active">
 
-            <!-- رسومات برمجية جميلة -->
             <div class="login-decor">
                 <div class="decor-orb orb-a"></div>
                 <div class="decor-orb orb-b"></div>
@@ -1208,7 +1224,6 @@
                 <div class="decor-icon di-4">⭐</div>
             </div>
 
-            <!-- رسمة الهيرو (يد التحكم النيون) -->
             <div class="login-hero">
                 <div class="hero-glow"></div>
                 <svg class="hero-graphic" viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg">
@@ -1223,20 +1238,16 @@
                             <stop offset="100%" stop-color="#ff2a5f"/>
                         </linearGradient>
                     </defs>
-                    <!-- شكل يد التحكم -->
                     <path d="M40,50 Q40,25 65,25 L135,25 Q160,25 160,50 L160,70 Q160,88 138,88 L118,88 Q108,88 100,80 Q92,88 82,88 L62,88 Q40,88 40,70 Z" 
                           fill="none" stroke="url(#heroGrad)" stroke-width="3" stroke-linejoin="round"/>
                     <path d="M40,50 Q40,25 65,25 L135,25 Q160,25 160,50 L160,70 Q160,88 138,88 L118,88 Q108,88 100,80 Q92,88 82,88 L62,88 Q40,88 40,70 Z" 
                           fill="url(#heroGrad)" opacity="0.08"/>
-                    <!-- D-Pad -->
                     <rect x="62" y="52" width="10" height="3" rx="1.5" fill="#00f0ff"/>
                     <rect x="65.5" y="48.5" width="3" height="10" rx="1.5" fill="#00f0ff"/>
-                    <!-- الأزرار -->
                     <circle cx="132" cy="53" r="4" fill="#ff2a5f"/>
                     <circle cx="142" cy="63" r="4" fill="#7000ff"/>
                     <circle cx="122" cy="63" r="4" fill="#00f0ff"/>
                     <circle cx="132" cy="73" r="4" fill="#ffd700"/>
-                    <!-- نقاط الإضاءة -->
                     <circle cx="100" cy="42" r="2" fill="#00f0ff" opacity="0.9">
                         <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite"/>
                     </circle>
@@ -1245,13 +1256,11 @@
                 </svg>
             </div>
 
-            <!-- التبويبات -->
             <div class="auth-tabs">
                 <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">🔐 تسجيل الدخول</button>
                 <button class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">✨ إنشاء حساب</button>
             </div>
 
-            <!-- نموذج تسجيل الدخول -->
             <div class="auth-form active" id="form-login">
                 <p class="auth-form-title">أهلاً بعودتك! سجّل دخولك للمتابعة</p>
                 <input type="text" id="login-username" placeholder="اسم المستخدم" maxlength="15" autocomplete="username">
@@ -1260,7 +1269,6 @@
                 <button onclick="loginUser()">دخول الآن 🚀</button>
             </div>
 
-            <!-- نموذج إنشاء حساب -->
             <div class="auth-form" id="form-register">
                 <p class="auth-form-title">أنشئ حسابك الجديد وابدأ اللعب</p>
                 <input type="text" id="register-username" placeholder="اسم المستخدم (أكثر من 5 أحرف)" maxlength="15" autocomplete="username">
@@ -1274,24 +1282,26 @@
                 <button onclick="registerUser()">إنشاء الحساب ✨</button>
             </div>
 
-            <!-- شريط الإعلانات (يظهر دائماً) - صور حقيقية Nexus.jpg & sasa.jpg -->
+            <!-- صورة Nexus الثابتة (بدون حركة) -->
+            <div class="ad-static-nexus">
+                <div class="ad-slide nexus">
+                    <img src="Nexus.jpg" alt="Nexus Games" class="ad-img">
+                    <div class="ad-overlay ad-overlay-nexus"></div>
+                    <div class="ad-content">
+                        <span class="ad-badge">✨ مميز</span>
+                        <h4 class="ad-title">Nexus Games™</h4>
+                        <p class="ad-subtitle">عالم الألعاب الاحترافي</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- شريط الإعلانات المتحرك (Sasa فقط) -->
             <div class="ad-slider-container">
                 <div class="ad-slider-track">
 
-                    <!-- الشريحة 1: Nexus -->
-                    <div class="ad-slide nexus">
-                        <img src="nexus.jpg" alt="Nexus Games" class="ad-img">
-                        <div class="ad-overlay ad-overlay-nexus"></div>
-                        <div class="ad-content">
-                            <span class="ad-badge">✨ مميز</span>
-                            <h4 class="ad-title">Nexus Games™</h4>
-                            <p class="ad-subtitle">عالم الألعاب الاحترافي</p>
-                        </div>
-                    </div>
-
-                    <!-- الشريحة 2: Sasa -->
+                    <!-- الشريحة 1: Sasa -->
                     <div class="ad-slide sasa">
-                        <img src="viop.jpg" alt="Sasa Store" class="ad-img">
+                        <img src="sasa.jpg" alt="Sasa Store" class="ad-img">
                         <div class="ad-overlay ad-overlay-sasa"></div>
                         <div class="ad-content">
                             <span class="ad-badge">🔥 عروض</span>
@@ -1300,18 +1310,7 @@
                         </div>
                     </div>
 
-                    <!-- الشريحة 3: Nexus (مكرر للتدوير السلس) -->
-                    <div class="ad-slide nexus">
-                        <img src="Nexus.jpg" alt="Nexus Games" class="ad-img">
-                        <div class="ad-overlay ad-overlay-nexus"></div>
-                        <div class="ad-content">
-                            <span class="ad-badge">✨ مميز</span>
-                            <h4 class="ad-title">Nexus Games™</h4>
-                            <p class="ad-subtitle">عالم الألعاب الاحترافي</p>
-                        </div>
-                    </div>
-
-                    <!-- الشريحة 4: Sasa (مكرر للتدوير السلس) -->
+                    <!-- الشريحة 2: Sasa (مكرر للتدوير السلس) -->
                     <div class="ad-slide sasa">
                         <img src="sasa.jpg" alt="Sasa Store" class="ad-img">
                         <div class="ad-overlay ad-overlay-sasa"></div>
@@ -1520,12 +1519,10 @@
         function openSettings() { document.getElementById('settings-modal').classList.add('active'); }
         function closeSettings() { document.getElementById('settings-modal').classList.remove('active'); }
 
-        // التحقق من كلمة المرور: أحرف إنجليزية وأرقام فقط
         function isValidPassword(password) {
             return /^[a-zA-Z0-9]+$/.test(password);
         }
 
-        // تبديل التبويبات بين تسجيل الدخول والتسجيل
         function switchAuthTab(tab) {
             document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
@@ -1647,9 +1644,6 @@
             });
         }
 
-        // ============================================
-        // تسجيل الدخول (يعتمد على حساب موجود مسبقاً)
-        // ============================================
         function loginUser() {
             let username = document.getElementById('login-username').value.trim();
             const password = document.getElementById('login-password').value.trim();
@@ -1692,9 +1686,6 @@
             });
         }
 
-        // ============================================
-        // إنشاء حساب جديد
-        // ============================================
         function registerUser() {
             let username = document.getElementById('register-username').value.trim();
             const password = document.getElementById('register-password').value.trim();
@@ -2061,157 +2052,4 @@
             setupGameUI(`⚡ ${roleDisplay}`);
             
             db.ref('games/' + gameId).on('value', (snapshot) => {
-                const data = snapshot.val();
-                if (data) {
-                    gameBoard = data.board || ["", "", "", "", "", "", "", "", ""]; isGameOver = data.winner !== '';
-                    playerXName = data.hostName || 'اللاعب (X)'; playerOName = data.guestName || 'اللاعب (O)';
-                    if (data.scores) scores = data.scores;
-                    updateScoreboardDOM(); renderBoard();
-                    
-                    if (data.winner !== '') { handleWinOnline(data); } 
-                    else {
-                        document.getElementById('reset-btn').style.display = 'none';
-                        let currentPlayerName = data.turn === 'X' ? playerXName : playerOName;
-                        if (data.turn === myRole) {
-                            document.getElementById('status-text').innerText = "🟢 دورك الآن..";
-                            document.getElementById('status-text').style.color = "var(--secondary-neon)";
-                        } else {
-                            document.getElementById('status-text').innerText = `⏳ بانتظار ${currentPlayerName}...`;
-                            document.getElementById('status-text').style.color = "#aaa";
-                        }
-                    }
-                } else {
-                    if(document.getElementById('game-section').classList.contains('active')){
-                        showToast("🚪 غادر الخصم اللعبة", "#ff2a5f"); exitGame();
-                    }
-                }
-            });
-        }
-
-        function setupGameUI(roleText) {
-            showSection('game-section');
-            document.getElementById('board').style.display = 'grid';
-            document.getElementById('exit-btn').style.display = 'inline-block';
-            document.getElementById('role-text').innerText = roleText;
-            updateScoreboardDOM(); updateStatusText();
-        }
-
-        function makeMove(index) {
-            if (isGameOver || gameBoard[index] !== "") return;
-            if (isOnline) {
-                db.ref('games/' + gameId).once('value').then((snapshot) => {
-                    let data = snapshot.val();
-                    if (data.turn === myRole && data.board[index] === "" && data.winner === "") {
-                        data.board[index] = myRole; data.turn = myRole === 'X' ? 'O' : 'X';
-                        let winner = checkWin(data.board);
-                        if (winner) {
-                            data.winner = winner;
-                            if (!data.scores) data.scores = { X: 0, O: 0, ties: 0 };
-                            if (winner === 'Draw') data.scores.ties += 1; else data.scores[winner] += 1;
-                        }
-                        db.ref('games/' + gameId).update(data);
-                    }
-                });
-            } else {
-                gameBoard[index] = localTurn;
-                let winner = checkWin(gameBoard);
-                if (winner) {
-                    isGameOver = true;
-                    if (winner === 'Draw') { document.getElementById('status-text').innerText = "🏁 تعادل!"; scores.ties += 1; saveUserStats(false); } 
-                    else {
-                        let winnerRealName = winner === 'X' ? playerXName : playerOName;
-                        document.getElementById('status-text').innerText = `🎉 الفائز: ${winnerRealName}!`;
-                        scores[winner] += 1; highlightWinningLine(gameBoard); playWinAnimation(); saveUserStats(true); 
-                    }
-                    updateScoreboardDOM(); document.getElementById('reset-btn').style.display = 'block';
-                } else { localTurn = localTurn === 'X' ? 'O' : 'X'; updateStatusText(); }
-                renderBoard();
-            }
-        }
-
-        function handleWinOnline(data) {
-            if (data.winner === 'Draw') { document.getElementById('status-text').innerText = "🏁 تعادل!"; saveUserStats(false); } 
-            else {
-                let winnerRealName = data.winner === 'X' ? playerXName : playerOName;
-                document.getElementById('status-text').innerText = `🎉 الفائز هو: ${winnerRealName}!`;
-                highlightWinningLine(gameBoard);
-                if(data.winner === myRole) { playWinAnimation(); saveUserStats(true); } else { saveUserStats(false); }
-            }
-            if(myRole === 'X') document.getElementById('reset-btn').style.display = 'block';
-            else document.getElementById('status-text').innerText += " (بانتظار المستضيف)";
-        }
-
-        function renderBoard() {
-            const cells = document.querySelectorAll('.cell');
-            cells.forEach((cell, index) => {
-                if (gameBoard[index] !== "") {
-                    if (!cell.hasChildNodes()) cell.innerHTML = `<span>${gameBoard[index]}</span>`;
-                } else { cell.innerHTML = ""; cell.classList.remove('winning-cell'); }
-                cell.className = 'cell';
-                if (gameBoard[index] === 'X') cell.classList.add('x');
-                if (gameBoard[index] === 'O') cell.classList.add('o');
-            });
-        }
-
-        function updateScoreboardDOM() {
-            document.getElementById('score-x').innerText = scores.X;
-            document.getElementById('score-o').innerText = scores.O;
-            document.getElementById('score-ties').innerText = scores.ties;
-            
-            let genderX = playerXName === currentUserData?.username ? currentUserData?.gender : null;
-            let genderO = playerOName === currentUserData?.username ? currentUserData?.gender : null;
-
-            document.getElementById('label-x').innerHTML = `<img src="${generateAvatarURL(playerXName, genderX)}" style="width:30px;height:30px;border-radius:50%;border:1px solid rgba(0,240,255,0.2);"><br>${playerXName}`;
-            document.getElementById('label-o').innerHTML = `<img src="${generateAvatarURL(playerOName, genderO)}" style="width:30px;height:30px;border-radius:50%;border:1px solid rgba(0,240,255,0.2);"><br>${playerOName}`;
-        }
-
-        function updateStatusText() {
-            if (!isOnline && !isGameOver) {
-                let currentName = localTurn === 'X' ? playerXName : playerOName;
-                document.getElementById('status-text').innerText = `🎯 دور اللاعب: ${currentName}`;
-            }
-        }
-
-        const winConditions = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
-        function checkWin(board) {
-            for (let condition of winConditions) {
-                let [a, b, c] = condition;
-                if (board[a] && board[a] === board[b] && board[a] === board[c]) return board[a]; 
-            }
-            if (!board.includes("")) return 'Draw'; return null;
-        }
-
-        function highlightWinningLine(board) {
-            for (let condition of winConditions) {
-                let [a, b, c] = condition;
-                if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-                    const cells = document.querySelectorAll('.cell');
-                    cells[a].classList.add('winning-cell'); cells[b].classList.add('winning-cell'); cells[c].classList.add('winning-cell');
-                    break;
-                }
-            }
-        }
-
-        function resetGame() {
-            hasLoggedStatThisGame = false;
-            if (isOnline) { db.ref('games/' + gameId).update({ board: ["", "", "", "", "", "", "", "", ""], turn: 'X', winner: '' }); } 
-            else {
-                gameBoard = ["", "", "", "", "", "", "", "", ""]; isGameOver = false; localTurn = 'X';
-                document.getElementById('reset-btn').style.display = 'none'; updateStatusText(); renderBoard();
-            }
-        }
-
-        function exitGame() {
-            if(isOnline && gameId) { db.ref('games/' + gameId).remove(); db.ref('games/' + gameId).off(); }
-            showSection('menu-section');
-        }
-
-        function saveUserStats(isWin) {
-            if (!currentUserData || !currentUserId || hasLoggedStatThisGame) return;
-            hasLoggedStatThisGame = true; currentUserData.played = (currentUserData.played || 0) + 1;
-            if (isWin) currentUserData.wins = (currentUserData.wins || 0) + 1;
-            db.ref('users/' + currentUserId).update({ played: currentUserData.played, wins: currentUserData.wins });
-        }
-    </script>
-</body>
-</html>
+                const data = snapshot
