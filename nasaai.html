@@ -40,23 +40,6 @@
   @keyframes popIn{ from{ transform:scale(.88); opacity:0 } to{ transform:scale(1); opacity:1 } }
   .pop-in{ animation:popIn .25s ease-out forwards; }
   
-  /* مؤشر الانتظار للخصم */
-  .waiting-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,0.85);
-      backdrop-filter: blur(8px);
-      z-index: 60;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      color: white;
-      font-size: 20px;
-      font-weight: bold;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-  }
-
   @keyframes lobbyFadeIn {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
@@ -75,16 +58,32 @@
 <div class="relative w-full h-full bg-black overflow-hidden">
   <canvas id="gameCanvas"></canvas>
 
-  <!-- شاشة الانتظار (تظهر عندما يكون دور الخصم) -->
-  <div id="waitingOverlay" class="waiting-overlay hidden">
-      <i class="fa-solid fa-hourglass-half text-5xl mb-4 text-amber-400 animate-spin"></i>
-      <div>بانتظار دور الخصم...</div>
+  <!-- شاشة الانتظار (تظهر في الأعلى يمين عندما يكون دور الخصم) -->
+  <div id="waitingOverlay" class="absolute top-20 right-3 z-30 hidden">
+      <div class="bg-slate-800/90 backdrop-blur-md text-white px-4 py-3 rounded-xl border border-slate-600 shadow-lg flex items-center gap-3">
+          <i class="fa-solid fa-hourglass-half text-amber-400 animate-spin"></i>
+          <span class="text-sm font-bold">بانتظار الخصم...</span>
+      </div>
+  </div>
+
+  <!-- مؤقت الرمية (15 ثانية) -->
+  <div id="shotTimerHud" class="absolute top-20 right-3 z-20 hidden">
+      <div class="bg-slate-800/90 backdrop-blur-md text-white px-4 py-3 rounded-xl border border-slate-600 shadow-lg flex items-center gap-3">
+          <i class="fa-solid fa-hourglass-end text-red-400"></i>
+          <div class="flex flex-col">
+              <span class="text-[10px] text-gray-300 font-semibold leading-none">الوقت المتبقي</span>
+              <span id="shotTimerDisplay" class="font-bold text-xl leading-tight">15</span>
+          </div>
+      </div>
   </div>
 
   <!-- ======= HUD علوي ======= -->
   <div class="absolute top-3 left-0 right-0 z-20 flex flex-col items-center pointer-events-none px-4">
-    <div class="bg-gradient-to-r from-blue-700 via-indigo-600 to-blue-700 text-white font-bold px-6 py-1 rounded-full text-sm md:text-base border-2 border-white/80 shadow-lg tracking-wider mb-2">
+    <div class="bg-gradient-to-r from-blue-700 via-indigo-600 to-blue-700 text-white font-bold px-6 py-1 rounded-full text-sm md:text-base border-2 border-white/80 shadow-lg tracking-wider mb-2 flex items-center gap-2">
       الجولة <span id="roundText">1/3</span>
+      <span class="text-white/50">|</span>
+      <i class="fa-solid fa-stopwatch text-amber-300"></i>
+      <span id="matchTimerDisplay">10:00</span>
     </div>
 
     <div class="flex gap-3">
@@ -201,19 +200,29 @@
           <div class="absolute -top-10 -left-10 w-32 h-32 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
           <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-          <div class="text-center mb-8 relative">
+          <div class="text-center mb-6 relative">
               <h1 class="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-500 to-orange-600 drop-shadow-lg mb-2" style="font-family: 'Teko', sans-serif;">نيشان</h1>
               <p class="text-slate-400 text-sm">لعبة القوس والنشاب — تطوير حمزة الحماده</p>
           </div>
 
           <!-- Profile Info -->
-          <div class="flex items-center gap-4 bg-slate-900/60 p-4 rounded-2xl mb-8 border border-slate-700/50 shadow-inner relative">
+          <div class="flex items-center gap-4 bg-slate-900/60 p-4 rounded-2xl mb-6 border border-slate-700/50 shadow-inner relative">
               <img id="lobbyAvatar" src="" class="w-16 h-16 rounded-full border-2 border-amber-400 bg-slate-800 shadow-[0_0_15px_rgba(251,191,36,0.3)]">
               <div class="flex-1">
                   <div id="lobbyName" class="text-white font-bold text-xl">جاري التحميل...</div>
                   <div id="lobbyId" class="text-amber-400 font-mono text-xs mt-1">ID: ---</div>
               </div>
               <button onclick="window.location.href='index.html'" class="text-slate-400 hover:text-white bg-slate-800 p-2 rounded-lg" title="الرئيسية"><i class="fa-solid fa-house"></i></button>
+          </div>
+
+          <!-- Duration Selector -->
+          <div class="mb-6">
+              <label class="text-slate-400 text-sm mb-2 block text-right">اختر مدة المباراة</label>
+              <div class="flex gap-2">
+                  <button onclick="setDuration(5)" class="flex-1 py-2 rounded-lg bg-slate-700 text-white text-sm duration-btn hover:bg-slate-600 transition" data-min="5">5 دقائق</button>
+                  <button onclick="setDuration(10)" class="flex-1 py-2 rounded-lg bg-amber-600 text-white text-sm duration-btn font-bold shadow-md shadow-amber-500/30" data-min="10">10 دقائق</button>
+                  <button onclick="setDuration(20)" class="flex-1 py-2 rounded-lg bg-slate-700 text-white text-sm duration-btn hover:bg-slate-600 transition" data-min="20">20 دقيقة</button>
+              </div>
           </div>
 
           <!-- Action Buttons -->
@@ -271,7 +280,7 @@
   </div>
 
   <!-- Waiting Overlay (for invite/link creation) -->
-  <div id="lobbyWaitingOverlay" class="waiting-overlay hidden z-50 flex-col">
+  <div id="lobbyWaitingOverlay" class="absolute inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex-col items-center justify-center">
       <i class="fa-solid fa-hourglass-half text-5xl mb-6 text-amber-400 animate-spin"></i>
       <div id="waitingTitle" class="text-2xl mb-2 text-white">بانتظار انضمام اللاعب...</div>
       <div id="waitingSubtitle" class="text-sm text-slate-400 mb-8">الرجاء الانتظار أو مشاركة الرابط</div>
@@ -323,6 +332,15 @@ let myName = localStorage.getItem('xo_username') || 'لاعب';
 let invitedFriendId = null;
 let isListening = false;
 
+// إعدادات الوقت
+let matchDuration = 10 * 60; // الافتراضي 10 دقائق
+let matchTimeLeft = 0;
+let matchTimerInterval = null;
+
+let shotTimeLeft = 0;
+let shotTimerInterval = null;
+const SHOT_TIME_LIMIT = 15;
+
 if (!myUid) {
     myUid = 'guest_' + Math.floor(Math.random() * 100000);
     myName = 'ضيف_' + Math.floor(Math.random() * 1000);
@@ -339,7 +357,6 @@ if (urlGameId) {
     let urlUid = urlParams.get('uid');
     
     if (!urlRole || !urlUid) {
-        // Guest via link
         myRole = 'O';
         myName = localStorage.getItem('xo_username') || 'ضيف_رابط';
         
@@ -735,6 +752,7 @@ function shootPlayer(){
   audioSFX.playShoot();
   isArrowInFlight = true;
   isPlayerTurn = false;
+  stopShotTimer(); // إيقاف مؤقت الرمية
 
   const devX = (Math.random() - 0.5) * CFG.arrowDeviation * 2;
   const devY = (Math.random() - 0.5) * CFG.arrowDeviation * 2;
@@ -754,6 +772,7 @@ function shootPlayer(){
 
 function startAITurn(){
   isPlayerTurn = false;
+  stopShotTimer(); // إيقاف المؤقت
   turnBanner.classList.remove('hidden');
   turnText.textContent = 'دور المنافس...';
 
@@ -786,7 +805,7 @@ function startAITurn(){
 }
 
 /* =========================================================
-   14) الإصابة
+   14) الإصابة والمزامنة
    ========================================================= */
 function onHit(){
   const f = flight;
@@ -829,6 +848,7 @@ function onHit(){
       updates[myRole + '_shots'] = shotIndex;
       let nextTurn = myRole === 'X' ? 'O' : 'X';
       updates['turn'] = nextTurn;
+      updates['stuck'] = stuck; // مزامنة السهام لتظهر لدى الخصم
       
       db.ref('games/' + gameId).once('value').then(snap => {
           let gData = snap.val();
@@ -850,8 +870,8 @@ function onHit(){
                   updates['round'] = currentRound;
                   updates['X_shots'] = 0;
                   updates['O_shots'] = 0;
-                  updates['turn'] = 'X'; // المستضيف يبدأ
-                  updates['stuck'] = null; // مسح السهام من الهدف
+                  updates['turn'] = 'X'; 
+                  updates['stuck'] = null; // مسح السهام
               }
           }
           db.ref('games/' + gameId).update(updates);
@@ -894,11 +914,12 @@ function nextShot(){
 
   randomizeWind();
   isPlayerTurn = true;
+  startShotTimer(); // بدء مؤقت الرمية
   aimHint.style.opacity = '1';
 }
 
 /* =========================================================
-   15) واجهة اللعبة
+   15) واجهة اللعبة والمؤقتات
    ========================================================= */
 function updateShotBoxes(){
   shotEls.forEach((box, i) => {
@@ -947,6 +968,9 @@ function hideScorePopup(){
 
 function endGame(winnerRole = null, winnerData = null){
   gameOver = true;
+  clearInterval(matchTimerInterval);
+  stopShotTimer();
+
   document.getElementById('finalPlayerScore').textContent = playerScore;
   document.getElementById('finalOpponentScore').textContent = opponentScore;
 
@@ -993,6 +1017,91 @@ function endGame(winnerRole = null, winnerData = null){
 
 function exitToLobby() {
     window.location.href = 'index.html'; 
+}
+
+function startMatchTimer(duration) {
+    clearInterval(matchTimerInterval);
+    matchTimeLeft = duration;
+    updateMatchTimerDisplay();
+    
+    matchTimerInterval = setInterval(() => {
+        matchTimeLeft--;
+        updateMatchTimerDisplay();
+        if (matchTimeLeft <= 0) {
+            clearInterval(matchTimerInterval);
+            handleTimeUp();
+        }
+    }, 1000);
+}
+
+function updateMatchTimerDisplay() {
+    let m = Math.floor(matchTimeLeft / 60);
+    let s = matchTimeLeft % 60;
+    document.getElementById('matchTimerDisplay').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+}
+
+function handleTimeUp() {
+    if (gameOver) return;
+    if (isOnline) {
+        if (myRole === 'X') {
+            let finalWinner = 'Draw';
+            if (playerScore > opponentScore) finalWinner = 'X';
+            else if (opponentScore > playerScore) finalWinner = 'O';
+            db.ref('games/' + gameId).update({ winner: finalWinner });
+        }
+    } else {
+        endGame(null, null);
+    }
+}
+
+function startShotTimer() {
+    clearInterval(shotTimerInterval);
+    if (!isPlayerTurn || isArrowInFlight || hitZoom || gameOver) {
+        document.getElementById('shotTimerHud').classList.add('hidden');
+        return;
+    }
+    
+    shotTimeLeft = SHOT_TIME_LIMIT;
+    document.getElementById('shotTimerHud').classList.remove('hidden');
+    document.getElementById('shotTimerDisplay').innerText = shotTimeLeft;
+    
+    shotTimerInterval = setInterval(() => {
+        shotTimeLeft--;
+        document.getElementById('shotTimerDisplay').innerText = shotTimeLeft;
+        
+        if (shotTimeLeft <= 0) {
+            clearInterval(shotTimerInterval);
+            autoFire();
+        }
+    }, 1000);
+}
+
+function stopShotTimer() {
+    clearInterval(shotTimerInterval);
+    document.getElementById('shotTimerHud').classList.add('hidden');
+}
+
+function autoFire() {
+    if (!isPlayerTurn || isArrowInFlight || hitZoom || gameOver) return;
+    // توجيه السهم تلقائياً لمنتصف الهدف مع انحراف بسيط
+    sightPos.x = (Math.random() - 0.5) * 30;
+    sightPos.y = (Math.random() - 0.5) * 30;
+    aimTarget.x = sightPos.x;
+    aimTarget.y = sightPos.y;
+    shootPlayer();
+}
+
+function setDuration(min) {
+    matchDuration = min * 60;
+    document.querySelectorAll('.duration-btn').forEach(btn => {
+        if (parseInt(btn.dataset.min) === min) {
+            btn.classList.add('bg-amber-600', 'font-bold', 'shadow-md', 'shadow-amber-500/30');
+            btn.classList.remove('bg-slate-700');
+        } else {
+            btn.classList.remove('bg-amber-600', 'font-bold', 'shadow-md', 'shadow-amber-500/30');
+            btn.classList.add('bg-slate-700');
+        }
+    });
 }
 
 /* =========================================================
@@ -1554,12 +1663,20 @@ function initOnlineMode() {
         playerScoreEl.textContent = playerScore;
         opponentScoreEl.textContent = opponentScore;
 
+        // مزامنة السهام في الهدف
+        if (data.stuck) {
+            if (JSON.stringify(data.stuck) !== JSON.stringify(stuck)) {
+                stuck = data.stuck;
+            }
+        } else {
+            if (stuck.length > 0) stuck = [];
+        }
+
         // تحديث الجولة والهدف
         let roundNumber = data.round || 1;
         if(roundNumber > round) {
             round = roundNumber;
             roundText.textContent = round + '/' + maxRounds;
-            stuck = [];
             shots = [null, null, null];
             updateShotBoxes();
             randomizeWind();
@@ -1567,7 +1684,18 @@ function initOnlineMode() {
 
         // معرفة دور من
         let currentTurn = data.turn || 'X';
-        isPlayerTurn = (currentTurn === myRole);
+        let isMyTurn = (currentTurn === myRole);
+
+        if (isMyTurn !== isPlayerTurn) {
+            isPlayerTurn = isMyTurn;
+            if (isPlayerTurn) {
+                startShotTimer();
+            } else {
+                stopShotTimer();
+            }
+        } else {
+            isPlayerTurn = isMyTurn;
+        }
 
         if(isPlayerTurn) {
             waitingOverlay.classList.add('hidden');
@@ -1611,7 +1739,15 @@ function startOnlineGame() {
     updateShotBoxes();
     roundText.textContent = '1/' + maxRounds;
     
-    initOnlineMode();
+    // قراءة مدة المباراة من الغرفة
+    db.ref('games/' + gameId).once('value').then(snap => {
+        let data = snap.val();
+        if (data && data.duration) {
+            matchDuration = data.duration;
+        }
+        startMatchTimer(matchDuration);
+        initOnlineMode();
+    });
 }
 
 /* =========================================================
@@ -1666,6 +1802,9 @@ function startBotGameFromLobby() {
     
     randomizeWind();
     aimHint.style.opacity = '1';
+    
+    startMatchTimer(matchDuration);
+    startShotTimer();
 }
 
 function loadFriends() {
@@ -1738,7 +1877,8 @@ function inviteFriendFromLobby(friendId, friendName) {
         turn: 'X', 
         X_score: 0, 
         O_score: 0,
-        round: 1
+        round: 1,
+        duration: matchDuration
     };
     
     db.ref('games/' + gameId).set(gameData).then(() => {
@@ -1790,7 +1930,8 @@ function createLinkFromLobby(mode) {
         turn: 'X', 
         X_score: 0, 
         O_score: 0,
-        round: 1
+        round: 1,
+        duration: matchDuration
     };
     
     db.ref('games/' + gameId).set(gameData).then(() => {
