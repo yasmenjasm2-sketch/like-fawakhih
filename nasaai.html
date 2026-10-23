@@ -1,0 +1,1472 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Archery Master 3D — لعبة القوس والنشاب | حمزة الحماده</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Teko:wght@600;700&family=Tajawal:wght@700;900&display=swap');
+
+  *{ user-select:none; -webkit-user-select:none; -webkit-tap-highlight-color:transparent; }
+  html,body{ margin:0; padding:0; height:100%; overflow:hidden; background:#0d131a; font-family:'Tajawal',sans-serif; }
+  .number-font{ font-family:'Teko',sans-serif; }
+  #gameCanvas{ display:block; width:100vw; height:100vh; touch-action:none; cursor:crosshair; }
+
+  .score-box{
+    background:linear-gradient(180deg,#ef4444 0%,#b91c1c 100%);
+    box-shadow: inset 0 2px 4px rgba(255,255,255,.4), 0 4px 8px rgba(0,0,0,.5);
+    border:2px solid #fff;
+  }
+  .hud-panel{
+    background:rgba(15,23,42,.75);
+    backdrop-filter:blur(8px);
+    border:1px solid rgba(255,255,255,.18);
+    box-shadow:0 8px 32px rgba(0,0,0,.37);
+  }
+
+  @keyframes scorePop{
+    0%{ transform:scale(.2) rotate(-10deg); opacity:0 }
+    50%{ transform:scale(1.3) rotate(5deg); opacity:1 }
+    100%{ transform:scale(1) rotate(0); opacity:1 }
+  }
+  .animate-score{ animation:scorePop .5s cubic-bezier(.175,.885,.32,1.275) forwards; }
+
+  @keyframes popIn{ from{ transform:scale(.88); opacity:0 } to{ transform:scale(1); opacity:1 } }
+  .pop-in{ animation:popIn .25s ease-out forwards; }
+  
+  /* مؤشر الانتظار للخصم */
+  .waiting-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      z-index: 15;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-size: 20px;
+      font-weight: bold;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+  }
+</style>
+</head>
+<body class="w-screen h-screen overflow-hidden flex justify-center items-center select-none">
+
+<div class="relative w-full h-full bg-black overflow-hidden">
+  <canvas id="gameCanvas"></canvas>
+
+  <!-- شاشة الانتظار (تظهر عندما يكون دور الخصم) -->
+  <div id="waitingOverlay" class="waiting-overlay hidden">
+      <i class="fa-solid fa-hourglass-half text-4xl mb-4 text-amber-400 animate-spin"></i>
+      <div>بانتظار دور الخصم...</div>
+  </div>
+
+  <!-- ======= HUD علوي ======= -->
+  <div class="absolute top-3 left-0 right-0 z-20 flex flex-col items-center pointer-events-none px-4">
+    <div class="bg-gradient-to-r from-blue-700 via-indigo-600 to-blue-700 text-white font-bold px-6 py-1 rounded-full text-sm md:text-base border-2 border-white/80 shadow-lg tracking-wider mb-2">
+      الجولة <span id="roundText">1/3</span>
+    </div>
+
+    <div class="flex gap-3">
+      <div id="shot1" class="score-box w-12 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center text-white text-2xl md:text-3xl font-bold number-font">?</div>
+      <div id="shot2" class="score-box w-12 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center text-white text-2xl md:text-3xl font-bold number-font">?</div>
+      <div id="shot3" class="score-box w-12 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center text-white text-2xl md:text-3xl font-bold number-font">?</div>
+    </div>
+  </div>
+
+  <!-- ======= HUD يسار ======= -->
+  <div class="absolute top-20 left-3 z-20 flex flex-col gap-3 pointer-events-none">
+    <div class="hud-panel rounded-2xl p-2.5 flex items-center gap-2 text-white min-w-[112px]">
+      <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white text-xl shadow-inner border border-blue-400">
+        <i id="windArrow" class="fa-solid fa-arrow-right transition-transform duration-500"></i>
+      </div>
+      <div class="flex flex-col">
+        <span class="text-[10px] text-gray-300 font-semibold leading-none">الرياح</span>
+        <span id="windSpeed" class="text-xl font-bold number-font leading-tight">1.6</span>
+      </div>
+    </div>
+
+    <div class="hud-panel rounded-2xl p-2 flex items-center justify-between w-36 text-white border-l-4 border-l-green-500">
+      <div class="flex items-center gap-2">
+        <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-amber-500 to-yellow-300 p-0.5 shadow-md">
+          <div class="w-full h-full bg-slate-800 rounded-full flex items-center justify-center overflow-hidden">
+            <i class="fa-solid fa-user-ninja text-amber-400 text-lg"></i>
+          </div>
+        </div>
+        <span class="text-xs font-bold" id="nameX">أنت</span>
+      </div>
+      <span id="playerScore" class="text-2xl font-black number-font text-green-400 pl-1">0</span>
+    </div>
+
+    <div class="hud-panel rounded-2xl p-2 flex items-center justify-between w-36 text-white border-l-4 border-l-blue-500">
+      <div class="flex items-center gap-2">
+        <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-blue-600 to-cyan-400 p-0.5 shadow-md">
+          <div class="w-full h-full bg-slate-800 rounded-full flex items-center justify-center overflow-hidden">
+            <i class="fa-solid fa-robot text-cyan-400 text-lg"></i>
+          </div>
+        </div>
+        <span class="text-xs font-bold" id="nameO">المنافس</span>
+      </div>
+      <span id="opponentScore" class="text-2xl font-black number-font text-blue-400 pl-1">0</span>
+    </div>
+  </div>
+
+  <!-- ======= نقاط منبثقة ======= -->
+  <div id="scorePopup" class="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none hidden">
+    <div class="relative flex flex-col items-center">
+      <span id="scorePopupVal" class="text-7xl md:text-8xl font-black text-yellow-300 drop-shadow-[0_5px_5px_rgba(0,0,0,.8)] number-font">10</span>
+      <span id="scorePopupText" class="text-lg font-extrabold text-white bg-red-600 px-4 py-0.5 rounded-full shadow-lg border border-white">إصابة ممتازة!</span>
+    </div>
+  </div>
+
+  <!-- ======= تلميح ======= -->
+  <div id="aimHint" class="absolute bottom-10 left-0 right-0 z-20 text-center pointer-events-none transition-opacity duration-300">
+    <div class="inline-block bg-black/70 backdrop-blur-md text-white text-sm px-5 py-2 rounded-full border border-white/25 shadow-lg">
+      <i class="fa-solid fa-hand-pointer ml-2 text-yellow-400"></i>
+      اضغط مطولاً <b class="text-yellow-300">2 ثانية</b> — حرّك بدقة للتصويب — اترك للإطلاق
+    </div>
+  </div>
+
+  <!-- ======= بانر الدور ======= -->
+  <div id="turnBanner" class="absolute top-1/2 left-0 right-0 -translate-y-1/2 z-30 pointer-events-none hidden">
+    <div class="bg-gradient-to-r from-red-600 via-amber-500 to-red-600 py-3 text-center text-white text-2xl font-black shadow-2xl border-y-2 border-white tracking-wide">
+      <span id="turnText">دور المنافس...</span>
+    </div>
+  </div>
+
+  <!-- ======= نهاية اللعبة ======= -->
+  <div id="gameOverModal" class="absolute inset-0 z-40 bg-black/80 backdrop-blur-md flex items-center justify-center hidden p-4">
+    <div class="bg-slate-900 border-2 border-amber-500/50 rounded-3xl p-6 w-full max-w-sm text-center text-white shadow-2xl relative overflow-hidden pop-in">
+      <div class="absolute -top-10 -left-10 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl"></div>
+
+      <div class="w-16 h-16 bg-gradient-to-tr from-amber-500 to-yellow-300 rounded-2xl flex items-center justify-center mx-auto mb-4 text-slate-900 text-3xl shadow-lg">
+        <i id="endIcon" class="fa-solid fa-trophy"></i>
+      </div>
+
+      <h2 id="endTitle" class="text-3xl font-black text-amber-400 mb-1">لقد فزت!</h2>
+      
+      <!-- بيانات الفائز -->
+      <div id="winnerDetails" class="my-3 p-3 bg-amber-900/30 border border-amber-500/30 rounded-xl hidden">
+          <div class="text-sm text-amber-200">الفائز بالبطولة:</div>
+          <div id="winnerNameTxt" class="text-xl font-bold text-white"></div>
+          <div id="winnerIdTxt" class="text-xs text-amber-400 font-mono mt-1"></div>
+      </div>
+
+      <p id="endSubtitle" class="text-gray-300 text-sm mb-6">أداء احترافي رائع في التصويب</p>
+
+      <div class="bg-slate-800/80 rounded-2xl p-4 mb-6 border border-slate-700/50 space-y-3">
+        <div class="flex justify-between items-center text-sm">
+          <span class="text-gray-400">مجموع نقاطك:</span>
+          <span id="finalPlayerScore" class="text-2xl font-bold text-green-400 number-font">0</span>
+        </div>
+        <div class="w-full h-px bg-slate-700"></div>
+        <div class="flex justify-between items-center text-sm">
+          <span class="text-gray-400">نقاط المنافس:</span>
+          <span id="finalOpponentScore" class="text-2xl font-bold text-blue-400 number-font">0</span>
+        </div>
+      </div>
+
+      <button onclick="exitToLobby()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold py-3.5 rounded-xl shadow-lg border border-emerald-400/30 transition-all active:scale-95 text-lg">
+        <i class="fa-solid fa-arrow-right-from-bracket ml-2"></i> العودة للرئيسية
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   1) إعداد قاعدة البيانات Firebase (بيانات مشروعك)
+   ========================================================= */
+const firebaseConfig = {
+    apiKey: "AIzaSyDr0kbQDE90hhEMohV6X1b4ndu4L7uZz24",
+    authDomain: "mehamzaalanat.firebaseapp.com",
+    databaseURL: "https://mehamzaalanat-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "mehamzaalanat",
+    storageBucket: "mehamzaalanat.firebasestorage.app",
+    messagingSenderId: "10248497310",
+    appId: "1:10248497310:android:bc2b88983738827f15338f"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+/* =========================================================
+   2) حالة اللعب الأونلاين (Multiplayer)
+   ========================================================= */
+let isOnline = false;
+let gameId = null;
+let myRole = 'X'; // X أو O
+let myUid = null;
+let myName = "أنت";
+let oppName = "المنافس";
+let oppUid = null;
+let isListening = false;
+
+// قراءة بيانات الرابط (إذا كان قادماً من دعوة)
+const urlParams = new URLSearchParams(window.location.search);
+const urlGameId = urlParams.get('gameId');
+if (urlGameId) {
+    isOnline = true;
+    gameId = urlGameId;
+    myRole = urlParams.get('role') || 'X';
+    myUid = urlParams.get('uid');
+    myName = decodeURIComponent(urlParams.get('username') || 'لاعب');
+    
+    // تحديث الأسماء في الواجهة
+    document.getElementById('nameX').innerText = myRole === 'X' ? myName : 'الخصم';
+    document.getElementById('nameO').innerText = myRole === 'O' ? myName : 'الخصم';
+}
+
+/* =========================================================
+   3) الأصوات — Web Audio
+   ========================================================= */
+class SoundEffects {
+  constructor(){ this.ctx = null; }
+  init(){
+    if(!this.ctx){
+      try { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){ this.ctx = null; }
+    }
+    if(this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+  }
+  tone(f1, f2, dur, type='sine', vol=0.2, when=0){
+    this.init(); if(!this.ctx) return;
+    const t = this.ctx.currentTime + when;
+    const osc = this.ctx.createOscillator();
+    const g   = this.ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(f1, t);
+    if(f2) osc.frequency.exponentialRampToValueAtTime(Math.max(1, f2), t + dur);
+    g.gain.setValueAtTime(vol, t);
+    g.gain.exponentialRampToValueAtTime(0.0008, t + dur);
+    osc.connect(g); g.connect(this.ctx.destination);
+    osc.start(t); osc.stop(t + dur + 0.03);
+  }
+  playBowPull(){ this.tone(180, 70, 0.4, 'triangle', 0.09); }
+  playChargeReady(){ this.tone(880, 880, 0.08, 'sine', 0.18); this.tone(1320, 1320, 0.12, 'sine', 0.14, 0.06); }
+  playShoot(){
+    this.tone(620, 100, 0.16, 'sine', 0.28);
+    this.tone(240, 70, 0.20, 'square', 0.06);
+  }
+  playCancel(){ this.tone(220, 140, 0.14, 'sawtooth', 0.08); }
+  playHit(score){
+    if(score >= 9){
+      this.tone(880, 880, 0.09, 'sine', 0.22);
+      setTimeout(()=>this.tone(1320, 1320, 0.14, 'sine', 0.18), 80);
+    } else if(score >= 6){
+      this.tone(520, 520, 0.12, 'square', 0.15);
+    } else if(score >= 1){
+      this.tone(300, 220, 0.14, 'triangle', 0.11);
+    } else {
+      this.tone(180, 100, 0.18, 'sawtooth', 0.10);
+    }
+  }
+}
+const audioSFX = new SoundEffects();
+
+/* =========================================================
+   4) عناصر الواجهة
+   ========================================================= */
+const canvas        = document.getElementById('gameCanvas');
+const ctx           = canvas.getContext('2d');
+
+const roundText     = document.getElementById('roundText');
+const shotEls       = [1,2,3].map(i => document.getElementById('shot'+i));
+const windSpeedEl   = document.getElementById('windSpeed');
+const windArrowEl   = document.getElementById('windArrow');
+const playerScoreEl = document.getElementById('playerScore');
+const opponentScoreEl = document.getElementById('opponentScore');
+const scorePopup    = document.getElementById('scorePopup');
+const scorePopupVal = document.getElementById('scorePopupVal');
+const scorePopupText= document.getElementById('scorePopupText');
+const aimHint       = document.getElementById('aimHint');
+const turnBanner    = document.getElementById('turnBanner');
+const turnText      = document.getElementById('turnText');
+const gameOverModal = document.getElementById('gameOverModal');
+const waitingOverlay= document.getElementById('waitingOverlay');
+
+/* =========================================================
+   5) إعدادات اللعبة
+   ========================================================= */
+const CFG = {
+  sensitivity : 0.28,
+  slowFactor  : 0.45,
+  smoothing   : 0.55,
+  maxAim      : 68,
+  zoomAim     : 1.45,
+  zoomHit     : 2.4,
+  windForce   : 10.0,
+  ringStep    : 4.3,
+  boardSize   : 122,
+  flightTime  : 0.55,
+  CHARGE_MIN  : 2000,
+  CHARGE_MAX  : 4500,
+  arrowDeviation : 2.8,
+  aiMinError : 6,
+  aiMaxError : 20,
+};
+
+/* =========================================================
+   6) حالة اللعبة
+   ========================================================= */
+let W = 0, H = 0, dpr = 1;
+let anchorX = 0, anchorY = 0;
+
+let round = 1, maxRounds = 3, shotIndex = 1;
+let isPlayerTurn = true, isAiming = false, isArrowInFlight = false;
+let hitZoom = false, gameOver = false;
+
+let playerScore = 0, opponentScore = 0;
+let shots = [null, null, null];
+
+let wind = { x:0, y:0, speed:'0.0', angle:0 };
+
+let aimTarget = { x:0, y:0 };
+let sightPos  = { x:0, y:0 };
+let sway      = { x:0, y:0 };
+let swayT     = 0;
+
+let viewScale = 1, camX = 0, camY = 0;
+let hitPoint  = { x:0, y:0 };
+
+let flight = null;
+let stuck  = [];
+
+let pointerDown = false;
+let isCharging  = false;
+let chargeStart = 0;
+let lastP = { x:0, y:0 };
+let lastTime = performance.now();
+
+let cancelFlash = 0;
+let screenShake = 0;
+let readyNotified = false;
+
+/* =========================================================
+   7) أدوات
+   ========================================================= */
+function roundRectPath(c, x, y, w, h, r){
+  r = Math.min(r, w/2, h/2);
+  c.beginPath();
+  c.moveTo(x + r, y);
+  c.lineTo(x + w - r, y);
+  c.quadraticCurveTo(x + w, y, x + w, y + r);
+  c.lineTo(x + w, y + h - r);
+  c.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  c.lineTo(x + r, y + h);
+  c.quadraticCurveTo(x, y + h, x, y + h - r);
+  c.lineTo(x, y + r);
+  c.quadraticCurveTo(x, y, x + r, y);
+  c.closePath();
+}
+
+function ringColor(ringNo){
+  if(ringNo === 1 || ringNo === 2) return '#facc15';
+  if(ringNo === 3 || ringNo === 4) return '#ef4444';
+  if(ringNo === 5 || ringNo === 6) return '#3b82f6';
+  if(ringNo === 7 || ringNo === 8) return '#0f172a';
+  return '#f8fafc';
+}
+
+/* =========================================================
+   8) القياسات
+   ========================================================= */
+function resize(){
+  dpr = Math.min(window.devicePixelRatio || 1, 2);
+  W = window.innerWidth;
+  H = window.innerHeight;
+
+  canvas.width  = Math.floor(W * dpr);
+  canvas.height = Math.floor(H * dpr);
+  canvas.style.width  = W + 'px';
+  canvas.style.height = H + 'px';
+
+  anchorX = W / 2;
+  anchorY = H * 0.42;
+
+  camX = anchorX;
+  camY = anchorY;
+}
+window.addEventListener('resize', resize);
+window.addEventListener('orientationchange', () => setTimeout(resize, 150));
+resize();
+
+/* =========================================================
+   9) الرياح
+   ========================================================= */
+function randomizeWind(){
+  const angle = Math.floor(Math.random() * 8) * 45;
+  const speed = +(Math.random() * 2.4 + 0.3).toFixed(1);
+  const rad = angle * Math.PI / 180;
+
+  wind = {
+    x: Math.cos(rad) * speed,
+    y: Math.sin(rad) * speed,
+    speed: speed.toFixed(1),
+    angle
+  };
+
+  windSpeedEl.textContent = wind.speed;
+  windArrowEl.style.transform = 'rotate(' + angle + 'deg)';
+}
+
+function windDrift(){
+  return { x: wind.x * CFG.windForce, y: wind.y * CFG.windForce };
+}
+
+/* =========================================================
+   10) حساب النقاط
+   ========================================================= */
+function scoreFromOffset(x, y){
+  const d = Math.hypot(x, y);
+  const s = 10 - Math.floor(d / CFG.ringStep);
+  return Math.max(0, Math.min(10, s));
+}
+
+/* =========================================================
+   11) الإدخال
+   ========================================================= */
+function getXY(e){
+  if(e.touches && e.touches.length) return { x:e.touches[0].clientX, y:e.touches[0].clientY };
+  return { x:e.clientX, y:e.clientY };
+}
+
+function onDown(e){
+  if(gameOver || !isPlayerTurn || isArrowInFlight || hitZoom) return;
+  if(isOnline && !isPlayerTurn) return; // حماية إضافية للأونلاين
+  if(e.target !== canvas) return;
+
+  pointerDown = true;
+  isCharging  = true;
+  chargeStart = performance.now();
+  readyNotified = false;
+  lastP = getXY(e);
+  isAiming = true;
+
+  audioSFX.init();
+  audioSFX.playBowPull();
+  aimHint.style.opacity = '0';
+
+  if(e.cancelable) e.preventDefault();
+}
+
+function onMove(e){
+  if(!pointerDown || !isPlayerTurn) return;
+
+  const p = getXY(e);
+  let dx = p.x - lastP.x;
+  let dy = p.y - lastP.y;
+
+  const mag = Math.hypot(dx, dy);
+  if(mag > 80){ dx = dx / mag * 80; dy = dy / mag * 80; }
+
+  const slow   = Math.min(1, mag / 12);
+  const factor = CFG.sensitivity * (CFG.slowFactor + (1 - CFG.slowFactor) * slow);
+
+  aimTarget.x += (dx * factor) / viewScale;
+  aimTarget.y += (dy * factor) / viewScale;
+
+  const dist = Math.hypot(aimTarget.x, aimTarget.y);
+  if(dist > CFG.maxAim){
+    aimTarget.x = aimTarget.x / dist * CFG.maxAim;
+    aimTarget.y = aimTarget.y / dist * CFG.maxAim;
+  }
+
+  lastP = p;
+  if(e.cancelable) e.preventDefault();
+}
+
+function onUp(e){
+  if(!pointerDown) return;
+  pointerDown = false;
+
+  if(!isAiming) return;
+  isAiming = false;
+
+  const held = performance.now() - chargeStart;
+  isCharging = false;
+
+  if(held < CFG.CHARGE_MIN){
+    audioSFX.playCancel();
+    cancelFlash = 1;
+    aimTarget.x *= 0.7;
+    aimTarget.y *= 0.7;
+    if(navigator.vibrate) try { navigator.vibrate(60); } catch(err){}
+    return;
+  }
+
+  shootPlayer();
+}
+
+canvas.addEventListener('pointerdown', onDown, { passive:false });
+window.addEventListener('pointermove', onMove, { passive:false });
+window.addEventListener('pointerup', onUp);
+window.addEventListener('pointercancel', onUp);
+window.addEventListener('contextmenu', e => e.preventDefault());
+
+/* =========================================================
+   12) التصويب
+   ========================================================= */
+function updateAim(dt){
+  const k = 1 - Math.pow(1 - CFG.smoothing, dt);
+  sightPos.x += (aimTarget.x - sightPos.x) * k;
+  sightPos.y += (aimTarget.y - sightPos.y) * k;
+
+  let amp = 0.45;
+
+  if(isCharging){
+    const held = performance.now() - chargeStart;
+    const over = Math.max(0, held - CFG.CHARGE_MIN);
+    amp = 0.45 + (over / 600);
+    amp = Math.min(amp, 5.2);
+
+    if(!readyNotified && held >= CFG.CHARGE_MIN){
+      readyNotified = true;
+      audioSFX.playChargeReady();
+      if(navigator.vibrate) try { navigator.vibrate(35); } catch(err){}
+    }
+  }
+
+  sway.x = Math.sin(swayT * 2.35) * amp + Math.sin(swayT * 4.7) * amp * 0.28;
+  sway.y = Math.cos(swayT * 1.9)  * amp + Math.cos(swayT * 4.1) * amp * 0.28;
+}
+
+function updateCamera(dt){
+  let ts = 1;
+  let tx = anchorX;
+  let ty = anchorY;
+
+  if(hitZoom){
+    ts = CFG.zoomHit;
+    tx = anchorX + hitPoint.x * 0.65;
+    ty = anchorY + hitPoint.y * 0.65;
+  } else if(isAiming){
+    ts = CFG.zoomAim;
+  }
+
+  const k = 1 - Math.pow(0.86, dt);
+  viewScale += (ts - viewScale) * k;
+  camX += (tx - camX) * k;
+  camY += (ty - camY) * k;
+}
+
+function reticleScreen(){
+  const wx = anchorX + sightPos.x + sway.x;
+  const wy = anchorY + sightPos.y + sway.y;
+  return {
+    x: anchorX + (wx - camX) * viewScale,
+    y: anchorY + (wy - camY) * viewScale
+  };
+}
+
+/* =========================================================
+   13) الرمي
+   ========================================================= */
+function resetShotState(){
+  sightPos.x = 0; sightPos.y = 0;
+  aimTarget.x = 0; aimTarget.y = 0;
+  isAiming = false;
+  isCharging = false;
+  pointerDown = false;
+  readyNotified = false;
+}
+
+function shootPlayer(){
+  if(!isPlayerTurn || isArrowInFlight || gameOver) return;
+
+  audioSFX.playShoot();
+  isArrowInFlight = true;
+  isPlayerTurn = false;
+
+  const devX = (Math.random() - 0.5) * CFG.arrowDeviation * 2;
+  const devY = (Math.random() - 0.5) * CFG.arrowDeviation * 2;
+
+  const drift = windDrift();
+  const ix = sightPos.x + sway.x + drift.x + devX;
+  const iy = sightPos.y + sway.y + drift.y + devY;
+
+  flight = {
+    t: 0,
+    from: { x: anchorX + 90, y: anchorY + H * 0.65 },
+    to:   { x: anchorX + ix, y: anchorY + iy },
+    score: scoreFromOffset(ix, iy),
+    isPlayer: true
+  };
+}
+
+function startAITurn(){
+  isPlayerTurn = false;
+  turnBanner.classList.remove('hidden');
+  turnText.textContent = 'دور المنافس...';
+
+  setTimeout(() => {
+    turnBanner.classList.add('hidden');
+    audioSFX.playBowPull();
+
+    setTimeout(() => {
+      audioSFX.playShoot();
+      isArrowInFlight = true;
+
+      const errR = CFG.aiMinError + Math.random() * (CFG.aiMaxError - CFG.aiMinError);
+      const a    = Math.random() * Math.PI * 2;
+      const ex   = Math.cos(a) * errR;
+      const ey   = Math.sin(a) * errR;
+
+      const drift = windDrift();
+      const ix = ex + drift.x * 0.5;
+      const iy = ey + drift.y * 0.5;
+
+      flight = {
+        t: 0,
+        from: { x: anchorX - 90, y: anchorY + H * 0.65 },
+        to:   { x: anchorX + ix, y: anchorY + iy },
+        score: scoreFromOffset(ix, iy),
+        isPlayer: false
+      };
+    }, 1100);
+  }, 900);
+}
+
+/* =========================================================
+   14) الإصابة
+   ========================================================= */
+function onHit(){
+  const f = flight;
+  flight = null;
+  isArrowInFlight = false;
+  hitZoom = true;
+
+  hitPoint = { x: f.to.x - anchorX, y: f.to.y - anchorY };
+
+  stuck.push({
+    x: hitPoint.x,
+    y: hitPoint.y,
+    score: f.score,
+    isPlayer: f.isPlayer
+  });
+
+  audioSFX.playHit(f.score);
+  screenShake = Math.min(6, 1.5 + f.score * 0.4);
+
+  if(navigator.vibrate){
+    try { navigator.vibrate(f.score >= 8 ? [25, 35, 70] : 25); } catch(e){}
+  }
+
+  showScorePopup(f.score);
+
+  if(f.isPlayer){
+    playerScore += f.score;
+    playerScoreEl.textContent = playerScore;
+    shots[shotIndex - 1] = f.score;
+    updateShotBoxes();
+  } else {
+    opponentScore += f.score;
+    opponentScoreEl.textContent = opponentScore;
+  }
+
+  // إرسال النتيجة لقاعدة البيانات في حال اللعب الجماعي
+  if (isOnline) {
+      let myCurrentScore = f.isPlayer ? playerScore : opponentScore;
+      let updates = {};
+      updates[myRole + '_score'] = myCurrentScore;
+      updates[myRole + '_shots'] = shotIndex;
+      updates['turn'] = myRole === 'X' ? 'O' : 'X';
+      
+      // التحقق من نهاية اللعبة
+      if (round === maxRounds && shotIndex === 3) {
+          // سيتم حساب الفائز في دالة المزامنة
+      }
+      db.ref('games/' + gameId).update(updates);
+  }
+
+  setTimeout(() => {
+    hideScorePopup();
+    hitZoom = false;
+    resetShotState();
+
+    if(isOnline) {
+        // الأونلاين يعتمد على الـ listener لتحديث الدور
+    } else {
+        if(f.isPlayer){
+          startAITurn();
+        } else {
+          nextShot();
+        }
+    }
+  }, 1900);
+}
+
+function nextShot(){
+  shotIndex++;
+
+  if(shotIndex > 3){
+    shotIndex = 1;
+    round++;
+    shots = [null, null, null];
+    stuck = [];
+    updateShotBoxes();
+
+    if(round > maxRounds){
+      endGame();
+      return;
+    }
+    roundText.textContent = round + '/' + maxRounds;
+  }
+
+  randomizeWind();
+  isPlayerTurn = true;
+  aimHint.style.opacity = '1';
+}
+
+/* =========================================================
+   15) واجهة اللعبة
+   ========================================================= */
+function updateShotBoxes(){
+  shotEls.forEach((box, i) => {
+    const v = shots[i];
+    box.classList.remove('animate-score');
+    if(v !== null && v !== undefined){
+      box.textContent = v;
+      void box.offsetWidth;
+      box.classList.add('animate-score');
+    } else {
+      box.textContent = '?';
+    }
+  });
+}
+
+function showScorePopup(score){
+  scorePopupVal.textContent = score;
+
+  if(score === 10){
+    scorePopupText.textContent = 'إصابة بؤرية 10!';
+    scorePopupVal.className = 'text-7xl md:text-8xl font-black text-yellow-300 drop-shadow-[0_5px_5px_rgba(0,0,0,.8)] number-font';
+  } else if(score >= 8){
+    scorePopupText.textContent = 'رمية ممتازة!';
+    scorePopupVal.className = 'text-7xl md:text-8xl font-black text-green-400 drop-shadow-[0_5px_5px_rgba(0,0,0,.8)] number-font';
+  } else if(score >= 5){
+    scorePopupText.textContent = 'رمية جيدة';
+    scorePopupVal.className = 'text-7xl md:text-8xl font-black text-blue-400 drop-shadow-[0_5px_5px_rgba(0,0,0,.8)] number-font';
+  } else if(score >= 1){
+    scorePopupText.textContent = 'حاول مجدداً';
+    scorePopupVal.className = 'text-7xl md:text-8xl font-black text-gray-300 drop-shadow-[0_5px_5px_rgba(0,0,0,.8)] number-font';
+  } else {
+    scorePopupText.textContent = 'خارج الهدف';
+    scorePopupVal.className = 'text-7xl md:text-8xl font-black text-red-500 drop-shadow-[0_5px_5px_rgba(0,0,0,.8)] number-font';
+  }
+
+  scorePopup.classList.remove('hidden');
+  scorePopup.classList.remove('animate-score');
+  void scorePopup.offsetWidth;
+  scorePopup.classList.add('animate-score');
+}
+
+function hideScorePopup(){
+  scorePopup.classList.add('hidden');
+  scorePopup.classList.remove('animate-score');
+}
+
+function endGame(winnerRole = null, winnerData = null){
+  gameOver = true;
+  document.getElementById('finalPlayerScore').textContent = playerScore;
+  document.getElementById('finalOpponentScore').textContent = opponentScore;
+
+  const title = document.getElementById('endTitle');
+  const sub   = document.getElementById('endSubtitle');
+  const icon  = document.getElementById('endIcon');
+  const winnerDetails = document.getElementById('winnerDetails');
+  const winnerNameTxt = document.getElementById('winnerNameTxt');
+  const winnerIdTxt = document.getElementById('winnerIdTxt');
+
+  winnerDetails.classList.add('hidden'); // إخفاء افتراضي
+
+  if(playerScore > opponentScore){
+    title.textContent = 'لقد فزت بالبطولة!';
+    title.className = 'text-3xl font-black text-amber-400 mb-1';
+    sub.textContent = 'تهانينا! أنت رامي القوس الأفضل';
+    icon.className = 'fa-solid fa-trophy';
+    
+    if(isOnline && myUid) {
+        // جلب بيانات الفائز (أنت)
+        winnerDetails.classList.remove('hidden');
+        winnerNameTxt.textContent = myName;
+        winnerIdTxt.textContent = `ID: ${myUid}`;
+    }
+  } else if(playerScore < opponentScore){
+    title.textContent = 'لقد خسرت المباراة';
+    title.className = 'text-3xl font-black text-red-500 mb-1';
+    sub.textContent = 'حاول مرة أخرى لتحسين مستواك';
+    icon.className = 'fa-solid fa-circle-xmark';
+    
+    if(isOnline && winnerData) {
+        winnerDetails.classList.remove('hidden');
+        winnerNameTxt.textContent = winnerData.name || oppName;
+        winnerIdTxt.textContent = `ID: ${winnerData.uid}`;
+    }
+  } else {
+    title.textContent = 'تعادل متكافئ!';
+    title.className = 'text-3xl font-black text-blue-400 mb-1';
+    sub.textContent = 'أداء قوي جداً من الطرفين';
+    icon.className = 'fa-solid fa-handshake';
+  }
+
+  gameOverModal.classList.remove('hidden');
+}
+
+function exitToLobby() {
+    window.location.href = 'index.html'; // العودة لصفحة البوابة الرئيسية
+}
+
+/* =========================================================
+   16) رسم البيئة (السماء، اسم المطور، العشب)
+   ========================================================= */
+function drawSkyName(){
+  const cx = W / 2;
+  const cy = Math.max(100, H * 0.20);
+
+  const nameSize = Math.min(56, Math.max(26, Math.min(W * 0.085, H * 0.075)));
+  const subSize  = Math.max(11, nameSize * 0.28);
+
+  ctx.save();
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  ctx.shadowColor = 'rgba(251,191,36,0.85)';
+  ctx.shadowBlur = 30;
+  ctx.font = `900 ${nameSize}px Tajawal, "Tahoma", sans-serif`;
+  ctx.fillStyle = 'rgba(251,191,36,0.28)';
+  ctx.fillText('حمزة الحماده', cx, cy);
+
+  const halfW = nameSize * 3.4;
+  const grad = ctx.createLinearGradient(cx - halfW, cy, cx + halfW, cy);
+  grad.addColorStop(0,    '#7c2d12');
+  grad.addColorStop(0.15, '#b45309');
+  grad.addColorStop(0.35, '#f59e0b');
+  grad.addColorStop(0.5,  '#fef9c3');
+  grad.addColorStop(0.65, '#f59e0b');
+  grad.addColorStop(0.85, '#b45309');
+  grad.addColorStop(1,    '#7c2d12');
+
+  ctx.shadowColor = 'rgba(251,191,36,0.9)';
+  ctx.shadowBlur = 18;
+  ctx.fillStyle = grad;
+  ctx.fillText('حمزة الحماده', cx, cy);
+
+  const lineY = cy + 2;
+  const gap   = halfW + nameSize * 0.2;
+  const lineW = Math.max(30, nameSize * 0.9);
+
+  ctx.shadowColor = 'rgba(251,191,36,0.7)';
+  ctx.shadowBlur = 10;
+  ctx.strokeStyle = 'rgba(251,191,36,0.85)';
+  ctx.lineWidth = 1.8;
+  ctx.lineCap = 'round';
+
+  ctx.beginPath(); ctx.moveTo(cx - gap - lineW, lineY); ctx.lineTo(cx - gap, lineY); ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx - gap - lineW - 4, lineY, 2.4, 0, Math.PI * 2); ctx.fillStyle = 'rgba(251,191,36,0.9)'; ctx.fill();
+  ctx.beginPath(); ctx.moveTo(cx + gap, lineY); ctx.lineTo(cx + gap + lineW, lineY); ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx + gap + lineW + 4, lineY, 2.4, 0, Math.PI * 2); ctx.fillStyle = 'rgba(251,191,36,0.9)'; ctx.fill();
+
+  ctx.shadowColor = 'rgba(251,191,36,0.6)';
+  ctx.shadowBlur = 8;
+  ctx.font = `700 ${subSize}px Tajawal, "Tahoma", sans-serif`;
+  ctx.fillStyle = 'rgba(251,191,36,0.9)';
+  ctx.fillText('★ مطور اللعبة ★', cx, cy + nameSize * 0.78);
+
+  ctx.restore();
+}
+
+function drawEnvironment(){
+  const sky = ctx.createLinearGradient(0, 0, 0, H * 0.46);
+  sky.addColorStop(0,    '#050d24');
+  sky.addColorStop(0.35, '#122659');
+  sky.addColorStop(0.7,  '#1e40af');
+  sky.addColorStop(0.9,  '#60a5fa');
+  sky.addColorStop(1,    '#bfdbfe');
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, W, H * 0.46);
+
+  ctx.save();
+  for(let i = 0; i < 46; i++){
+    const sx = ((i * 149.3 + 13) % W);
+    const sy = ((i * 71.7 + 23) % (H * 0.30));
+    const size = 0.6 + ((i * 0.37) % 1.3);
+    const tw = 0.35 + 0.55 * Math.abs(Math.sin(swayT * 0.6 + i * 0.9));
+    ctx.globalAlpha = tw * 0.7;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(sx, sy, size, size);
+  }
+  ctx.restore();
+
+  const sunX = W * 0.82;
+  const sunY = H * 0.10;
+  const sunR = Math.min(60, W * 0.09);
+
+  const sunGlow = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, sunR * 3.2);
+  sunGlow.addColorStop(0,   'rgba(255,240,180,0.55)');
+  sunGlow.addColorStop(0.3, 'rgba(255,220,120,0.28)');
+  sunGlow.addColorStop(0.7, 'rgba(255,200,80,0.10)');
+  sunGlow.addColorStop(1,   'rgba(255,200,80,0)');
+  ctx.fillStyle = sunGlow;
+  ctx.beginPath();
+  ctx.arc(sunX, sunY, sunR * 3.2, 0, Math.PI * 2);
+  ctx.fill();
+
+  const sunCore = ctx.createRadialGradient(sunX - sunR*0.3, sunY - sunR*0.3, 0, sunX, sunY, sunR);
+  sunCore.addColorStop(0,   '#fffef2');
+  sunCore.addColorStop(0.4, '#fef3c7');
+  sunCore.addColorStop(0.8, '#fbbf24');
+  sunCore.addColorStop(1,   '#f59e0b');
+  ctx.fillStyle = sunCore;
+  ctx.beginPath();
+  ctx.arc(sunX, sunY, sunR, 0, Math.PI * 2);
+  ctx.fill();
+
+  drawSkyName();
+
+  ctx.fillStyle = '#0a0f1f';
+  ctx.fillRect(0, H * 0.28, W, H * 0.12);
+  ctx.fillStyle = 'rgba(148,163,184,.55)';
+  for(let i = 0; i < W; i += 13){
+    for(let j = H * 0.29; j < H * 0.385; j += 9){
+      if(((i / 13) | 0) % 3 === ((j / 9) | 0) % 3) ctx.fillRect(i, j, 5, 4);
+    }
+  }
+
+  const standShade = ctx.createLinearGradient(0, H * 0.28, 0, H * 0.40);
+  standShade.addColorStop(0, 'rgba(0,0,0,0)');
+  standShade.addColorStop(1, 'rgba(0,0,0,0.55)');
+  ctx.fillStyle = standShade;
+  ctx.fillRect(0, H * 0.28, W, H * 0.12);
+
+  const grassTop = H * 0.40;
+  const grassHeight = H - grassTop;
+  const grass = ctx.createLinearGradient(0, grassTop, 0, H);
+  grass.addColorStop(0,    '#0a2e15');
+  grass.addColorStop(0.22, '#166534');
+  grass.addColorStop(0.55, '#15803d');
+  grass.addColorStop(0.85, '#22c55e');
+  grass.addColorStop(1,    '#86efac');
+  ctx.fillStyle = grass;
+  ctx.fillRect(0, grassTop, W, grassHeight);
+
+  const stripes = 8;
+  for(let i = 0; i < stripes; i++){
+    const y0 = grassTop + grassHeight * (i / stripes);
+    const y1 = grassTop + grassHeight * ((i + 1) / stripes);
+    if(i % 2 === 0){
+      const sh = ctx.createLinearGradient(0, y0, 0, y1);
+      sh.addColorStop(0, 'rgba(255,255,255,0.055)');
+      sh.addColorStop(1, 'rgba(255,255,255,0.015)');
+      ctx.fillStyle = sh;
+      ctx.fillRect(0, y0, W, y1 - y0);
+    } else {
+      ctx.fillStyle = 'rgba(0,0,0,0.075)';
+      ctx.fillRect(0, y0, W, y1 - y0);
+    }
+  }
+
+  const haze = ctx.createLinearGradient(0, grassTop, 0, grassTop + H * 0.10);
+  haze.addColorStop(0, 'rgba(255,255,255,0.11)');
+  haze.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = haze;
+  ctx.fillRect(0, grassTop, W, H * 0.10);
+
+  ctx.strokeStyle = 'rgba(22,101,52,0.40)';
+  ctx.lineWidth = 1;
+  for(let i = 0; i < 90; i++){
+    const gx = ((i * 137.3 + 17) % W);
+    const gy = grassTop + 25 + ((i * 71.7) % (grassHeight - 50));
+    const size = 2 + ((i % 3));
+    ctx.beginPath();
+    ctx.moveTo(gx, gy); ctx.quadraticCurveTo(gx - size/2, gy - size, gx - size, gy - size*1.5);
+    ctx.moveTo(gx, gy); ctx.quadraticCurveTo(gx + size/2, gy - size, gx + size, gy - size*1.5);
+    ctx.stroke();
+  }
+
+  const vig = ctx.createLinearGradient(0, H * 0.88, 0, H);
+  vig.addColorStop(0, 'rgba(0,0,0,0)');
+  vig.addColorStop(1, 'rgba(0,0,0,0.40)');
+  ctx.fillStyle = vig;
+  ctx.fillRect(0, H * 0.88, W, H * 0.12);
+
+  ctx.strokeStyle = 'rgba(255,255,255,.55)';
+  ctx.lineWidth = 3;
+  const vx = W / 2, vy = grassTop;
+  ctx.beginPath();
+  ctx.moveTo(vx - 62, vy); ctx.lineTo(-120, H);
+  ctx.moveTo(vx + 62, vy); ctx.lineTo(W + 120, H);
+  ctx.moveTo(vx - 16, vy); ctx.lineTo(W * 0.18, H);
+  ctx.moveTo(vx + 16, vy); ctx.lineTo(W * 0.82, H);
+  ctx.stroke();
+}
+
+/* =========================================================
+   17) رسم الهدف والسهام
+   ========================================================= */
+function drawTarget(){
+  const cx = anchorX, cy = anchorY;
+  const R  = CFG.ringStep * 10;
+  const S  = CFG.boardSize;
+
+  ctx.strokeStyle = '#3f2a14';
+  ctx.lineWidth = 10;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(cx - 38, cy + R + 78); ctx.lineTo(cx - 17, cy + R - 6);
+  ctx.moveTo(cx + 38, cy + R + 78); ctx.lineTo(cx + 17, cy + R - 6);
+  ctx.moveTo(cx,      cy + R + 86); ctx.lineTo(cx,      cy + R - 2);
+  ctx.stroke();
+
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,.55)';
+  ctx.shadowBlur = 22;
+  ctx.shadowOffsetY = 12;
+  ctx.fillStyle = '#f5f0e6';
+  roundRectPath(ctx, cx - S/2, cy - S/2, S, S, 14);
+  ctx.fill();
+  ctx.restore();
+
+  ctx.strokeStyle = '#6b4a2b';
+  ctx.lineWidth = 5;
+  roundRectPath(ctx, cx - S/2, cy - S/2, S, S, 14);
+  ctx.stroke();
+
+  for(let s = 10; s >= 1; s--){
+    ctx.beginPath();
+    ctx.arc(cx, cy, s * CFG.ringStep, 0, Math.PI * 2);
+    ctx.fillStyle = ringColor(s);
+    ctx.fill();
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(0,0,0,.32)';
+    ctx.stroke();
+  }
+
+  const inner = ctx.createRadialGradient(cx, cy, 0, cx, cy, R);
+  inner.addColorStop(0, 'rgba(255,255,255,0.10)');
+  inner.addColorStop(0.7, 'rgba(0,0,0,0)');
+  inner.addColorStop(1, 'rgba(0,0,0,0.28)');
+  ctx.fillStyle = inner;
+  ctx.beginPath();
+  ctx.arc(cx, cy, R, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function drawStuckArrows(){
+  stuck.forEach(a => {
+    const ax = anchorX + a.x;
+    const ay = anchorY + a.y;
+
+    ctx.fillStyle = 'rgba(0,0,0,.30)';
+    ctx.beginPath();
+    ctx.arc(ax + 2, ay + 2, 3.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    const tailGrad = ctx.createLinearGradient(ax, ay, ax + 14, ay + 22);
+    tailGrad.addColorStop(0, '#c9a26b');
+    tailGrad.addColorStop(1, '#8b5e34');
+    ctx.strokeStyle = tailGrad;
+    ctx.lineWidth = 2.6;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(ax, ay);
+    ctx.lineTo(ax + 14, ay + 22);
+    ctx.stroke();
+
+    const fletchColor = a.isPlayer ? '#dc2626' : '#2563eb';
+    ctx.fillStyle = fletchColor;
+    ctx.save();
+    ctx.translate(ax + 12, ay + 19);
+    ctx.rotate(Math.PI / 5.5);
+    ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-2, -6); ctx.lineTo(4, -4); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-2, 6); ctx.lineTo(4, 4); ctx.closePath(); ctx.fill();
+    ctx.restore();
+  });
+}
+
+function drawWindGhost(){
+  if(!isPlayerTurn || isArrowInFlight || hitZoom) return;
+
+  const d = windDrift();
+  const rx = anchorX + sightPos.x + sway.x;
+  const ry = anchorY + sightPos.y + sway.y;
+  const gx = rx + d.x;
+  const gy = ry + d.y;
+
+  ctx.save();
+  ctx.strokeStyle = 'rgba(255,255,255,0.30)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([2, 3]);
+  ctx.beginPath(); ctx.moveTo(rx, ry); ctx.lineTo(gx, gy); ctx.stroke();
+
+  ctx.setLineDash([3, 4]);
+  ctx.strokeStyle = 'rgba(255,255,255,0.80)';
+  ctx.lineWidth = 1.6;
+  ctx.beginPath(); ctx.arc(gx, gy, 7, 0, Math.PI * 2); ctx.stroke();
+
+  ctx.fillStyle = 'rgba(255,255,255,0.65)';
+  ctx.beginPath(); ctx.arc(gx, gy, 1.8, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+}
+
+function drawArrowShape(sc, isPlayer){
+  const shaftLen = 90 * sc;
+  const shaftW = Math.max(1.6, 3.2 * sc);
+
+  const shaftGrad = ctx.createLinearGradient(-shaftLen, 0, 0, 0);
+  shaftGrad.addColorStop(0, '#8b5e34');
+  shaftGrad.addColorStop(0.5, '#c9a26b');
+  shaftGrad.addColorStop(1, '#e6c79a');
+  ctx.strokeStyle = shaftGrad;
+  ctx.lineWidth = shaftW;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(-shaftLen, 0);
+  ctx.lineTo(-8 * sc, 0);
+  ctx.stroke();
+
+  const headGrad = ctx.createLinearGradient(-8 * sc, -4 * sc, 6 * sc, 4 * sc);
+  headGrad.addColorStop(0, '#94a3b8');
+  headGrad.addColorStop(0.5, '#cbd5e1');
+  headGrad.addColorStop(1, '#475569');
+  ctx.fillStyle = headGrad;
+  ctx.beginPath();
+  ctx.moveTo(-9 * sc, -4.5 * sc);
+  ctx.lineTo(6 * sc, 0);
+  ctx.lineTo(-9 * sc, 4.5 * sc);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.fillStyle = 'rgba(255,255,255,0.55)';
+  ctx.beginPath();
+  ctx.moveTo(-7 * sc, -2.6 * sc);
+  ctx.lineTo(1 * sc, -0.6 * sc);
+  ctx.lineTo(-7 * sc, 0.6 * sc);
+  ctx.closePath();
+  ctx.fill();
+
+  const fletchColor = isPlayer ? '#dc2626' : '#2563eb';
+  const fletchAlt   = isPlayer ? '#ef4444' : '#3b82f6';
+  const fletchStart = -shaftLen + 6 * sc;
+  const fletchLen   = 18 * sc;
+  const fletchW     = 6 * sc;
+
+  ctx.fillStyle = fletchColor;
+  ctx.beginPath();
+  ctx.moveTo(fletchStart, 0); ctx.lineTo(fletchStart + fletchLen, fletchW); ctx.lineTo(fletchStart + fletchLen * 0.9, 0); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = fletchAlt;
+  ctx.globalAlpha = 0.75;
+  ctx.beginPath();
+  ctx.moveTo(fletchStart, 0); ctx.lineTo(fletchStart + fletchLen, -fletchW); ctx.lineTo(fletchStart + fletchLen * 0.9, 0); ctx.closePath(); ctx.fill();
+  ctx.globalAlpha = 1;
+}
+
+function drawFlyingArrow(dtS){
+  flight.t += dtS / CFG.flightTime;
+
+  if(flight.t >= 1){
+    flight.t = 1;
+    onHit();
+    return;
+  }
+
+  const p = flight.t;
+  const e = 1 - Math.pow(1 - p, 2);
+
+  const x = flight.from.x + (flight.to.x - flight.from.x) * e;
+  const y = flight.from.y + (flight.to.y - flight.from.y) * e - Math.sin(p * Math.PI) * 90;
+
+  const sc  = 1 - 0.65 * p;
+  const ang = Math.atan2(flight.to.y - y, flight.to.x - x);
+
+  ctx.save();
+  ctx.globalAlpha = 0.18;
+  ctx.fillStyle = '#000';
+  ctx.beginPath(); ctx.ellipse(x, anchorY + 130, 22 * sc, 7 * sc, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(ang);
+  drawArrowShape(sc, flight.isPlayer);
+  ctx.restore();
+}
+
+function drawBow(){
+  const r = reticleScreen();
+  const bx = W * 0.76;
+  const by = H * 0.86;
+
+  const ang  = Math.atan2(r.y - by, r.x - bx);
+  const dist = Math.hypot(r.x - bx, r.y - by);
+
+  let charge = 0;
+  if(isCharging) charge = Math.min(1, (performance.now() - chargeStart) / CFG.CHARGE_MIN);
+  const pull = isCharging ? 12 + charge * 46 : 12;
+
+  ctx.save();
+  ctx.translate(bx, by);
+  ctx.rotate(ang);
+
+  const limbGrad = ctx.createLinearGradient(-40, -170, 30, 170);
+  limbGrad.addColorStop(0,   '#8b5e34');
+  limbGrad.addColorStop(0.35,'#b91c1c');
+  limbGrad.addColorStop(0.65,'#991b1b');
+  limbGrad.addColorStop(1,   '#5a1212');
+
+  ctx.strokeStyle = limbGrad;
+  ctx.lineWidth = 14;
+  ctx.lineCap = 'round';
+
+  ctx.beginPath(); ctx.moveTo(0, -30); ctx.bezierCurveTo(-28, -80, -22, -140, 6, -172); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0, 30); ctx.bezierCurveTo(-28, 80, -22, 140, 6, 172); ctx.stroke();
+
+  ctx.fillStyle = '#1e293b';
+  roundRectPath(ctx, -10, -36, 20, 72, 8);
+  ctx.fill();
+
+  ctx.strokeStyle = 'rgba(248,250,252,0.95)';
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(6, -172); ctx.lineTo(-pull, 0); ctx.lineTo(6, 172); ctx.stroke();
+
+  if(isPlayerTurn && !isArrowInFlight && !hitZoom){
+    const shaftGrad = ctx.createLinearGradient(-pull, 0, dist, 0);
+    shaftGrad.addColorStop(0, '#8b5e34'); shaftGrad.addColorStop(0.5, '#c9a26b'); shaftGrad.addColorStop(1, '#e6c79a');
+    ctx.strokeStyle = shaftGrad;
+    ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.moveTo(-pull, 0); ctx.lineTo(Math.max(24, dist - 6), 0); ctx.stroke();
+
+    const headGrad = ctx.createLinearGradient(Math.max(24, dist - 6) - 8, -4, Math.max(24, dist - 6) + 6, 4);
+    headGrad.addColorStop(0, '#94a3b8'); headGrad.addColorStop(0.5, '#e2e8f0'); headGrad.addColorStop(1, '#475569');
+    ctx.fillStyle = headGrad;
+    ctx.beginPath(); ctx.moveTo(Math.max(24, dist - 6) - 2, -4); ctx.lineTo(Math.max(24, dist - 6) + 6, 0); ctx.lineTo(Math.max(24, dist - 6) - 2, 4); ctx.closePath(); ctx.fill();
+
+    ctx.fillStyle = '#dc2626';
+    ctx.beginPath(); ctx.moveTo(-pull, -7); ctx.lineTo(-pull + 22, -2); ctx.lineTo(-pull + 22, 0); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(-pull, 7); ctx.lineTo(-pull + 22, 2); ctx.lineTo(-pull + 22, 0); ctx.closePath(); ctx.fill();
+  }
+
+  ctx.restore();
+
+  ctx.save();
+  ctx.fillStyle = '#0f172a';
+  ctx.beginPath(); ctx.moveTo(bx - 14, by - 8); ctx.lineTo(W + 80, H + 40); ctx.lineTo(W + 120, H + 160); ctx.lineTo(bx + 22, by + 44); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#fca5a5'; ctx.beginPath(); ctx.arc(bx - 6, by, 13, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+}
+
+function drawReticle(){
+  const r = reticleScreen();
+
+  ctx.save();
+  const glow = ctx.createRadialGradient(r.x, r.y, 2, r.x, r.y, 52);
+  glow.addColorStop(0, isAiming ? 'rgba(34,197,94,0.20)' : 'rgba(239,68,68,0.14)');
+  glow.addColorStop(1, 'rgba(34,197,94,0)');
+  ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(r.x, r.y, 52, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+
+  ctx.strokeStyle = 'rgba(0,0,0,0.7)'; ctx.lineWidth = 2.2;
+  ctx.beginPath(); ctx.arc(r.x, r.y, 26, 0, Math.PI * 2); ctx.stroke();
+
+  const baseColor = isAiming ? 'rgba(34,197,94,0.95)' : 'rgba(239,68,68,0.85)';
+  ctx.strokeStyle = baseColor; ctx.lineWidth = 1.4;
+  ctx.beginPath(); ctx.arc(r.x, r.y, 26, 0, Math.PI * 2); ctx.stroke();
+
+  ctx.strokeStyle = 'rgba(34,197,94,0.55)'; ctx.lineWidth = 0.9;
+  ctx.beginPath(); ctx.arc(r.x, r.y, 12, 0, Math.PI * 2); ctx.stroke();
+
+  if(isCharging){
+    const held = performance.now() - chargeStart;
+    const ratio = Math.min(1, held / CFG.CHARGE_MIN);
+    const over = held - CFG.CHARGE_MIN;
+    const R = 42;
+
+    ctx.strokeStyle = 'rgba(0,0,0,0.55)'; ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.arc(r.x, r.y, R, 0, Math.PI * 2); ctx.stroke();
+
+    let color = '#fbbf24';
+    if(ratio >= 1){ if(over < 1500) color = '#22c55e'; else if(over < 3000) color = '#f97316'; else color = '#ef4444'; }
+
+    ctx.strokeStyle = color; ctx.lineWidth = 5; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.arc(r.x, r.y, R, -Math.PI/2, -Math.PI/2 + Math.PI * 2 * ratio); ctx.stroke();
+  }
+}
+
+/* =========================================================
+   18) حلقة الرسم الرئيسية
+   ========================================================= */
+function render(now){
+  const dtMs = Math.min(64, now - lastTime);
+  lastTime = now;
+  const dt  = dtMs / 16.667;
+  const dtS = dtMs / 1000;
+
+  swayT += dtS;
+  updateAim(dt);
+  updateCamera(dt);
+
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, W, H);
+
+  if(screenShake > 0.1){
+    const sx = (Math.random() - 0.5) * screenShake;
+    const sy = (Math.random() - 0.5) * screenShake;
+    ctx.translate(sx, sy);
+    screenShake *= 0.85;
+  }
+
+  if(cancelFlash > 0.01){
+    ctx.fillStyle = `rgba(239,68,68,${cancelFlash * 0.18})`;
+    ctx.fillRect(0, 0, W, H);
+    cancelFlash *= 0.90;
+  }
+
+  drawEnvironment();
+
+  ctx.save();
+  ctx.translate(anchorX, anchorY);
+  ctx.scale(viewScale, viewScale);
+  ctx.translate(-camX, -camY);
+
+  drawTarget();
+  drawStuckArrows();
+  drawWindGhost();
+  if(flight) drawFlyingArrow(dtS);
+
+  ctx.restore();
+
+  if(!hitZoom){
+    drawBow();
+    drawReticle();
+  }
+
+  requestAnimationFrame(render);
+}
+
+/* =========================================================
+   19) منطق اللعب الأونلاين (Firebase)
+   ========================================================= */
+function initOnlineMode() {
+    db.ref('games/' + gameId).on('value', (snap) => {
+        const data = snap.val();
+        if(!data) {
+            // تم حذف الغرفة
+            alert("انتهت الغرفة أو تم إغلاقها.");
+            exitToLobby();
+            return;
+        }
+
+        // تحديث الأسماء
+        if(data.hostName) {
+            document.getElementById('nameX').innerText = data.hostName;
+            if(myRole === 'X') myName = data.hostName;
+        }
+        if(data.guestName && data.guestName !== 'جاري الانضمام...') {
+            document.getElementById('nameO').innerText = data.guestName;
+            if(myRole === 'O') myName = data.guestName;
+        }
+
+        // إذا كانت اللعبة قد انتهت
+        if(data.winner) {
+            playerScore = data.X_score || 0;
+            opponentScore = data.O_score || 0;
+            playerScoreEl.textContent = playerScore;
+            opponentScoreEl.textContent = opponentScore;
+            
+            // جلب بيانات الفائز
+            let winnerUid = data.winner === 'X' ? data.hostUid : data.guestUid;
+            let winnerName = data.winner === 'X' ? data.hostName : data.guestName;
+            
+            if(winnerUid) {
+                db.ref('users/' + winnerUid).once('value').then(uSnap => {
+                    let uData = uSnap.val();
+                    endGame(data.winner, { name: uData ? uData.username : winnerName, uid: winnerUid });
+                });
+            } else {
+                endGame(data.winner, null);
+            }
+            return;
+        }
+
+        // تحديث النقاط
+        playerScore = myRole === 'X' ? (data.X_score || 0) : (data.O_score || 0);
+        opponentScore = myRole === 'X' ? (data.O_score || 0) : (data.X_score || 0);
+        playerScoreEl.textContent = playerScore;
+        opponentScoreEl.textContent = opponentScore;
+
+        // معرفة دور من
+        let currentTurn = data.turn || 'X';
+        isPlayerTurn = (currentTurn === myRole);
+
+        if(isPlayerTurn) {
+            waitingOverlay.classList.add('hidden');
+            if(!isArrowInFlight && !hitZoom) {
+                aimHint.style.opacity = '1';
+                document.getElementById('status-text').innerText = "دورك الآن!";
+            }
+        } else {
+            waitingOverlay.classList.remove('hidden');
+            aimHint.style.opacity = '0';
+        }
+
+        // تحديث الجولة
+        let roundNumber = data.round || 1;
+        roundText.textContent = roundNumber + '/' + maxRounds;
+        
+        // إذا كنا في اللعبة الأونلاين، نقوم بتصفير السهام إذا تغيرت الجولة
+        if(roundNumber > round) {
+            round = roundNumber;
+            stuck = [];
+            shots = [null, null, null];
+            updateShotBoxes();
+            randomizeWind();
+        }
+
+        // التحقق من انتهاء اللعبة (بعد 3 رميات لكل لاعب)
+        let xShots = data.X_shots || 0;
+        let oShots = data.O_shots || 0;
+        if(xShots >= 3 && oShots >= 3 && round >= maxRounds && !data.winner) {
+            let winnerRole = 'Draw';
+            if((data.X_score || 0) > (data.O_score || 0)) winnerRole = 'X';
+            else if((data.O_score || 0) > (data.X_score || 0)) winnerRole = 'O';
+            
+            db.ref('games/' + gameId).update({ winner: winnerRole });
+        }
+    });
+}
+
+function startOnlineGame() {
+    // إخفاء رسالة الانتظار إن وجدت
+    waitingOverlay.classList.add('hidden');
+    initOnlineMode();
+}
+
+function startBotGame() {
+    isPlayerTurn = true;
+    randomizeWind();
+}
+
+/* =========================================================
+   20) الإقلاع
+   ========================================================= */
+window.addEventListener('load', () => {
+  resize();
+  updateShotBoxes();
+  roundText.textContent = '1/' + maxRounds;
+  requestAnimationFrame(render);
+
+  if (isOnline) {
+      startOnlineGame();
+  } else {
+      startBotGame();
+  }
+});
+</script>
+</body>
+</html>
