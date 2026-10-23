@@ -337,7 +337,7 @@
         }
         select option { background: #14142a; color: #fff; }
 
-        /* الأزرار */
+        /* الأزرار العامة */
         button {
             background: linear-gradient(135deg, #5a24ff 0%, #7000ff 55%, #8b2bff 100%);
             color: white;
@@ -396,39 +396,13 @@
         button.secondary-btn:hover {
             box-shadow: 0 10px 26px rgba(255, 42, 95, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
-        button.ludo-btn {
-            background: linear-gradient(135deg, #00c6e6 0%, #0083b0 55%, #0099c4 100%);
-            box-shadow: 0 6px 18px rgba(0, 180, 219, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.15);
-        }
-        button.ludo-btn:hover {
-            box-shadow: 0 10px 26px rgba(0, 180, 219, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-        }
+
         button.friends-panel-btn {
             background: linear-gradient(135deg, #14d492 0%, #059669 55%, #0ea876 100%);
             box-shadow: 0 6px 18px rgba(16, 185, 129, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.15);
         }
         button.friends-panel-btn:hover {
             box-shadow: 0 10px 26px rgba(16, 185, 129, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-        }
-        button.millionaire-btn {
-            background: linear-gradient(135deg, #ffc62e 0%, #ff8c00 55%, #ffa726 100%);
-            box-shadow: 0 6px 18px rgba(255, 140, 0, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.25);
-            color: #1a1200;
-            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.25);
-        }
-        button.millionaire-btn:hover {
-            box-shadow: 0 10px 26px rgba(255, 140, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.3);
-        }
-
-        /* زر نيشان (لعبة الأسهم) */
-        button.archery-btn {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 55%, #b45309 100%);
-            box-shadow: 0 6px 18px rgba(245, 158, 11, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            color: #fff;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-        }
-        button.archery-btn:hover {
-            box-shadow: 0 10px 26px rgba(245, 158, 11, 0.55), 0 0 25px rgba(245, 158, 11, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3);
         }
 
         button.action-btn {
@@ -454,6 +428,109 @@
             border: 1px solid rgba(255, 255, 255, 0.055);
             margin-bottom: 16px;
             box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+        }
+
+        /* ========================================= */
+        /* تصميم مربعات الألعاب الجديدة (الأنيقة) */
+        /* ========================================= */
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .game-card {
+            position: relative;
+            background: rgba(20, 20, 40, 0.85);
+            border-radius: 22px;
+            padding: 15px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+            z-index: 1;
+            transition: all 0.35s ease;
+            animation: floatCard 4s ease-in-out infinite;
+        }
+        
+        .game-card:nth-child(even) { animation-delay: 1.5s; }
+        .game-card:nth-child(odd) { animation-delay: 0.5s; }
+
+        @keyframes floatCard {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        /* حواف دائرية مكسورة (تأثير النيون الدوار) */
+        .game-card::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: conic-gradient(from 0deg, transparent 0 340deg, var(--secondary-neon) 360deg);
+            border-radius: inherit;
+            z-index: -1;
+            animation: spinBorder 3s linear infinite;
+        }
+
+        @keyframes spinBorder {
+            to { transform: rotate(360deg); }
+        }
+
+        .game-card:hover {
+            transform: translateY(-8px) scale(1.03);
+            box-shadow: 0 12px 25px rgba(0, 240, 255, 0.25), inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+
+        .game-img-container {
+            width: 80px;
+            height: 80px;
+            border-radius: 18px;
+            overflow: hidden;
+            margin-bottom: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            border: 2px solid rgba(255,255,255,0.1);
+            transition: border-color 0.3s ease;
+        }
+
+        .game-card:hover .game-img-container {
+            border-color: var(--primary-neon);
+        }
+
+        .game-img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .game-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 12px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+
+        .game-play-btn {
+            background: linear-gradient(135deg, #5a24ff, #ff2a5f);
+            border: none;
+            border-radius: 12px;
+            padding: 8px 10px;
+            color: white;
+            font-weight: bold;
+            font-size: 13px;
+            width: 100%;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(255, 42, 95, 0.3);
+            margin: 0;
+        }
+
+        .game-play-btn:hover {
+            background: linear-gradient(135deg, #ff2a5f, #5a24ff);
+            box-shadow: 0 6px 16px rgba(0, 240, 255, 0.4);
+            transform: scale(1.05);
         }
 
         /* شريط النتائج */
@@ -742,6 +819,10 @@
             .developer-badge { font-size: 12px; padding: 8px 16px; }
             .user-profile-card { padding: 14px; }
             button { font-size: 14px; padding: 13px 16px; }
+            .games-grid { gap: 8px; }
+            .game-img-container { width: 65px; height: 65px; }
+            .game-title { font-size: 12px; }
+            .game-play-btn { font-size: 11px; padding: 6px; }
         }
     </style>
 
@@ -795,15 +876,45 @@
         <section id="menu-section">
             <div class="dashboard-section">
                 <h2>🎮 ساحات اللعب المتاحة</h2>
-                <button onclick="startLocalGame()">لعب X O محلي (نفس الجهاز)</button>
-                <button class="ludo-btn" onclick="openGameOptionsModalWithoutFriend()">إنشاء غرفة أونلاين (رابط مباشر) 🎲</button>
                 
-                <!-- زر لعبة نيشان الجديد المعدل -->
-                <button class="archery-btn" onclick="goToArcheryPage()">
-                    🏹 نيشان - لعبة ممتعة الأسهم
-                </button>
-                
-                <button class="millionaire-btn" onclick="window.location.href='millionaire.html'">💰 العب من سيربح المليون (فردية)</button>
+                <!-- شبكة مربعات الألعاب الجديدة -->
+                <div class="games-grid">
+                    <!-- لعبة XO -->
+                    <div class="game-card">
+                        <div class="game-img-container">
+                            <img src="xo.jpg" alt="XO">
+                        </div>
+                        <div class="game-title">X O</div>
+                        <button class="game-play-btn" onclick="startLocalGame()">دخول</button>
+                    </div>
+
+                    <!-- لعبة لودو -->
+                    <div class="game-card">
+                        <div class="game-img-container">
+                            <img src="ludo.jpg" alt="Ludo">
+                        </div>
+                        <div class="game-title">لودو</div>
+                        <button class="game-play-btn" onclick="openGameOptionsModalWithoutFriend()">دخول</button>
+                    </div>
+
+                    <!-- لعبة نيشان -->
+                    <div class="game-card">
+                        <div class="game-img-container">
+                            <img src="neshan.jpg" alt="Neshan">
+                        </div>
+                        <div class="game-title">نيشان</div>
+                        <button class="game-play-btn" onclick="goToArcheryPage()">دخول</button>
+                    </div>
+
+                    <!-- لعبة من سيربح المليون -->
+                    <div class="game-card">
+                        <div class="game-img-container">
+                            <img src="mlion.jpg" alt="Millionaire">
+                        </div>
+                        <div class="game-title">المليون</div>
+                        <button class="game-play-btn" onclick="window.location.href='millionaire.html'">دخول</button>
+                    </div>
+                </div>
             </div>
             
             <div class="dashboard-section" style="margin-top: 20px;">
@@ -905,7 +1016,7 @@
                 <button onclick="sendSpecificInvite('ludo4')" style="background: linear-gradient(90deg, #10b981, #059669);">حرب اللودو (2 ضد 2 فريق)</button>
                 
                 <!-- زر دعوة نيشان الجديد داخل النافذة -->
-                <button onclick="sendSpecificInvite('archery')" class="archery-btn">🏹 تحدي نيشان (القوس والنشاب)</button>
+                <button onclick="sendSpecificInvite('archery')" class="archery-btn" style="background: linear-gradient(90deg, #f59e0b, #d97706);">🏹 تحدي نيشان (القوس والنشاب)</button>
 
                 <button onclick="document.getElementById('choose-game-modal').classList.remove('active')" class="secondary-btn" style="background: #252535; margin-top: 10px;">تراجع</button>
             </div>
