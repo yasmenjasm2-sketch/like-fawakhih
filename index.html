@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>بوابة الألعاب الاحترافية أونلاين | حمزة الحماده</title>
+    <title>Nexus Games™ | منصة الألعاب</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
@@ -285,7 +285,7 @@
         }
 
         h1 {
-            font-size: 26px;
+            font-size: 24px;
             margin-top: 0;
             margin-bottom: 26px;
             font-weight: 900;
@@ -297,6 +297,10 @@
             -webkit-text-fill-color: transparent;
             text-shadow: 0 0 38px rgba(0, 240, 255, 0.12);
             animation: titleFlow 7s ease-in-out infinite alternate;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
         }
         @keyframes titleFlow {
             0%   { background-position: 0% center; }
@@ -309,6 +313,10 @@
             color: #e6e6f7;
             font-weight: 600;
             letter-spacing: -0.2px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
         }
 
         /* الحقول */
@@ -436,7 +444,7 @@
         .games-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            gap: 15px;
             margin-top: 15px;
         }
 
@@ -444,7 +452,7 @@
             position: relative;
             background: rgba(20, 20, 40, 0.85);
             border-radius: 22px;
-            padding: 15px 10px;
+            padding: 18px 12px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -454,6 +462,7 @@
             z-index: 1;
             transition: all 0.35s ease;
             animation: floatCard 4s ease-in-out infinite;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
         
         .game-card:nth-child(even) { animation-delay: 1.5s; }
@@ -464,39 +473,26 @@
             50% { transform: translateY(-6px); }
         }
 
-        /* حواف دائرية مكسورة (تأثير النيون الدوار) */
-        .game-card::before {
-            content: '';
-            position: absolute;
-            inset: -2px;
-            background: conic-gradient(from 0deg, transparent 0 340deg, var(--secondary-neon) 360deg);
-            border-radius: inherit;
-            z-index: -1;
-            animation: spinBorder 3s linear infinite;
-        }
-
-        @keyframes spinBorder {
-            to { transform: rotate(360deg); }
-        }
-
         .game-card:hover {
             transform: translateY(-8px) scale(1.03);
             box-shadow: 0 12px 25px rgba(0, 240, 255, 0.25), inset 0 1px 0 rgba(255,255,255,0.1);
+            border-color: rgba(0, 240, 255, 0.3);
         }
 
         .game-img-container {
-            width: 80px;
-            height: 80px;
-            border-radius: 18px;
+            width: 110px;
+            height: 110px;
+            border-radius: 20px;
             overflow: hidden;
-            margin-bottom: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            margin-bottom: 15px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.6);
             border: 2px solid rgba(255,255,255,0.1);
-            transition: border-color 0.3s ease;
+            transition: border-color 0.3s ease, transform 0.3s ease;
         }
 
         .game-card:hover .game-img-container {
             border-color: var(--primary-neon);
+            transform: scale(1.05);
         }
 
         .game-img-container img {
@@ -506,10 +502,10 @@
         }
 
         .game-title {
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 800;
             color: #fff;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
             text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
         }
 
@@ -517,10 +513,10 @@
             background: linear-gradient(135deg, #5a24ff, #ff2a5f);
             border: none;
             border-radius: 12px;
-            padding: 8px 10px;
+            padding: 9px 10px;
             color: white;
             font-weight: bold;
-            font-size: 13px;
+            font-size: 14px;
             width: 100%;
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(255, 42, 95, 0.3);
@@ -815,14 +811,14 @@
         /* استجابة الشاشات الصغيرة */
         @media (max-width: 380px) {
             .container { padding: 26px 16px; }
-            h1 { font-size: 22px; }
+            h1 { font-size: 20px; }
             .developer-badge { font-size: 12px; padding: 8px 16px; }
             .user-profile-card { padding: 14px; }
             button { font-size: 14px; padding: 13px 16px; }
-            .games-grid { gap: 8px; }
-            .game-img-container { width: 65px; height: 65px; }
-            .game-title { font-size: 12px; }
-            .game-play-btn { font-size: 11px; padding: 6px; }
+            .games-grid { gap: 10px; }
+            .game-img-container { width: 90px; height: 90px; }
+            .game-title { font-size: 13px; }
+            .game-play-btn { font-size: 12px; padding: 8px; }
         }
     </style>
 
@@ -858,7 +854,13 @@
     </div>
 
     <div class="container">
-        <h1>منصة الألعاب الجماعية أونلاين</h1>
+        <h1>
+            <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--secondary-neon); filter: drop-shadow(0 0 8px var(--secondary-neon));">
+                <path d="M6 12h4m-2-2v4m8-1h.01M18 9h.01"/>
+                <path d="M18 6H6a4 4 0 0 0-4 4v4a4 4 0 0 0 4 4h12a4 4 0 0 0 4-4v-4a4 4 0 0 0-4-4Z"/>
+            </svg>
+            منصة الالعاب Nexus Games™
+        </h1>
 
         <section id="login-section" class="active">
             <h2>تسجيل الدخول / إنشاء حساب</h2>
@@ -875,7 +877,13 @@
 
         <section id="menu-section">
             <div class="dashboard-section">
-                <h2>🎮 ساحات اللعب المتاحة</h2>
+                <h2>
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary-neon); filter: drop-shadow(0 0 5px var(--primary-neon));">
+                        <path d="M6 12h4m-2-2v4m8-1h.01M18 9h.01"/>
+                        <path d="M18 6H6a4 4 0 0 0-4 4v4a4 4 0 0 0 4 4h12a4 4 0 0 0 4-4v-4a4 4 0 0 0-4-4Z"/>
+                    </svg>
+                    ساحات اللعب المتاحة
+                </h2>
                 
                 <!-- شبكة مربعات الألعاب الجديدة -->
                 <div class="games-grid">
