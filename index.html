@@ -337,7 +337,7 @@
         }
         select option { background: #14142a; color: #fff; }
 
-        /* الأزرار — ناعمة واحترافية */
+        /* الأزرار */
         button {
             background: linear-gradient(135deg, #5a24ff 0%, #7000ff 55%, #8b2bff 100%);
             color: white;
@@ -419,6 +419,18 @@
         button.millionaire-btn:hover {
             box-shadow: 0 10px 26px rgba(255, 140, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.3);
         }
+
+        /* زر نيشان (لعبة الأسهم) */
+        button.archery-btn {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 55%, #b45309 100%);
+            box-shadow: 0 6px 18px rgba(245, 158, 11, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            color: #fff;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+        button.archery-btn:hover {
+            box-shadow: 0 10px 26px rgba(245, 158, 11, 0.55), 0 0 25px rgba(245, 158, 11, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
         button.action-btn {
             width: auto;
             padding: 7px 15px;
@@ -785,6 +797,12 @@
                 <h2>🎮 ساحات اللعب المتاحة</h2>
                 <button onclick="startLocalGame()">لعب X O محلي (نفس الجهاز)</button>
                 <button class="ludo-btn" onclick="openGameOptionsModalWithoutFriend()">إنشاء غرفة أونلاين (رابط مباشر) 🎲</button>
+                
+                <!-- زر لعبة نيشان الجديد -->
+                <button class="archery-btn" onclick="window.location.href='nasaai.html'">
+                    🏹 نيشان - لعبة ممتعة الأسهم
+                </button>
+                
                 <button class="millionaire-btn" onclick="window.location.href='millionaire.html'">💰 العب من سيربح المليون (فردية)</button>
             </div>
             
@@ -800,6 +818,9 @@
                 <p style="font-size: 12px; color: #ccc; margin-bottom: 12px;">أرسل الرابط مباشرة دون الحاجة لإضافة الصديق لقائمتك</p>
                 <button onclick="createInviteLink('xo')" style="background: linear-gradient(90deg, #ff2a5f, #c10036); margin: 0; font-size: 12px; padding: 10px;">رابط مواجهة X O</button>
                 <button onclick="createInviteLink('ludo2')" style="background: linear-gradient(90deg, #00b4db, #0083b0); margin: 8px 0 0 0; font-size: 12px; padding: 10px;">رابط تحدي لودو 1v1</button>
+                
+                <!-- زر رابط نيشان الجديد -->
+                <button onclick="createInviteLink('archery')" style="background: linear-gradient(90deg, #f59e0b, #d97706); margin: 8px 0 0 0; font-size: 12px; padding: 10px; color: #fff;">رابط تحدي نيشان (القوس والنشاب)</button>
             </div>
 
             <div class="dashboard-section">
@@ -882,6 +903,10 @@
                 <button onclick="sendSpecificInvite('xo')" style="background: linear-gradient(90deg, #511fff, #7000ff);">طاولة X O الاحترافية</button>
                 <button onclick="sendSpecificInvite('ludo2')" style="background: linear-gradient(90deg, #ff2a5f, #d10043);">حرب اللودو (1 ضد 1)</button>
                 <button onclick="sendSpecificInvite('ludo4')" style="background: linear-gradient(90deg, #10b981, #059669);">حرب اللودو (2 ضد 2 فريق)</button>
+                
+                <!-- زر دعوة نيشان الجديد داخل النافذة -->
+                <button onclick="sendSpecificInvite('archery')" class="archery-btn">🏹 تحدي نيشان (القوس والنشاب)</button>
+
                 <button onclick="document.getElementById('choose-game-modal').classList.remove('active')" class="secondary-btn" style="background: #252535; margin-top: 10px;">تراجع</button>
             </div>
         </div>
@@ -1201,7 +1226,10 @@
                 const invite = snap.val();
                 if(invite && invite.gameId) {
                     pendingInviteId = invite.gameId;
-                    let gameName = invite.gameType === 'xo' ? 'X O' : 'لودو';
+                    let gameName = 'X O';
+                    if (invite.gameType === 'ludo2' || invite.gameType === 'ludo4') gameName = 'لودو';
+                    else if (invite.gameType === 'archery') gameName = 'نيشان (القوس والنشاب)';
+                    
                     document.getElementById('invite-msg').innerText = `صديقك ${invite.senderName} يدعوك للعب ${gameName}!`;
                     document.getElementById('invite-modal').classList.add('active');
                 } else { document.getElementById('invite-modal').classList.remove('active'); pendingInviteId = null; }
@@ -1263,13 +1291,17 @@
 
         function inviteFriend(friendId, friendName, gameType = 'xo') {
             activeFriendId = friendId; gameId = Math.random().toString(36).substring(2, 10);
-            myRole = gameType === 'xo' ? 'X' : 'Red'; isOnline = true;
+            myRole = gameType === 'xo' ? 'X' : (gameType === 'archery' ? 'X' : 'Red'); isOnline = true;
             document.getElementById('waiting-msg-title').innerText = "بانتظار قبول صديقك للدعوة...";
 
             let gameData = { type: gameType, winner: '', player2Joined: false, hostName: currentUserData.username, guestName: friendName };
             if(gameType === 'xo') {
                 gameData.board = ["", "", "", "", "", "", "", "", ""]; gameData.turn = 'X'; gameData.scores = { X: 0, O: 0, ties: 0 };
-            } else { gameData.turn = 'Red'; gameData.dice = 0; }
+            } else if (gameType === 'archery') {
+                gameData.turn = 'X'; gameData.scores = { X: 0, O: 0 };
+            } else { 
+                gameData.turn = 'Red'; gameData.dice = 0; 
+            }
 
             db.ref('games/' + gameId).set(gameData);
             db.ref('users/' + friendId + '/game_invite').set({ gameId: gameId, gameType: gameType, senderId: currentUserId, senderName: currentUserData.username });
@@ -1280,7 +1312,9 @@
                     playAcceptSound(); 
                     db.ref('games/' + gameId + '/player2Joined').off();
                     db.ref('games/' + gameId + '/rejected').off();
-                    if(gameType === 'xo') startGameOnline(); else startLudoOnline(gameType);
+                    if(gameType === 'xo') startGameOnline(); 
+                    else if(gameType === 'archery') startArcheryOnline(); 
+                    else startLudoOnline(gameType);
                 }
             });
 
@@ -1297,12 +1331,16 @@
 
         function createInviteLink(gameType = 'xo') {
             gameId = Math.random().toString(36).substring(2, 10);
-            myRole = gameType === 'xo' ? 'X' : 'Red'; isOnline = true; activeFriendId = null; 
+            myRole = gameType === 'xo' ? 'X' : (gameType === 'archery' ? 'X' : 'Red'); isOnline = true; activeFriendId = null; 
 
             let gameData = { type: gameType, winner: '', player2Joined: false, hostName: currentUserData.username, guestName: 'جاري الانضمام...', isLinkInvite: true };
             if(gameType === 'xo') {
                 gameData.board = ["", "", "", "", "", "", "", "", ""]; gameData.turn = 'X'; gameData.scores = { X: 0, O: 0, ties: 0 };
-            } else { gameData.turn = 'Red'; gameData.dice = 0; }
+            } else if (gameType === 'archery') {
+                gameData.turn = 'X'; gameData.scores = { X: 0, O: 0 };
+            } else { 
+                gameData.turn = 'Red'; gameData.dice = 0; 
+            }
 
             db.ref('games/' + gameId).set(gameData);
             const inviteLink = window.location.origin + window.location.pathname + "?invite=" + gameId;
@@ -1315,7 +1353,9 @@
                 if(snap.val() === true) {
                     playAcceptSound(); 
                     db.ref('games/' + gameId + '/player2Joined').off();
-                    if(gameType === 'xo') startGameOnline(); else startLudoOnline(gameType);
+                    if(gameType === 'xo') startGameOnline(); 
+                    else if(gameType === 'archery') startArcheryOnline(); 
+                    else startLudoOnline(gameType);
                 }
             });
         }
@@ -1325,7 +1365,10 @@
                 let data = snap.val();
                 if (data && data.isLinkInvite && !data.player2Joined) {
                     pendingInviteId = gameIdParam;
-                    let gameName = data.type === 'xo' ? 'X O' : 'لودو';
+                    let gameName = 'X O';
+                    if (data.type === 'ludo2' || data.type === 'ludo4') gameName = 'لودو';
+                    else if (data.type === 'archery') gameName = 'نيشان (القوس والنشاب)';
+
                     document.getElementById('invite-msg').innerText = `دعوة خاصة للعب ${gameName} من ${data.hostName}!`;
                     document.getElementById('invite-modal').classList.add('active');
                     window.history.replaceState({}, document.title, window.location.pathname);
@@ -1349,11 +1392,16 @@
             db.ref('games/' + gameId).once('value', snap => {
                 let data = snap.val(); if(!data) return;
                 let gameType = data.type || 'xo';
-                myRole = gameType === 'xo' ? 'O' : 'Yellow';
+                if (gameType === 'xo') myRole = 'O';
+                else if (gameType === 'archery') myRole = 'O';
+                else myRole = 'Yellow';
+
                 db.ref('games/' + gameId).update({ player2Joined: true, guestName: currentUserData.username });
                 db.ref('users/' + currentUserId + '/game_invite').remove();
                 document.getElementById('invite-modal').classList.remove('active');
-                if(gameType === 'xo') startGameOnline(); else startLudoOnline(gameType);
+                if(gameType === 'xo') startGameOnline(); 
+                else if(gameType === 'archery') startArcheryOnline(); 
+                else startLudoOnline(gameType);
             });
         }
 
@@ -1368,6 +1416,11 @@
 
         function startLudoOnline(type) {
             window.location.href = `ludo.html?gameId=${gameId}&role=${myRole}&uid=${currentUserId}&username=${encodeURIComponent(currentUsername)}&type=${type}`;
+        }
+
+        // دالة الانتقال للعبة نيشان الجديدة
+        function startArcheryOnline() {
+            window.location.href = `nasaai.html?gameId=${gameId}&role=${myRole}&uid=${currentUserId}&username=${encodeURIComponent(currentUsername)}`;
         }
 
         function startLocalGame() {
