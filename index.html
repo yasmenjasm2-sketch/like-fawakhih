@@ -798,8 +798,8 @@
                 <button onclick="startLocalGame()">لعب X O محلي (نفس الجهاز)</button>
                 <button class="ludo-btn" onclick="openGameOptionsModalWithoutFriend()">إنشاء غرفة أونلاين (رابط مباشر) 🎲</button>
                 
-                <!-- زر لعبة نيشان الجديد -->
-                <button class="archery-btn" onclick="window.location.href='nasaai.html'">
+                <!-- زر لعبة نيشان الجديد المعدل -->
+                <button class="archery-btn" onclick="goToArcheryPage()">
                     🏹 نيشان - لعبة ممتعة الأسهم
                 </button>
                 
@@ -1418,7 +1418,16 @@
             window.location.href = `ludo.html?gameId=${gameId}&role=${myRole}&uid=${currentUserId}&username=${encodeURIComponent(currentUsername)}&type=${type}`;
         }
 
-        // دالة الانتقال للعبة نيشان الجديدة
+        // دالة الانتقال المباشر لزر نيشان في القائمة الرئيسية
+        function goToArcheryPage() {
+            if (currentUserId && currentUsername) {
+                window.location.href = `nasaai.html?uid=${currentUserId}&username=${encodeURIComponent(currentUsername)}`;
+            } else {
+                window.location.href = `nasaai.html`;
+            }
+        }
+
+        // دالة الانتقال للعبة نيشان عند القبول أو إنشاء الرابط
         function startArcheryOnline() {
             window.location.href = `nasaai.html?gameId=${gameId}&role=${myRole}&uid=${currentUserId}&username=${encodeURIComponent(currentUsername)}`;
         }
