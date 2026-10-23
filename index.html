@@ -963,15 +963,18 @@
         .ad-slider-container {
             margin-top: 25px;
             width: 100%;
-            height: 130px;
+            height: 140px;
             border-radius: 18px;
             overflow: hidden;
             position: relative;
-            box-shadow: 0 0 22px rgba(0, 240, 255, 0.15), inset 0 0 15px rgba(0, 0, 0, 0.5);
-            border: 1.5px solid rgba(0, 240, 255, 0.28);
+            border: 1.5px solid rgba(0, 240, 255, 0.32);
             background: rgba(0, 0, 0, 0.5);
-            position: relative;
             z-index: 5;
+            animation: adContainerPulse 4s ease-in-out infinite alternate;
+        }
+        @keyframes adContainerPulse {
+            0%   { box-shadow: 0 0 18px rgba(0, 240, 255, 0.15), inset 0 0 15px rgba(0, 0, 0, 0.5); }
+            100% { box-shadow: 0 0 30px rgba(0, 240, 255, 0.3),  inset 0 0 15px rgba(0, 0, 0, 0.5); }
         }
         
         .ad-slider-track {
@@ -985,85 +988,145 @@
         .ad-slide {
             width: 25%;
             height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 18px;
-            padding: 15px 20px;
             position: relative;
             overflow: hidden;
             flex-shrink: 0;
+            isolation: isolate;
         }
+        .ad-slide.nexus {
+            background: linear-gradient(135deg, #0a0a1a, #150525, #0a0a1a);
+        }
+        .ad-slide.sasa {
+            background: linear-gradient(135deg, #1a0a15, #2a0a20, #1a0a15);
+        }
+        
+        .ad-img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            z-index: 0;
+            transition: transform 8s ease-in-out;
+            filter: brightness(0.85) saturate(1.1);
+        }
+        .ad-slide:hover .ad-img {
+            transform: scale(1.08);
+        }
+        
+        .ad-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
+        .ad-overlay-nexus {
+            background: linear-gradient(to left, 
+                rgba(5, 5, 20, 0.94) 0%, 
+                rgba(20, 5, 40, 0.65) 35%, 
+                rgba(0, 240, 255, 0.06) 70%, 
+                transparent 100%);
+        }
+        .ad-overlay-sasa {
+            background: linear-gradient(to left, 
+                rgba(5, 5, 20, 0.94) 0%, 
+                rgba(40, 5, 20, 0.65) 35%, 
+                rgba(255, 42, 95, 0.06) 70%, 
+                transparent 100%);
+        }
+        
+        .ad-content {
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 0 22px;
+            text-align: right;
+            gap: 4px;
+        }
+        
+        .ad-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 0.8px;
+            color: #fff;
+            background: rgba(0, 240, 255, 0.16);
+            border: 1px solid rgba(0, 240, 255, 0.45);
+            padding: 2px 9px;
+            border-radius: 20px;
+            margin-bottom: 2px;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.25);
+        }
+        .ad-slide.sasa .ad-badge {
+            background: rgba(255, 42, 95, 0.16);
+            border-color: rgba(255, 42, 95, 0.45);
+            box-shadow: 0 0 10px rgba(255, 42, 95, 0.25);
+        }
+        
+        .ad-title {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 900;
+            letter-spacing: 0.2px;
+            line-height: 1.1;
+            background: linear-gradient(90deg, #ffffff, #00f0ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.5));
+        }
+        .ad-slide.sasa .ad-title {
+            background: linear-gradient(90deg, #ffffff, #ffd700);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5));
+        }
+        
+        .ad-subtitle {
+            margin: 0;
+            font-size: 11px;
+            color: #e0e0f5;
+            font-weight: 600;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+        }
+        
+        /* شريط اللمعان المتحرك */
         .ad-slide::after {
             content: '';
             position: absolute;
-            inset: 0;
-            background-image: 
-                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-            background-size: 20px 20px;
+            top: 0;
+            left: 0;
+            width: 55%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.14), transparent);
+            transform: translateX(-150%) skewX(-20deg);
+            animation: adShine 5s ease-in-out infinite;
+            z-index: 3;
             pointer-events: none;
-            opacity: 0.5;
         }
+        .ad-slide:nth-child(1)::after { animation-delay: 0.5s; }
+        .ad-slide:nth-child(2)::after { animation-delay: 1.75s; }
+        .ad-slide:nth-child(3)::after { animation-delay: 3s; }
+        .ad-slide:nth-child(4)::after { animation-delay: 4.25s; }
         
-        .ad-nexus {
-            background: 
-                radial-gradient(circle at 25% 50%, rgba(0, 240, 255, 0.35), transparent 55%),
-                radial-gradient(circle at 75% 50%, rgba(112, 0, 255, 0.4), transparent 55%),
-                linear-gradient(135deg, #0a0a1a, #150525, #0a0a1a);
-        }
-        .ad-sasa {
-            background: 
-                radial-gradient(circle at 25% 50%, rgba(255, 42, 95, 0.35), transparent 55%),
-                radial-gradient(circle at 75% 50%, rgba(255, 215, 0, 0.3), transparent 55%),
-                linear-gradient(135deg, #1a0a15, #2a0a20, #1a0a15);
-        }
-        
-        .ad-icon {
-            font-size: 46px;
-            filter: drop-shadow(0 0 15px rgba(0, 240, 255, 0.7));
-            animation: adBounce 2s ease-in-out infinite;
-            position: relative;
-            z-index: 1;
-        }
-        .ad-sasa .ad-icon {
-            filter: drop-shadow(0 0 15px rgba(255, 42, 95, 0.7));
-        }
-        @keyframes adBounce {
-            0%, 100% { transform: scale(1) rotate(-3deg); }
-            50% { transform: scale(1.18) rotate(5deg); }
-        }
-        
-        .ad-text {
-            text-align: right;
-            position: relative;
-            z-index: 1;
-        }
-        .ad-text h4 {
-            margin: 0 0 4px 0;
-            font-size: 17px;
-            background: linear-gradient(90deg, #fff, #00f0ff);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 900;
-            letter-spacing: 0.3px;
-        }
-        .ad-sasa .ad-text h4 {
-            background: linear-gradient(90deg, #fff, #ffd700);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .ad-text p {
-            margin: 0;
-            font-size: 11px;
-            color: #c9c9e0;
-            font-weight: 600;
+        @keyframes adShine {
+            0%   { transform: translateX(-150%) skewX(-20deg); }
+            45%  { transform: translateX(280%) skewX(-20deg); }
+            100% { transform: translateX(280%) skewX(-20deg); }
         }
         
         @keyframes scrollAds {
-            0% { transform: translateX(0); }
+            0%   { transform: translateX(0); }
             100% { transform: translateX(-50%); }
         }
         
@@ -1081,9 +1144,11 @@
             .game-img-container { width: 90px; height: 90px; }
             .game-title { font-size: 13px; }
             .game-play-btn { font-size: 12px; padding: 8px; }
-            .ad-slider-container { height: 110px; }
-            .ad-icon { font-size: 38px; }
-            .ad-text h4 { font-size: 15px; }
+            .ad-slider-container { height: 120px; }
+            .ad-title { font-size: 15px; }
+            .ad-subtitle { font-size: 10px; }
+            .ad-content { padding: 0 16px; }
+            .ad-badge { font-size: 8px; padding: 2px 7px; }
             .login-hero { height: 95px; }
             .hero-graphic { width: 170px; height: 95px; }
         }
@@ -1209,37 +1274,54 @@
                 <button onclick="registerUser()">إنشاء الحساب ✨</button>
             </div>
 
-            <!-- شريط الإعلانات (يظهر دائماً) -->
+            <!-- شريط الإعلانات (يظهر دائماً) - صور حقيقية Nexus.jpg & sasa.jpg -->
             <div class="ad-slider-container">
                 <div class="ad-slider-track">
-                    <div class="ad-slide ad-nexus">
-                        <div class="ad-icon">🎮</div>
-                        <div class="ad-text">
-                            <h4>Nexus Games™</h4>
-                            <p>عالم الألعاب الاحترافي</p>
+
+                    <!-- الشريحة 1: Nexus -->
+                    <div class="ad-slide nexus">
+                        <img src="Nexus.jpg" alt="Nexus Games" class="ad-img">
+                        <div class="ad-overlay ad-overlay-nexus"></div>
+                        <div class="ad-content">
+                            <span class="ad-badge">✨ مميز</span>
+                            <h4 class="ad-title">Nexus Games™</h4>
+                            <p class="ad-subtitle">عالم الألعاب الاحترافي</p>
                         </div>
                     </div>
-                    <div class="ad-slide ad-sasa">
-                        <div class="ad-icon">🏆</div>
-                        <div class="ad-text">
-                            <h4>Sasa Store</h4>
-                            <p>أفضل العروض الحصرية</p>
+
+                    <!-- الشريحة 2: Sasa -->
+                    <div class="ad-slide sasa">
+                        <img src="sasa.jpg" alt="Sasa Store" class="ad-img">
+                        <div class="ad-overlay ad-overlay-sasa"></div>
+                        <div class="ad-content">
+                            <span class="ad-badge">🔥 عروض</span>
+                            <h4 class="ad-title">Sasa Store</h4>
+                            <p class="ad-subtitle">أفضل العروض الحصرية</p>
                         </div>
                     </div>
-                    <div class="ad-slide ad-nexus">
-                        <div class="ad-icon">🎮</div>
-                        <div class="ad-text">
-                            <h4>Nexus Games™</h4>
-                            <p>عالم الألعاب الاحترافي</p>
+
+                    <!-- الشريحة 3: Nexus (مكرر للتدوير السلس) -->
+                    <div class="ad-slide nexus">
+                        <img src="Nexus.jpg" alt="Nexus Games" class="ad-img">
+                        <div class="ad-overlay ad-overlay-nexus"></div>
+                        <div class="ad-content">
+                            <span class="ad-badge">✨ مميز</span>
+                            <h4 class="ad-title">Nexus Games™</h4>
+                            <p class="ad-subtitle">عالم الألعاب الاحترافي</p>
                         </div>
                     </div>
-                    <div class="ad-slide ad-sasa">
-                        <div class="ad-icon">🏆</div>
-                        <div class="ad-text">
-                            <h4>Sasa Store</h4>
-                            <p>أفضل العروض الحصرية</p>
+
+                    <!-- الشريحة 4: Sasa (مكرر للتدوير السلس) -->
+                    <div class="ad-slide sasa">
+                        <img src="sasa.jpg" alt="Sasa Store" class="ad-img">
+                        <div class="ad-overlay ad-overlay-sasa"></div>
+                        <div class="ad-content">
+                            <span class="ad-badge">🔥 عروض</span>
+                            <h4 class="ad-title">Sasa Store</h4>
+                            <p class="ad-subtitle">أفضل العروض الحصرية</p>
                         </div>
                     </div>
+
                 </div>
             </div>
 
