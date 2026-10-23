@@ -60,7 +60,6 @@
             background-size: cover;
         }
 
-        /* شبكة خفيفة احترافية بالخلفية */
         body::before {
             content: '';
             position: fixed;
@@ -80,7 +79,6 @@
             100% { opacity: 1; }
         }
 
-        /* جزيئات متصاعدة */
         .particles-container {
             position: fixed;
             top: 0; left: 0;
@@ -107,7 +105,6 @@
             100% { transform: translate3d(0, -125vh, 0) scale(0.4); opacity: 0; }
         }
 
-        /* شارة المطور العلوية */
         .developer-badge {
             font-size: 13px;
             letter-spacing: 0.3px;
@@ -149,7 +146,6 @@
             text-shadow: 0 0 10px var(--secondary-neon), 0 0 24px rgba(0, 240, 255, 0.4);
         }
 
-        /* بطاقة الملف الشخصي */
         .user-profile-card {
             background: linear-gradient(150deg, rgba(28, 28, 54, 0.75), rgba(18, 18, 36, 0.65));
             border: 1px solid rgba(0, 240, 255, 0.22);
@@ -266,7 +262,6 @@
             border: 1px solid rgba(255, 255, 255, 0.04);
         }
 
-        /* الحاوية الرئيسية */
         .container {
             background: var(--container-bg);
             padding: 32px 22px;
@@ -319,7 +314,6 @@
             gap: 8px;
         }
 
-        /* الحقول */
         input[type="text"],
         input[type="password"],
         input[type="number"],
@@ -345,7 +339,6 @@
         }
         select option { background: #14142a; color: #fff; }
 
-        /* الأزرار العامة */
         button {
             background: linear-gradient(135deg, #5a24ff 0%, #7000ff 55%, #8b2bff 100%);
             color: white;
@@ -428,7 +421,6 @@
             width: auto;
         }
 
-        /* أقسام اللوحة */
         .dashboard-section {
             background: linear-gradient(150deg, rgba(0, 0, 0, 0.22), rgba(15, 15, 32, 0.3));
             padding: 17px 16px;
@@ -438,9 +430,6 @@
             box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
         }
 
-        /* ========================================= */
-        /* تصميم مربعات الألعاب الجديدة (الأنيقة) */
-        /* ========================================= */
         .games-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -529,7 +518,6 @@
             transform: scale(1.05);
         }
 
-        /* شريط النتائج */
         .scoreboard {
             display: flex;
             justify-content: space-around;
@@ -569,7 +557,6 @@
             text-shadow: 0 0 12px rgba(0, 240, 255, 0.45);
         }
 
-        /* اللوحة */
         .board {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -631,7 +618,6 @@
             100% { box-shadow: 0 0 34px var(--accent-glow), 0 0 18px rgba(0, 240, 255, 0.25); }
         }
 
-        /* الأقسام والانتقالات */
         section { display: none; }
         section.active {
             display: block;
@@ -659,7 +645,6 @@
             color: var(--text-soft);
         }
 
-        /* القوائم */
         .list-container {
             background: rgba(0, 0, 0, 0.38);
             border-radius: 16px;
@@ -707,7 +692,6 @@
             border: 1px solid rgba(0, 240, 255, 0.2);
         }
 
-        /* التوست */
         .toast {
             position: fixed;
             bottom: 26px;
@@ -729,7 +713,6 @@
             opacity: 1;
         }
 
-        /* النوافذ المنبثقة */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0;
@@ -781,7 +764,6 @@
             gap: 10px;
         }
 
-        /* مربع رابط الدعوة */
         .invite-link-box {
             background: linear-gradient(150deg, rgba(255, 42, 95, 0.06), rgba(112, 0, 255, 0.06));
             border: 1.5px dashed rgba(255, 42, 95, 0.4);
@@ -792,7 +774,6 @@
             box-shadow: inset 0 0 20px rgba(255, 42, 95, 0.04);
         }
 
-        /* اللودر */
         .loader {
             margin: 25px auto;
             width: 46px;
@@ -809,7 +790,175 @@
         }
 
         /* ========================================= */
-        /* شريط الإعلانات المنبثق (السلايدر) */
+        /* =========== شاشة تسجيل الدخول المحسنة =========== */
+        /* ========================================= */
+
+        /* رسومات برمجية جميلة للشاشة الدخول */
+        .login-hero {
+            position: relative;
+            height: 110px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .hero-glow {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(0, 240, 255, 0.25) 0%, transparent 60%);
+            filter: blur(20px);
+            animation: heroGlowPulse 3s ease-in-out infinite alternate;
+        }
+        @keyframes heroGlowPulse {
+            0% { transform: scale(0.9); opacity: 0.5; }
+            100% { transform: scale(1.2); opacity: 1; }
+        }
+
+        .hero-graphic {
+            width: 200px;
+            height: 110px;
+            position: relative;
+            z-index: 2;
+            filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.6));
+            animation: heroFloat 4s ease-in-out infinite;
+        }
+        @keyframes heroFloat {
+            0%, 100% { transform: translateY(0) rotate(-2deg); }
+            50% { transform: translateY(-8px) rotate(2deg); }
+        }
+
+        /* أيقونات عائمة حول الشاشة */
+        .login-decor {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+            border-radius: 26px;
+        }
+
+        .decor-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(35px);
+            opacity: 0.5;
+            animation: orbFloat 8s ease-in-out infinite;
+        }
+        .orb-a {
+            width: 130px; height: 130px;
+            background: radial-gradient(circle, #7000ff, transparent 70%);
+            top: -40px; left: -30px;
+            animation-delay: 0s;
+        }
+        .orb-b {
+            width: 110px; height: 110px;
+            background: radial-gradient(circle, #00f0ff, transparent 70%);
+            bottom: 30%; right: -40px;
+            animation-delay: 2s;
+        }
+        .orb-c {
+            width: 90px; height: 90px;
+            background: radial-gradient(circle, #ff2a5f, transparent 70%);
+            top: 40%; left: -30px;
+            animation-delay: 4s;
+        }
+        @keyframes orbFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(15px, -15px) scale(1.15); }
+        }
+
+        .decor-icon {
+            position: absolute;
+            font-size: 22px;
+            opacity: 0.55;
+            filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.6));
+            animation: decorIconFloat 6s ease-in-out infinite;
+        }
+        .di-1 { top: 6%; left: 6%; animation-delay: 0s; }
+        .di-2 { top: 15%; right: 8%; animation-delay: 1.2s; }
+        .di-3 { bottom: 12%; left: 10%; animation-delay: 2.5s; }
+        .di-4 { bottom: 22%; right: 6%; animation-delay: 3.8s; }
+        @keyframes decorIconFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+            50% { transform: translateY(-12px) rotate(12deg) scale(1.1); }
+        }
+
+        /* تبويبات الدخول / التسجيل */
+        .auth-tabs {
+            display: flex;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 14px;
+            padding: 5px;
+            margin-bottom: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 5;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 12px 10px;
+            background: transparent;
+            color: #8a8aa0;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 800;
+            font-size: 14px;
+            margin: 0;
+            box-shadow: none;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        .auth-tab::before { display: none; }
+        .auth-tab:hover { background: rgba(255,255,255,0.04); transform: none; color: #fff; }
+        .auth-tab.active {
+            background: linear-gradient(135deg, #5a24ff, #7000ff);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(112, 0, 255, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transform: none;
+        }
+
+        /* نموذج الدخول والتسجيل */
+        .auth-form {
+            display: none;
+            position: relative;
+            z-index: 5;
+        }
+        .auth-form.active {
+            display: block;
+            animation: fadeIn 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .password-hint {
+            font-size: 11px;
+            color: #8a8aa0;
+            text-align: right;
+            margin: -3px 4px 8px 4px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            line-height: 1.4;
+        }
+        .password-hint::before {
+            content: 'ⓘ';
+            color: var(--secondary-neon);
+            font-size: 12px;
+        }
+
+        .auth-form-title {
+            font-size: 15px;
+            color: var(--text-soft);
+            margin: 0 0 12px 0;
+            font-weight: 600;
+        }
+
+        /* ========================================= */
+        /* ============ شريط الإعلانات الجديد ============ */
         /* ========================================= */
         .ad-slider-container {
             margin-top: 25px;
@@ -818,37 +967,110 @@
             border-radius: 18px;
             overflow: hidden;
             position: relative;
-            box-shadow: 0 0 20px rgba(0, 240, 255, 0.15), inset 0 0 15px rgba(0, 0, 0, 0.7);
-            border: 1.5px solid rgba(0, 240, 255, 0.3);
+            box-shadow: 0 0 22px rgba(0, 240, 255, 0.15), inset 0 0 15px rgba(0, 0, 0, 0.5);
+            border: 1.5px solid rgba(0, 240, 255, 0.28);
             background: rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 5;
         }
         
         .ad-slider-track {
             display: flex;
-            width: 400%; /* 4 صور للتدوير السلس */
+            width: 400%;
             height: 100%;
-            animation: scrollAds 16s linear infinite;
+            animation: scrollAds 20s linear infinite;
+            will-change: transform;
         }
         
-        .ad-slider-track img {
+        .ad-slide {
             width: 25%;
             height: 100%;
-            object-fit: cover;
-            object-position: center;
-            filter: brightness(0.95); /* لمسة جمالية */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            padding: 15px 20px;
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .ad-slide::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+            opacity: 0.5;
+        }
+        
+        .ad-nexus {
+            background: 
+                radial-gradient(circle at 25% 50%, rgba(0, 240, 255, 0.35), transparent 55%),
+                radial-gradient(circle at 75% 50%, rgba(112, 0, 255, 0.4), transparent 55%),
+                linear-gradient(135deg, #0a0a1a, #150525, #0a0a1a);
+        }
+        .ad-sasa {
+            background: 
+                radial-gradient(circle at 25% 50%, rgba(255, 42, 95, 0.35), transparent 55%),
+                radial-gradient(circle at 75% 50%, rgba(255, 215, 0, 0.3), transparent 55%),
+                linear-gradient(135deg, #1a0a15, #2a0a20, #1a0a15);
+        }
+        
+        .ad-icon {
+            font-size: 46px;
+            filter: drop-shadow(0 0 15px rgba(0, 240, 255, 0.7));
+            animation: adBounce 2s ease-in-out infinite;
+            position: relative;
+            z-index: 1;
+        }
+        .ad-sasa .ad-icon {
+            filter: drop-shadow(0 0 15px rgba(255, 42, 95, 0.7));
+        }
+        @keyframes adBounce {
+            0%, 100% { transform: scale(1) rotate(-3deg); }
+            50% { transform: scale(1.18) rotate(5deg); }
+        }
+        
+        .ad-text {
+            text-align: right;
+            position: relative;
+            z-index: 1;
+        }
+        .ad-text h4 {
+            margin: 0 0 4px 0;
+            font-size: 17px;
+            background: linear-gradient(90deg, #fff, #00f0ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 900;
+            letter-spacing: 0.3px;
+        }
+        .ad-sasa .ad-text h4 {
+            background: linear-gradient(90deg, #fff, #ffd700);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .ad-text p {
+            margin: 0;
+            font-size: 11px;
+            color: #c9c9e0;
+            font-weight: 600;
         }
         
         @keyframes scrollAds {
             0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); } 
+            100% { transform: translateX(-50%); }
         }
         
-        /* إيقاف الحركة مؤقتاً عند وضع الماوس */
         .ad-slider-container:hover .ad-slider-track {
             animation-play-state: paused;
         }
 
-        /* استجابة الشاشات الصغيرة */
         @media (max-width: 380px) {
             .container { padding: 26px 16px; }
             h1 { font-size: 20px; }
@@ -860,6 +1082,10 @@
             .game-title { font-size: 13px; }
             .game-play-btn { font-size: 12px; padding: 8px; }
             .ad-slider-container { height: 110px; }
+            .ad-icon { font-size: 38px; }
+            .ad-text h4 { font-size: 15px; }
+            .login-hero { height: 95px; }
+            .hero-graphic { width: 170px; height: 95px; }
         }
     </style>
 
@@ -903,26 +1129,117 @@
             منصة الالعاب Nexus Games™
         </h1>
 
+        <!-- ====== شاشة تسجيل الدخول / إنشاء حساب ====== -->
         <section id="login-section" class="active">
-            <h2>تسجيل الدخول / إنشاء حساب</h2>
-            <input type="text" id="username-input" placeholder="اسم المستخدم (أكثر من 5 أحرف)" maxlength="15">
-            <input type="password" id="password-input" placeholder="كلمة المرور">
-            <select id="gender-input" required>
-                <option value="" disabled selected>-- حدد الجنس للبدء --</option>
-                <option value="boy">👨 ذكر</option>
-                <option value="girl">👩 أنثى</option>
-            </select>
-            <button onclick="authenticateUser()">دخول / تسجيل المشغل</button>
-            <p style="font-size: 11px; color: #777; margin-top: 12px; margin-bottom: 0;">إذا لم يكن الحساب موجوداً سيتم إنشاؤه تلقائياً بهذا الاسم</p>
-            
-            <!-- شريط الإعلانات المنبثق التلقائي -->
+
+            <!-- رسومات برمجية جميلة -->
+            <div class="login-decor">
+                <div class="decor-orb orb-a"></div>
+                <div class="decor-orb orb-b"></div>
+                <div class="decor-orb orb-c"></div>
+                <div class="decor-icon di-1">🎮</div>
+                <div class="decor-icon di-2">🏆</div>
+                <div class="decor-icon di-3">🎲</div>
+                <div class="decor-icon di-4">⭐</div>
+            </div>
+
+            <!-- رسمة الهيرو (يد التحكم النيون) -->
+            <div class="login-hero">
+                <div class="hero-glow"></div>
+                <svg class="hero-graphic" viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="heroGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#ff2a5f"/>
+                            <stop offset="50%" stop-color="#7000ff"/>
+                            <stop offset="100%" stop-color="#00f0ff"/>
+                        </linearGradient>
+                        <linearGradient id="heroGrad2" x1="100%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#00f0ff"/>
+                            <stop offset="100%" stop-color="#ff2a5f"/>
+                        </linearGradient>
+                    </defs>
+                    <!-- شكل يد التحكم -->
+                    <path d="M40,50 Q40,25 65,25 L135,25 Q160,25 160,50 L160,70 Q160,88 138,88 L118,88 Q108,88 100,80 Q92,88 82,88 L62,88 Q40,88 40,70 Z" 
+                          fill="none" stroke="url(#heroGrad)" stroke-width="3" stroke-linejoin="round"/>
+                    <path d="M40,50 Q40,25 65,25 L135,25 Q160,25 160,50 L160,70 Q160,88 138,88 L118,88 Q108,88 100,80 Q92,88 82,88 L62,88 Q40,88 40,70 Z" 
+                          fill="url(#heroGrad)" opacity="0.08"/>
+                    <!-- D-Pad -->
+                    <rect x="62" y="52" width="10" height="3" rx="1.5" fill="#00f0ff"/>
+                    <rect x="65.5" y="48.5" width="3" height="10" rx="1.5" fill="#00f0ff"/>
+                    <!-- الأزرار -->
+                    <circle cx="132" cy="53" r="4" fill="#ff2a5f"/>
+                    <circle cx="142" cy="63" r="4" fill="#7000ff"/>
+                    <circle cx="122" cy="63" r="4" fill="#00f0ff"/>
+                    <circle cx="132" cy="73" r="4" fill="#ffd700"/>
+                    <!-- نقاط الإضاءة -->
+                    <circle cx="100" cy="42" r="2" fill="#00f0ff" opacity="0.9">
+                        <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite"/>
+                    </circle>
+                    <circle cx="80" cy="42" r="1.5" fill="#ff2a5f" opacity="0.7"/>
+                    <circle cx="120" cy="42" r="1.5" fill="#ff2a5f" opacity="0.7"/>
+                </svg>
+            </div>
+
+            <!-- التبويبات -->
+            <div class="auth-tabs">
+                <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">🔐 تسجيل الدخول</button>
+                <button class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">✨ إنشاء حساب</button>
+            </div>
+
+            <!-- نموذج تسجيل الدخول -->
+            <div class="auth-form active" id="form-login">
+                <p class="auth-form-title">أهلاً بعودتك! سجّل دخولك للمتابعة</p>
+                <input type="text" id="login-username" placeholder="اسم المستخدم" maxlength="15" autocomplete="username">
+                <input type="password" id="login-password" placeholder="كلمة المرور" autocomplete="current-password">
+                <div class="password-hint">كلمة المرور: أحرف إنجليزية وأرقام فقط</div>
+                <button onclick="loginUser()">دخول الآن 🚀</button>
+            </div>
+
+            <!-- نموذج إنشاء حساب -->
+            <div class="auth-form" id="form-register">
+                <p class="auth-form-title">أنشئ حسابك الجديد وابدأ اللعب</p>
+                <input type="text" id="register-username" placeholder="اسم المستخدم (أكثر من 5 أحرف)" maxlength="15" autocomplete="username">
+                <input type="password" id="register-password" placeholder="كلمة المرور (إنجليزي وأرقام فقط)" autocomplete="new-password">
+                <div class="password-hint">يُسمح بالأحرف الإنجليزية والأرقام فقط</div>
+                <select id="register-gender" required>
+                    <option value="" disabled selected>-- حدد الجنس --</option>
+                    <option value="boy">👨 ذكر</option>
+                    <option value="girl">👩 أنثى</option>
+                </select>
+                <button onclick="registerUser()">إنشاء الحساب ✨</button>
+            </div>
+
+            <!-- شريط الإعلانات (يظهر دائماً) -->
             <div class="ad-slider-container">
                 <div class="ad-slider-track">
-                    <img src="Nexus.jpg" alt="Nexus Ad">
-                    <img src="sasa.jpg" alt="Sasa Ad">
-                    <!-- تكرار الصور لضمان استمرارية الحركة بدون انقطاع -->
-                    <img src="Nexus.jpg" alt="Nexus Ad">
-                    <img src="sasa.jpg" alt="Sasa Ad">
+                    <div class="ad-slide ad-nexus">
+                        <div class="ad-icon">🎮</div>
+                        <div class="ad-text">
+                            <h4>Nexus Games™</h4>
+                            <p>عالم الألعاب الاحترافي</p>
+                        </div>
+                    </div>
+                    <div class="ad-slide ad-sasa">
+                        <div class="ad-icon">🏆</div>
+                        <div class="ad-text">
+                            <h4>Sasa Store</h4>
+                            <p>أفضل العروض الحصرية</p>
+                        </div>
+                    </div>
+                    <div class="ad-slide ad-nexus">
+                        <div class="ad-icon">🎮</div>
+                        <div class="ad-text">
+                            <h4>Nexus Games™</h4>
+                            <p>عالم الألعاب الاحترافي</p>
+                        </div>
+                    </div>
+                    <div class="ad-slide ad-sasa">
+                        <div class="ad-icon">🏆</div>
+                        <div class="ad-text">
+                            <h4>Sasa Store</h4>
+                            <p>أفضل العروض الحصرية</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -938,9 +1255,7 @@
                     ساحات اللعب المتاحة
                 </h2>
                 
-                <!-- شبكة مربعات الألعاب الجديدة -->
                 <div class="games-grid">
-                    <!-- لعبة XO -->
                     <div class="game-card">
                         <div class="game-img-container">
                             <img src="xo.jpg" alt="XO">
@@ -949,7 +1264,6 @@
                         <button class="game-play-btn" onclick="startLocalGame()">دخول</button>
                     </div>
 
-                    <!-- لعبة لودو -->
                     <div class="game-card">
                         <div class="game-img-container">
                             <img src="ludo.jpg" alt="Ludo">
@@ -958,7 +1272,6 @@
                         <button class="game-play-btn" onclick="openGameOptionsModalWithoutFriend()">دخول</button>
                     </div>
 
-                    <!-- لعبة نيشان -->
                     <div class="game-card">
                         <div class="game-img-container">
                             <img src="neshan.jpg" alt="Neshan">
@@ -967,7 +1280,6 @@
                         <button class="game-play-btn" onclick="goToArcheryPage()">دخول</button>
                     </div>
 
-                    <!-- لعبة من سيربح المليون -->
                     <div class="game-card">
                         <div class="game-img-container">
                             <img src="mlion.jpg" alt="Millionaire">
@@ -990,8 +1302,6 @@
                 <p style="font-size: 12px; color: #ccc; margin-bottom: 12px;">أرسل الرابط مباشرة دون الحاجة لإضافة الصديق لقائمتك</p>
                 <button onclick="createInviteLink('xo')" style="background: linear-gradient(90deg, #ff2a5f, #c10036); margin: 0; font-size: 12px; padding: 10px;">رابط مواجهة X O</button>
                 <button onclick="createInviteLink('ludo2')" style="background: linear-gradient(90deg, #00b4db, #0083b0); margin: 8px 0 0 0; font-size: 12px; padding: 10px;">رابط تحدي لودو 1v1</button>
-                
-                <!-- زر رابط نيشان الجديد -->
                 <button onclick="createInviteLink('archery')" style="background: linear-gradient(90deg, #f59e0b, #d97706); margin: 8px 0 0 0; font-size: 12px; padding: 10px; color: #fff;">رابط تحدي نيشان (القوس والنشاب)</button>
             </div>
 
@@ -1075,10 +1385,7 @@
                 <button onclick="sendSpecificInvite('xo')" style="background: linear-gradient(90deg, #511fff, #7000ff);">طاولة X O الاحترافية</button>
                 <button onclick="sendSpecificInvite('ludo2')" style="background: linear-gradient(90deg, #ff2a5f, #d10043);">حرب اللودو (1 ضد 1)</button>
                 <button onclick="sendSpecificInvite('ludo4')" style="background: linear-gradient(90deg, #10b981, #059669);">حرب اللودو (2 ضد 2 فريق)</button>
-                
-                <!-- زر دعوة نيشان الجديد داخل النافذة -->
                 <button onclick="sendSpecificInvite('archery')" class="archery-btn" style="background: linear-gradient(90deg, #f59e0b, #d97706);">🏹 تحدي نيشان (القوس والنشاب)</button>
-
                 <button onclick="document.getElementById('choose-game-modal').classList.remove('active')" class="secondary-btn" style="background: #252535; margin-top: 10px;">تراجع</button>
             </div>
         </div>
@@ -1130,6 +1437,24 @@
 
         function openSettings() { document.getElementById('settings-modal').classList.add('active'); }
         function closeSettings() { document.getElementById('settings-modal').classList.remove('active'); }
+
+        // التحقق من كلمة المرور: أحرف إنجليزية وأرقام فقط
+        function isValidPassword(password) {
+            return /^[a-zA-Z0-9]+$/.test(password);
+        }
+
+        // تبديل التبويبات بين تسجيل الدخول والتسجيل
+        function switchAuthTab(tab) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            if (tab === 'login') {
+                document.getElementById('tab-login').classList.add('active');
+                document.getElementById('form-login').classList.add('active');
+            } else {
+                document.getElementById('tab-register').classList.add('active');
+                document.getElementById('form-register').classList.add('active');
+            }
+        }
 
         function playAcceptSound() {
             try {
@@ -1240,14 +1565,19 @@
             });
         }
 
-        function authenticateUser() {
-            let username = document.getElementById('username-input').value.trim();
-            const password = document.getElementById('password-input').value.trim();
-            const gender = document.getElementById('gender-input').value;
+        // ============================================
+        // تسجيل الدخول (يعتمد على حساب موجود مسبقاً)
+        // ============================================
+        function loginUser() {
+            let username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value.trim();
 
-            if (username.length <= 5) { showToast("⚠️ اليوزر يجب أن يكون أكثر من 5 أحرف!", "#ff2a5f"); return; }
+            if (username.length <= 5) { showToast("⚠️ اسم المستخدم يجب أن يكون أكثر من 5 أحرف!", "#ff2a5f"); return; }
             if (password.length < 4) { showToast("⚠️ كلمة المرور قصيرة جداً!", "#ff2a5f"); return; }
-            if (!gender || gender === "") { showToast("⚠️ يرجى تحديد الجنس للتمكن من الدخول!", "#ff2a5f"); return; }
+            if (!isValidPassword(password)) { 
+                showToast("⚠️ كلمة المرور يجب أن تحتوي على أحرف إنجليزية وأرقام فقط!", "#ff2a5f"); 
+                return; 
+            }
 
             let isAdmin = (username === "حمزة الحماده" && password === "hamzagmailcom34567");
             if(isAdmin) username = "حمزة الحماده"; 
@@ -1256,35 +1586,69 @@
                 let uid = snap.exists() ? snap.val() : null;
                 if (isAdmin) uid = "552";
 
-                if (uid) {
-                    checkIfBanned(uid, () => {
-                        db.ref('users/' + uid).once('value').then(userSnap => {
-                            let data = userSnap.val();
-                            if (data && data.password === password) {
-                                data.gender = gender;
-                                db.ref('users/' + uid + '/gender').set(gender);
-                                loginSuccess(uid, username, data);
-                            } else if (isAdmin) {
-                                createAccount(username, password, "552", gender);
-                            } else { showToast("❌ كلمة المرور غير صحيحة!", "#ff2a5f"); }
-                        });
+                if (!uid && !isAdmin) {
+                    showToast("❌ الحساب غير موجود! يرجى إنشاء حساب جديد أولاً.", "#ff2a5f");
+                    switchAuthTab('register');
+                    document.getElementById('register-username').value = username;
+                    document.getElementById('register-password').value = password;
+                    return;
+                }
+
+                checkIfBanned(uid, () => {
+                    db.ref('users/' + uid).once('value').then(userSnap => {
+                        let data = userSnap.val();
+                        if (data && data.password === password) {
+                            if (!data.gender) data.gender = 'boy';
+                            loginSuccess(uid, username, data);
+                        } else if (isAdmin && !data) {
+                            createAccount(username, password, "552", "boy", true);
+                        } else {
+                            showToast("❌ كلمة المرور غير صحيحة!", "#ff2a5f");
+                        }
                     });
+                });
+            });
+        }
+
+        // ============================================
+        // إنشاء حساب جديد
+        // ============================================
+        function registerUser() {
+            let username = document.getElementById('register-username').value.trim();
+            const password = document.getElementById('register-password').value.trim();
+            const gender = document.getElementById('register-gender').value;
+
+            if (username.length <= 5) { showToast("⚠️ اسم المستخدم يجب أن يكون أكثر من 5 أحرف!", "#ff2a5f"); return; }
+            if (password.length < 4) { showToast("⚠️ كلمة المرور قصيرة جداً!", "#ff2a5f"); return; }
+            if (!isValidPassword(password)) { 
+                showToast("⚠️ كلمة المرور يجب أن تحتوي على أحرف إنجليزية وأرقام فقط!", "#ff2a5f"); 
+                return; 
+            }
+            if (!gender || gender === "") { showToast("⚠️ يرجى تحديد الجنس!", "#ff2a5f"); return; }
+
+            let isAdmin = (username === "حمزة الحماده" && password === "hamzagmailcom34567");
+
+            db.ref('usernames/' + username).once('value').then(snap => {
+                if (snap.exists() && !isAdmin) {
+                    showToast("❌ اسم المستخدم محجوز! جرب اسماً آخر أو سجّل الدخول.", "#ff2a5f");
+                    return;
+                }
+                if (isAdmin) {
+                    createAccount(username, password, "552", gender, false);
                 } else {
-                    if(isAdmin) createAccount(username, password, "552", gender);
-                    else {
-                        let newUid = Math.floor(10000000 + Math.random() * 90000000).toString();
-                        createAccount(username, password, newUid, gender);
-                    }
+                    let newUid = Math.floor(10000000 + Math.random() * 90000000).toString();
+                    createAccount(username, password, newUid, gender, false);
                 }
             });
         }
 
-        function createAccount(username, password, uid, gender) {
+        function createAccount(username, password, uid, gender, isAdmin) {
             let newData = { username: username, password: password, uid: uid, played: 0, wins: 0, gender: gender };
             db.ref('usernames/' + username).set(uid);
             db.ref('users/' + uid).set(newData);
             loginSuccess(uid, username, newData);
-            showToast("✅ تم إنشاء الحساب بنجاح!");
+            if (isAdmin) showToast("👑 تم تسجيل دخول المطور!");
+            else showToast("✅ تم إنشاء الحساب بنجاح!");
         }
 
         function loginSuccess(uid, username, data) {
@@ -1312,7 +1676,7 @@
             document.getElementById('display-id').innerText = currentUserId;
             document.getElementById('display-played').innerText = `🎮 لعب: ${currentUserData.played || 0}`;
             document.getElementById('display-wins').innerText = `🏆 فاز: ${currentUserData.wins || 0}`;
-            document.getElementById('user-avatar').src = generateAvatarURL(currentUserData.username, currentUserData.gender);
+            document.getElementById('user-avatar').src = generateAvatarURL(currentUserData.username, currentUserData.gender || 'boy');
             showSection('menu-section');
         }
 
@@ -1590,7 +1954,6 @@
             window.location.href = `ludo.html?gameId=${gameId}&role=${myRole}&uid=${currentUserId}&username=${encodeURIComponent(currentUsername)}&type=${type}`;
         }
 
-        // دالة الانتقال المباشر لزر نيشان في القائمة الرئيسية
         function goToArcheryPage() {
             if (currentUserId && currentUsername) {
                 window.location.href = `nasaai.html?uid=${currentUserId}&username=${encodeURIComponent(currentUsername)}`;
@@ -1599,7 +1962,6 @@
             }
         }
 
-        // دالة الانتقال للعبة نيشان عند القبول أو إنشاء الرابط
         function startArcheryOnline() {
             window.location.href = `nasaai.html?gameId=${gameId}&role=${myRole}&uid=${currentUserId}&username=${encodeURIComponent(currentUsername)}`;
         }
