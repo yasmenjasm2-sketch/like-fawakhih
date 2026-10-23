@@ -523,10 +523,8 @@
     <div class="custom-overlay" id="friends-modal">
         <div class="custom-box">
             <h3>قائمة الأصدقاء</h3>
-            <div style="max-height: 200px; overflow-y: auto;">
-                <div class="friend-item"><span>🎮 اللاعب المجهول</span> <button onclick="sendInviteToFriend(this)">دعوة</button></div>
-                <div class="friend-item"><span>🚀 محترف اللودو</span> <button onclick="sendInviteToFriend(this)">دعوة</button></div>
-                <div class="friend-item"><span>👑 ملك النرد</span> <button onclick="sendInviteToFriend(this)">دعوة</button></div>
+            <div id="friends-list-container" style="max-height: 200px; overflow-y: auto; padding: 5px;">
+                <div style="color: #aaa; padding: 10px;">جاري التحميل...</div>
             </div>
             <button class="exit-btn" onclick="closeModal('friends-modal')">إغلاق القائمة</button>
         </div>
@@ -643,17 +641,8 @@
         let spectatorName = "مشاهد_" + Math.floor(Math.random() * 9999);
 
         let isRollingDice = false;
-        let isMovingToken = false;   // قفل حركة الأحجار
-        let noMoveTimerScheduled = false; // منع تكرار جدولة تمرير الدور
-
-        if (rawRole) {
-            let r = rawRole.toLowerCase();
-            let validRoles = gameType === 'ludo4' ? ['red', 'yellow', 'green', 'blue'] : ['red', 'yellow'];
-            if (validRoles.includes(r)) {
-                myRole = r;
-                isSpectator = false;
-            }
-        }
+        let isMovingToken = false;   
+        let noMoveTimerScheduled = false; 
 
         // خرائط اللودو
         const pathCoords = [
@@ -687,8 +676,45 @@
             6: "rotateY(180deg)"
         };
 
-        window.onload = () => {
+        window.onload = async () => {
             if(!gameId) { alert("رابط الغرفة غير صالح!"); window.location.href = 'index.html'; return; }
+            
+            const myUid = localStorage.getItem('xo_uid') || 'guest_' + Math.floor(Math.random() * 100000);
+
+            if (!rawRole) {
+                try {
+                    const snap = await db.ref(`games/${gameId}`).once('value');
+                    const data = snap.val();
+                    if (data) {
+                        const players = data.players || { red: true };
+                        if (gameType === 'ludo4') {
+                            if (!players.green) rawRole = 'green';
+                            else if (!players.blue) rawRole = 'blue';
+                            else if (!players.yellow) rawRole = 'yellow';
+                        } else {
+                            if (!players.yellow) rawRole = 'yellow';
+                        }
+                        
+                        if (rawRole) {
+                            await db.ref(`games/${gameId}/players/${rawRole}`).set(myUid);
+                            showToast(`✅ تم انضمامك كلاعب ${getRoleName(rawRole)}`);
+                        } else {
+                            isSpectator = true;
+                            showToast("👁️ الغرفة ممتلئة، أنت تشاهد الآن");
+                        }
+                    }
+                } catch(e) { console.error(e); }
+            }
+
+            if (rawRole) {
+                let r = rawRole.toLowerCase();
+                let validRoles = gameType === 'ludo4' ? ['red', 'yellow', 'green', 'blue'] : ['red', 'yellow'];
+                if (validRoles.includes(r)) {
+                    myRole = r;
+                    isSpectator = false;
+                    db.ref(`games/${gameId}/players/${myRole}`).set(myUid);
+                }
+            }
             
             if (isSpectator) {
                 document.getElementById('ludo-role-text').innerText = `أنت تشاهد المباراة 👁️ ${gameType === 'ludo4' ? '(4 لاعبين)' : '(1v1)'}`;
@@ -713,7 +739,10 @@
             return names[r] || r;
         }
 
-        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function openModal(id) { 
+            document.getElementById(id).classList.add('active'); 
+            if (id === 'friends-modal') loadFriendsList();
+        }
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
         function showToast(msg) {
@@ -724,26 +753,99 @@
             window._toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
-        function sendInviteToFriend(btn) {
-            btn.innerText = "تم الإرسال";
-            btn.style.background = "#555";
-            btn.disabled = true;
-            showToast("✅ تم إرسال دعوة اللعب لصديقك!");
-            setTimeout(() => closeModal('friends-modal'), 1000);
+        async function loadFriendsList() {
+            const uid = localStorage.getItem('xo_uid');
+            const container = document.getElementById('friends-list-container');
+            if (!uid) {
+                container.innerHTML = '<div style="color: #ff2a5f; text-align: center; padding: 10px;">الرجاء تسجيل الدخول أولاً</div>';
+                return;
+            }
+            
+            container.innerHTML = '<div style="color: #aaa; text-align: center; padding: 10px;">جاري التحميل...</div>';
+            try {
+                const snap = await db.ref(`users/${uid}/friends`).once('value');
+                const friends = snap.val();
+                
+                if (!friends || Object.keys(friends).length === 0) {
+                    container.innerHTML = '<div style="color: #aaa; text-align: center; padding: 10px;">لا يوجد أصدقاء بعد</div>';
+                    return;
+                }
+                
+                container.innerHTML = '';
+                for (let id in friends) {
+                    const f = friends[id];
+                    const name = typeof f === 'string' ? f : f.name;
+                    
+                    const div = document.createElement('div');
+                    div.className = 'friend-item';
+                    div.innerHTML = `<span>${name}</span> <button onclick="sendGameInvite('${id}', '${name}')">دعوة</button>`;
+                    container.appendChild(div);
+                }
+            } catch (err) {
+                console.error(err);
+                container.innerHTML = '<div style="color: #ff2a5f; text-align: center; padding: 10px;">خطأ في تحميل الأصدقاء</div>';
+            }
+        }
+
+        async function sendGameInvite(friendId, friendName) {
+            let availableRole = null;
+            const data = gameState;
+            if (data && data.players) {
+                if (gameType === 'ludo4') {
+                    if (!data.players.green) availableRole = 'green';
+                    else if (!data.players.blue) availableRole = 'blue';
+                    else if (!data.players.yellow) availableRole = 'yellow';
+                } else {
+                    if (!data.players.yellow) availableRole = 'yellow';
+                }
+            } else {
+                if (gameType === 'ludo4') availableRole = 'green';
+                else availableRole = 'yellow';
+            }
+
+            const inviteLink = window.location.origin + window.location.pathname + "?gameId=" + gameId + "&type=" + gameType + (availableRole ? `&role=${availableRole}` : "");
+            
+            await db.ref(`users/${friendId}/game_invite`).set({
+                gameId: gameId,
+                gameType: gameType === 'ludo4' ? 'ludo4' : 'ludo2',
+                senderId: localStorage.getItem('xo_uid'),
+                senderName: localStorage.getItem('xo_username') || 'لاعب'
+            });
+            
+            navigator.clipboard.writeText(inviteLink).then(() => {
+                showToast("✅ تم إرسال الدعوة ونسخ الرابط!");
+                closeModal('friends-modal');
+            }).catch(() => {
+                showToast("✅ تم إرسال الدعوة!");
+                closeModal('friends-modal');
+            });
         }
 
         function initGameData() {
             db.ref('games/' + gameId).once('value').then(snap => {
                 let data = snap.val();
+                const myUid = localStorage.getItem('xo_uid') || 'player_' + Date.now();
+                
                 if (!data || !data.tokens) {
                     let initialTokens = { red: [-1,-1,-1,-1], yellow: [-1,-1,-1,-1] };
                     if(gameType === 'ludo4') { initialTokens.green = [-1,-1,-1,-1]; initialTokens.blue = [-1,-1,-1,-1]; }
+                    
+                    let initialPlayers = { red: myUid };
+                    if (myRole === 'yellow') { initialPlayers.red = 'host'; initialPlayers.yellow = myUid; }
+                    else if (myRole === 'green') { initialPlayers.red = 'host'; initialPlayers.green = myUid; }
+                    else if (myRole === 'blue') { initialPlayers.red = 'host'; initialPlayers.blue = myUid; }
+
                     db.ref('games/' + gameId).update({
                         tokens: initialTokens, turn: 'red',
                         dicePool: [], consecutiveSixes: 0,
                         diceRolled: false, winner: '',
-                        rematchVotes: { red: false, yellow: false, green: false, blue: false }
+                        rematchVotes: { red: false, yellow: false, green: false, blue: false },
+                        players: initialPlayers
                     });
+                } else {
+                    if (!isSpectator) {
+                        db.ref(`games/${gameId}/players/${myRole}`).set(myUid);
+                    }
                 }
             }).catch(err => {
                 console.error(err);
@@ -1280,7 +1382,6 @@
                 
                 setTimeout(() => {
                     noMoveTimerScheduled = false;
-                    // التحقق من عدم تغير الحالة أثناء الانتظار
                     if (!gameState) return;
                     if (isMovingToken) return;
                     if (gameState.turn !== turnSnapshot) return;
