@@ -9,7 +9,7 @@
         :root {
             --bg-deep: #05050d;
             --bg-mid: #0d0a1f;
-            --container-bg: rgba(18, 18, 36, 0.72);
+            --container-bg: rgba(18, 18, 36, 0.92);
             --card-bg: rgba(28, 28, 54, 0.55);
             --primary-neon: #ff2a5f;
             --secondary-neon: #00f0ff;
@@ -23,14 +23,9 @@
             --glass-border: rgba(255, 255, 255, 0.09);
         }
 
+        /* ✅ تحسين #1: إزالة transition من * (كان يُطبق على كل عنصر = أبطأ شيء بالصفحة) */
         * {
             box-sizing: border-box;
-            transition: background 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-                        color 0.3s ease,
-                        border-color 0.3s ease,
-                        box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-                        transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
-                        opacity 0.3s ease;
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -51,12 +46,12 @@
             justify-content: center;
             align-items: center;
             position: relative;
+            /* ✅ تحسين #2: إزالة background-attachment: fixed (ثقيل جداً على الموبايل) */
             background:
                 radial-gradient(ellipse at 15% 0%, rgba(112, 0, 255, 0.18) 0%, transparent 50%),
                 radial-gradient(ellipse at 85% 100%, rgba(0, 240, 255, 0.12) 0%, transparent 50%),
                 radial-gradient(ellipse at 50% 50%, rgba(255, 42, 95, 0.06) 0%, transparent 60%),
                 linear-gradient(160deg, var(--bg-deep) 0%, var(--bg-mid) 55%, #06040f 100%);
-            background-attachment: fixed;
             background-size: cover;
         }
 
@@ -72,13 +67,10 @@
             -webkit-mask-image: radial-gradient(ellipse at center, black 25%, transparent 78%);
             pointer-events: none;
             z-index: 0;
-            animation: gridPulse 12s ease-in-out infinite alternate;
-        }
-        @keyframes gridPulse {
-            0% { opacity: 0.55; }
-            100% { opacity: 1; }
+            /* ✅ تحسين #3: إيقاف gridPulse (كان يعمل باستمرار) */
         }
 
+        /* ✅ تحسين #4: تقليل عدد الجزيئات من 20 إلى 8 */
         .particles-container {
             position: fixed;
             top: 0; left: 0;
@@ -86,6 +78,7 @@
             z-index: 1;
             overflow: hidden;
             pointer-events: none;
+            contain: strict;
         }
         .drop {
             position: absolute;
@@ -94,9 +87,7 @@
             height: 22px;
             border-radius: 50px;
             opacity: 0;
-            will-change: transform, opacity;
             animation: rise linear infinite;
-            filter: blur(0.4px);
         }
         @keyframes rise {
             0%   { transform: translate3d(0, 0, 0) scale(1); opacity: 0; }
@@ -111,43 +102,32 @@
             color: rgba(255, 255, 255, 0.85);
             margin-bottom: 16px;
             background: linear-gradient(120deg,
-                rgba(112, 0, 255, 0.22),
-                rgba(0, 240, 255, 0.18),
-                rgba(255, 42, 95, 0.14));
-            background-size: 220% 220%;
+                rgba(112, 0, 255, 0.35),
+                rgba(0, 240, 255, 0.28),
+                rgba(255, 42, 95, 0.22));
             padding: 9px 22px;
             border-radius: 50px;
             border: 1px solid rgba(0, 240, 255, 0.3);
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            box-shadow:
-                0 0 20px rgba(0, 240, 255, 0.12),
-                inset 0 0 14px rgba(112, 0, 255, 0.12);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            animation: badgeGlow 4s ease-in-out infinite alternate;
+            /* ✅ تحسين #5: إزالة backdrop-filter + إيقاف badgeGlow */
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
             position: relative;
             z-index: 10;
-        }
-        @keyframes badgeGlow {
-            0%   { box-shadow: 0 0 18px rgba(0, 240, 255, 0.1), inset 0 0 12px rgba(112, 0, 255, 0.1); }
-            100% { box-shadow: 0 0 30px rgba(0, 240, 255, 0.25), inset 0 0 18px rgba(112, 0, 255, 0.2); }
         }
         .developer-badge::before {
             content: '✦';
             color: var(--gold);
-            text-shadow: 0 0 10px var(--gold);
             font-size: 14px;
         }
         .developer-badge span {
             color: var(--secondary-neon);
             font-weight: 800;
-            text-shadow: 0 0 10px var(--secondary-neon), 0 0 24px rgba(0, 240, 255, 0.4);
         }
 
         .user-profile-card {
-            background: linear-gradient(150deg, rgba(28, 28, 54, 0.75), rgba(18, 18, 36, 0.65));
+            background: linear-gradient(150deg, rgba(28, 28, 54, 0.95), rgba(18, 18, 36, 0.92));
             border: 1px solid rgba(0, 240, 255, 0.22);
             border-radius: 20px;
             padding: 16px;
@@ -155,33 +135,16 @@
             display: none;
             flex-direction: column;
             gap: 13px;
-            box-shadow:
-                inset 0 0 22px rgba(0, 240, 255, 0.06),
-                0 8px 28px rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
             position: relative;
             z-index: 10;
             max-width: 420px;
             width: 100%;
             overflow: hidden;
         }
-        .user-profile-card::after {
-            content: '';
-            position: absolute;
-            top: 0; left: -60%;
-            width: 60%; height: 100%;
-            background: linear-gradient(100deg, transparent, rgba(0, 240, 255, 0.06), transparent);
-            animation: shimmer 6s ease-in-out infinite;
-        }
-        @keyframes shimmer {
-            0%   { left: -60%; }
-            55%  { left: 120%; }
-            100% { left: 120%; }
-        }
         .user-profile-card.active {
             display: flex;
-            animation: fadeIn 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+            animation: fadeIn 0.35s ease;
         }
         .profile-header {
             display: flex;
@@ -202,7 +165,7 @@
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.08);
             border: 2px solid var(--secondary-neon);
-            box-shadow: 0 0 14px rgba(0, 240, 255, 0.45), inset 0 0 8px rgba(0, 240, 255, 0.15);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.35);
             object-fit: cover;
             flex-shrink: 0;
         }
@@ -217,22 +180,17 @@
             gap: 6px;
         }
         .admin-badge {
-            background: linear-gradient(90deg, #ffd700, #ff8c00, #ffd700);
-            background-size: 200% 100%;
+            background: linear-gradient(90deg, #ffd700, #ff8c00);
             color: #000;
             font-size: 11px;
             padding: 3px 10px;
             border-radius: 12px;
             font-weight: 900;
-            box-shadow: 0 0 12px rgba(255, 215, 0, 0.55);
+            box-shadow: 0 0 8px rgba(255, 215, 0, 0.45);
             display: inline-flex;
             align-items: center;
             gap: 4px;
-            animation: goldShine 3s linear infinite;
-        }
-        @keyframes goldShine {
-            0%   { background-position: 0% 50%; }
-            100% { background-position: 200% 50%; }
+            /* ✅ تحسين #6: إيقاف goldShine */
         }
         .user-id-box {
             background: rgba(0, 0, 0, 0.42);
@@ -266,17 +224,16 @@
             background: var(--container-bg);
             padding: 32px 22px;
             border-radius: 26px;
+            /* ✅ تحسين #7: تبسيط الظلال + إزالة backdrop-filter */
             box-shadow:
-                0 24px 60px rgba(0, 0, 0, 0.6),
-                0 0 50px rgba(112, 0, 255, 0.12),
-                inset 0 1px 0 rgba(255, 255, 255, 0.06);
+                0 20px 50px rgba(0, 0, 0, 0.55),
+                0 0 30px rgba(112, 0, 255, 0.1);
             max-width: 420px;
             width: 100%;
             border: 1px solid var(--glass-border);
-            backdrop-filter: blur(18px) saturate(130%);
-            -webkit-backdrop-filter: blur(18px) saturate(130%);
             position: relative;
             z-index: 10;
+            contain: layout style paint;
         }
 
         h1 {
@@ -286,20 +243,14 @@
             font-weight: 900;
             letter-spacing: -0.4px;
             background: linear-gradient(95deg, var(--primary-neon), var(--secondary-neon), var(--primary-neon));
-            background-size: 220% auto;
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 38px rgba(0, 240, 255, 0.12);
-            animation: titleFlow 7s ease-in-out infinite alternate;
+            /* ✅ تحسين #8: إيقاف titleFlow */
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 8px;
-        }
-        @keyframes titleFlow {
-            0%   { background-position: 0% center; }
-            100% { background-position: 100% center; }
         }
 
         h2 {
@@ -329,12 +280,13 @@
             text-align: center;
             outline: none;
             font-family: inherit;
-            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.25);
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.25);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
         input::placeholder { color: #6b6b8a; }
         input:focus, select:focus {
             border-color: var(--secondary-neon);
-            box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.1), inset 0 2px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.1), inset 0 2px 6px rgba(0, 0, 0, 0.2);
             background: rgba(0, 0, 0, 0.5);
         }
         select option { background: #14142a; color: #fff; }
@@ -353,33 +305,23 @@
             font-family: inherit;
             letter-spacing: 0.1px;
             box-shadow:
-                0 6px 18px rgba(112, 0, 255, 0.32),
+                0 5px 15px rgba(112, 0, 255, 0.3),
                 inset 0 1px 0 rgba(255, 255, 255, 0.15);
             position: relative;
             overflow: hidden;
             -webkit-user-select: none;
             user-select: none;
+            transition: transform 0.15s ease, box-shadow 0.2s ease;
         }
-        button::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -80%;
-            width: 60%; height: 100%;
-            background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.22), transparent);
-            transform: skewX(-18deg);
-            transition: left 0.55s ease;
-        }
-        button:hover::before { left: 130%; }
         button:hover {
-            transform: translateY(-2.5px);
+            transform: translateY(-2px);
             box-shadow:
-                0 10px 26px rgba(112, 0, 255, 0.45),
-                0 0 22px rgba(0, 240, 255, 0.08),
+                0 8px 22px rgba(112, 0, 255, 0.4),
                 inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
         button:active {
             transform: translateY(1px) scale(0.985);
-            box-shadow: 0 4px 12px rgba(112, 0, 255, 0.3);
+            box-shadow: 0 3px 10px rgba(112, 0, 255, 0.3);
         }
         button:disabled {
             background: linear-gradient(135deg, #2a2a3a, #333344) !important;
@@ -388,22 +330,21 @@
             color: #777;
             transform: none;
         }
-        button:disabled::before { display: none; }
 
         button.secondary-btn {
             background: linear-gradient(135deg, #ff2a5f 0%, #d10043 55%, #e01a4f 100%);
-            box-shadow: 0 6px 18px rgba(255, 42, 95, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+            box-shadow: 0 5px 15px rgba(255, 42, 95, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
         }
         button.secondary-btn:hover {
-            box-shadow: 0 10px 26px rgba(255, 42, 95, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 22px rgba(255, 42, 95, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
 
         button.friends-panel-btn {
             background: linear-gradient(135deg, #14d492 0%, #059669 55%, #0ea876 100%);
-            box-shadow: 0 6px 18px rgba(16, 185, 129, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
         }
         button.friends-panel-btn:hover {
-            box-shadow: 0 10px 26px rgba(16, 185, 129, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 22px rgba(16, 185, 129, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
 
         button.action-btn {
@@ -414,7 +355,6 @@
             box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
             border-radius: 10px;
         }
-        button.action-btn::before { display: none; }
         button.small-btn {
             padding: 11px 22px;
             font-size: 14px;
@@ -449,21 +389,12 @@
             overflow: hidden;
             box-shadow: 0 8px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
             z-index: 1;
-            transition: all 0.35s ease;
-            animation: floatCard 4s ease-in-out infinite;
+            /* ✅ تحسين #9: إزالة floatCard (4 بطاقات تعمل animation باستمرار) */
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
-        
-        .game-card:nth-child(even) { animation-delay: 1.5s; }
-        .game-card:nth-child(odd) { animation-delay: 0.5s; }
-
-        @keyframes floatCard {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-6px); }
-        }
-
         .game-card:hover {
-            transform: translateY(-8px) scale(1.03);
+            transform: translateY(-5px) scale(1.02);
             box-shadow: 0 12px 25px rgba(0, 240, 255, 0.25), inset 0 1px 0 rgba(255,255,255,0.1);
             border-color: rgba(0, 240, 255, 0.3);
         }
@@ -488,6 +419,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            display: block;
         }
 
         .game-title {
@@ -495,7 +427,6 @@
             font-weight: 800;
             color: #fff;
             margin-bottom: 14px;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
         }
 
         .game-play-btn {
@@ -510,6 +441,7 @@
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(255, 42, 95, 0.3);
             margin: 0;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
         .game-play-btn:hover {
@@ -526,7 +458,7 @@
             border-radius: 18px;
             margin-bottom: 20px;
             border: 1px solid rgba(255, 255, 255, 0.06);
-            box-shadow: inset 0 2px 12px rgba(0, 0, 0, 0.3);
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
         }
         .score-box {
             display: flex;
@@ -548,14 +480,8 @@
             font-weight: 900;
             font-family: 'Segoe UI', sans-serif;
         }
-        .score-box.x-team .score-value {
-            color: var(--primary-neon);
-            text-shadow: 0 0 12px rgba(255, 42, 95, 0.45);
-        }
-        .score-box.o-team .score-value {
-            color: var(--secondary-neon);
-            text-shadow: 0 0 12px rgba(0, 240, 255, 0.45);
-        }
+        .score-box.x-team .score-value { color: var(--primary-neon); }
+        .score-box.o-team .score-value { color: var(--secondary-neon); }
 
         .board {
             display: grid;
@@ -578,53 +504,32 @@
             cursor: pointer;
             border: 1.5px solid rgba(255, 255, 255, 0.05);
             box-shadow:
-                inset 0 0 16px rgba(0, 0, 0, 0.5),
-                0 4px 12px rgba(0, 0, 0, 0.2);
+                inset 0 0 12px rgba(0, 0, 0, 0.5),
+                0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: background 0.2s ease, transform 0.15s ease;
         }
         .cell:hover {
             background: var(--cell-hover);
             transform: translateY(-2px);
-            box-shadow:
-                inset 0 0 16px rgba(0, 0, 0, 0.4),
-                0 8px 20px rgba(0, 0, 0, 0.3),
-                0 0 15px rgba(0, 240, 255, 0.08);
         }
         .cell:active { transform: scale(0.94); }
-        .cell span { animation: popIn 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
 
-        @keyframes popIn {
-            0%   { transform: scale(0.3); opacity: 0; }
-            60%  { transform: scale(1.12); opacity: 1; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        .cell.x {
-            color: var(--primary-neon);
-            text-shadow: 0 0 18px rgba(255, 42, 95, 0.7);
-        }
-        .cell.o {
-            color: var(--secondary-neon);
-            text-shadow: 0 0 18px rgba(0, 240, 255, 0.7);
-        }
+        .cell.x { color: var(--primary-neon); }
+        .cell.o { color: var(--secondary-neon); }
         .cell.winning-cell {
             background: linear-gradient(135deg, var(--accent-glow), #4f46e5) !important;
             color: #fff !important;
             transform: scale(1.04);
-            box-shadow: 0 0 24px var(--accent-glow), inset 0 0 16px rgba(255, 255, 255, 0.15);
-            animation: winPulse 1s ease-in-out infinite alternate;
-        }
-        @keyframes winPulse {
-            0%   { box-shadow: 0 0 20px var(--accent-glow); }
-            100% { box-shadow: 0 0 34px var(--accent-glow), 0 0 18px rgba(0, 240, 255, 0.25); }
+            box-shadow: 0 0 20px var(--accent-glow);
         }
 
         section { display: none; }
         section.active {
             display: block;
-            animation: fadeIn 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+            animation: fadeIn 0.35s ease;
         }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(8px); }
             to   { opacity: 1; transform: translateY(0); }
         }
 
@@ -653,7 +558,7 @@
             margin-bottom: 15px;
             padding: 8px;
             border: 1px solid rgba(255, 255, 255, 0.06);
-            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.25);
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.25);
         }
         .list-container::-webkit-scrollbar { width: 5px; }
         .list-container::-webkit-scrollbar-track { background: transparent; }
@@ -670,10 +575,6 @@
             border-radius: 12px;
             margin-bottom: 6px;
             border: 1px solid rgba(255, 255, 255, 0.03);
-        }
-        .list-item:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(0, 240, 255, 0.12);
         }
         .list-item span {
             font-size: 14px;
@@ -705,8 +606,9 @@
             opacity: 0;
             pointer-events: none;
             z-index: 9999;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35), 0 0 20px rgba(16, 185, 129, 0.25);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
             max-width: 88vw;
+            transition: transform 0.3s ease, opacity 0.3s ease;
         }
         .toast.show {
             transform: translateY(0);
@@ -717,18 +619,16 @@
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.82);
+            background: rgba(0, 0, 0, 0.88);
             z-index: 99999;
             display: none;
             justify-content: center;
             align-items: center;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
             padding: 15px;
         }
         .modal-overlay.active {
             display: flex;
-            animation: fadeIn 0.35s ease-out;
+            animation: fadeIn 0.3s ease-out;
         }
         .modal-content {
             background: linear-gradient(160deg, #181829, #111122);
@@ -738,13 +638,11 @@
             text-align: center;
             width: 92%;
             max-width: 350px;
-            box-shadow:
-                0 0 40px rgba(0, 240, 255, 0.22),
-                inset 0 1px 0 rgba(255, 255, 255, 0.05);
-            animation: modalPop 0.4s cubic-bezier(0.22, 1.4, 0.36, 1);
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.2);
+            animation: modalPop 0.35s ease;
         }
         @keyframes modalPop {
-            0%   { transform: scale(0.85); opacity: 0; }
+            0%   { transform: scale(0.88); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
         .modal-content h3 {
@@ -771,7 +669,6 @@
             border-radius: 18px;
             margin-bottom: 20px;
             text-align: center;
-            box-shadow: inset 0 0 20px rgba(255, 42, 95, 0.04);
         }
 
         .loader {
@@ -781,17 +678,14 @@
             border: 4px solid rgba(255, 255, 255, 0.08);
             border-top: 4px solid var(--secondary-neon);
             border-radius: 50%;
-            animation: spin 0.85s linear infinite;
-            box-shadow: 0 0 18px rgba(0, 240, 255, 0.15);
+            animation: spin 0.9s linear infinite;
         }
         @keyframes spin {
             0%   { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
 
-        /* ========================================= */
-        /* =========== شاشة تسجيل الدخول المحسنة =========== */
-        /* ========================================= */
+        /* =========== شاشة تسجيل الدخول =========== */
 
         .login-hero {
             position: relative;
@@ -803,17 +697,13 @@
             overflow: hidden;
         }
 
+        /* ✅ تحسين #10: إيقاف heroGlowPulse و heroFloat و إزالة drop-shadow */
         .hero-glow {
             position: absolute;
-            width: 200px;
-            height: 200px;
-            background: radial-gradient(circle, rgba(0, 240, 255, 0.25) 0%, transparent 60%);
-            filter: blur(20px);
-            animation: heroGlowPulse 3s ease-in-out infinite alternate;
-        }
-        @keyframes heroGlowPulse {
-            0% { transform: scale(0.9); opacity: 0.5; }
-            100% { transform: scale(1.2); opacity: 1; }
+            width: 180px;
+            height: 180px;
+            background: radial-gradient(circle, rgba(0, 240, 255, 0.18) 0%, transparent 60%);
+            pointer-events: none;
         }
 
         .hero-graphic {
@@ -821,14 +711,9 @@
             height: 110px;
             position: relative;
             z-index: 2;
-            filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.6));
-            animation: heroFloat 4s ease-in-out infinite;
-        }
-        @keyframes heroFloat {
-            0%, 100% { transform: translateY(0) rotate(-2deg); }
-            50% { transform: translateY(-8px) rotate(2deg); }
         }
 
+        /* ✅ تحسين #11: إيقاف orbFloat و decorIconFloat (كانت 7 عناصر متحركة باستمرار) */
         .login-decor {
             position: absolute;
             inset: 0;
@@ -841,48 +726,33 @@
         .decor-orb {
             position: absolute;
             border-radius: 50%;
-            filter: blur(35px);
-            opacity: 0.5;
-            animation: orbFloat 8s ease-in-out infinite;
+            opacity: 0.35;
         }
         .orb-a {
             width: 130px; height: 130px;
             background: radial-gradient(circle, #7000ff, transparent 70%);
             top: -40px; left: -30px;
-            animation-delay: 0s;
         }
         .orb-b {
             width: 110px; height: 110px;
             background: radial-gradient(circle, #00f0ff, transparent 70%);
             bottom: 30%; right: -40px;
-            animation-delay: 2s;
         }
         .orb-c {
             width: 90px; height: 90px;
             background: radial-gradient(circle, #ff2a5f, transparent 70%);
             top: 40%; left: -30px;
-            animation-delay: 4s;
-        }
-        @keyframes orbFloat {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(15px, -15px) scale(1.15); }
         }
 
         .decor-icon {
             position: absolute;
             font-size: 22px;
-            opacity: 0.55;
-            filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.6));
-            animation: decorIconFloat 6s ease-in-out infinite;
+            opacity: 0.45;
         }
-        .di-1 { top: 6%; left: 6%; animation-delay: 0s; }
-        .di-2 { top: 15%; right: 8%; animation-delay: 1.2s; }
-        .di-3 { bottom: 12%; left: 10%; animation-delay: 2.5s; }
-        .di-4 { bottom: 22%; right: 6%; animation-delay: 3.8s; }
-        @keyframes decorIconFloat {
-            0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
-            50% { transform: translateY(-12px) rotate(12deg) scale(1.1); }
-        }
+        .di-1 { top: 6%; left: 6%; }
+        .di-2 { top: 15%; right: 8%; }
+        .di-3 { bottom: 12%; left: 10%; }
+        .di-4 { bottom: 22%; right: 6%; }
 
         .auth-tabs {
             display: flex;
@@ -891,7 +761,7 @@
             padding: 5px;
             margin-bottom: 18px;
             border: 1px solid rgba(255, 255, 255, 0.06);
-            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
             position: relative;
             z-index: 5;
         }
@@ -908,15 +778,14 @@
             font-size: 14px;
             margin: 0;
             box-shadow: none;
-            transition: all 0.3s ease;
+            transition: background 0.25s ease, color 0.25s ease;
             font-family: inherit;
         }
-        .auth-tab::before { display: none; }
         .auth-tab:hover { background: rgba(255,255,255,0.04); transform: none; color: #fff; }
         .auth-tab.active {
             background: linear-gradient(135deg, #5a24ff, #7000ff);
             color: #fff;
-            box-shadow: 0 4px 14px rgba(112, 0, 255, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            box-shadow: 0 3px 10px rgba(112, 0, 255, 0.4);
             transform: none;
         }
 
@@ -927,7 +796,7 @@
         }
         .auth-form.active {
             display: block;
-            animation: fadeIn 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            animation: fadeIn 0.35s ease;
         }
 
         .password-hint {
@@ -953,29 +822,7 @@
             font-weight: 600;
         }
 
-        /* ========================================= */
-        /* ============ صورة Nexus الثابتة ============ */
-        /* ========================================= */
-        .ad-static-nexus {
-            margin-top: 25px;
-            width: 100%;
-            height: 140px;
-            border-radius: 18px;
-            overflow: hidden;
-            position: relative;
-            border: 1.5px solid rgba(0, 240, 255, 0.32);
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 5;
-            animation: adContainerPulse 4s ease-in-out infinite alternate;
-        }
-        .ad-static-nexus .ad-slide {
-            width: 100%;
-            height: 100%;
-        }
-
-        /* ========================================= */
-        /* ============ شريط الإعلانات الجديد ============ */
-        /* ========================================= */
+        /* ============ شريط الإعلانات ============ */
         .ad-slider-container {
             margin-top: 25px;
             width: 100%;
@@ -986,23 +833,20 @@
             border: 1.5px solid rgba(0, 240, 255, 0.32);
             background: rgba(0, 0, 0, 0.5);
             z-index: 5;
-            animation: adContainerPulse 4s ease-in-out infinite alternate;
-        }
-        @keyframes adContainerPulse {
-            0%   { box-shadow: 0 0 18px rgba(0, 240, 255, 0.15), inset 0 0 15px rgba(0, 0, 0, 0.5); }
-            100% { box-shadow: 0 0 30px rgba(0, 240, 255, 0.3),  inset 0 0 15px rgba(0, 0, 0, 0.5); }
+            /* ✅ تحسين #12: إيقاف adContainerPulse (كان pulse مستمر) */
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
         }
         
         .ad-slider-track {
             display: flex;
-            width: 200%;
+            width: 400%;
             height: 100%;
             animation: scrollAds 20s linear infinite;
             will-change: transform;
         }
         
         .ad-slide {
-            width: 50%;
+            width: 25%;
             height: 100%;
             position: relative;
             overflow: hidden;
@@ -1024,11 +868,7 @@
             object-fit: cover;
             object-position: center;
             z-index: 0;
-            transition: transform 8s ease-in-out;
-            filter: brightness(0.85) saturate(1.1);
-        }
-        .ad-slide:hover .ad-img {
-            transform: scale(1.08);
+            filter: brightness(0.85);
         }
         
         .ad-overlay {
@@ -1078,14 +918,10 @@
             padding: 2px 9px;
             border-radius: 20px;
             margin-bottom: 2px;
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            box-shadow: 0 0 10px rgba(0, 240, 255, 0.25);
         }
         .ad-slide.sasa .ad-badge {
             background: rgba(255, 42, 95, 0.16);
             border-color: rgba(255, 42, 95, 0.45);
-            box-shadow: 0 0 10px rgba(255, 42, 95, 0.25);
         }
         
         .ad-title {
@@ -1098,14 +934,12 @@
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.5));
         }
         .ad-slide.sasa .ad-title {
             background: linear-gradient(90deg, #ffffff, #ffd700);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5));
         }
         
         .ad-subtitle {
@@ -1113,33 +947,9 @@
             font-size: 11px;
             color: #e0e0f5;
             font-weight: 600;
-            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
         }
         
-        /* شريط اللمعان المتحرك */
-        .ad-slide::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 55%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.14), transparent);
-            transform: translateX(-150%) skewX(-20deg);
-            animation: adShine 5s ease-in-out infinite;
-            z-index: 3;
-            pointer-events: none;
-        }
-        .ad-slide:nth-child(1)::after { animation-delay: 0.5s; }
-        .ad-slide:nth-child(2)::after { animation-delay: 1.75s; }
-        .ad-slide:nth-child(3)::after { animation-delay: 3s; }
-        .ad-slide:nth-child(4)::after { animation-delay: 4.25s; }
-        
-        @keyframes adShine {
-            0%   { transform: translateX(-150%) skewX(-20deg); }
-            45%  { transform: translateX(280%) skewX(-20deg); }
-            100% { transform: translateX(280%) skewX(-20deg); }
-        }
+        /* ✅ تحسين #13: إزالة adShine (كان يعمل 4 مرات على صور مختلفة) */
         
         @keyframes scrollAds {
             0%   { transform: translateX(0); }
@@ -1148,6 +958,15 @@
         
         .ad-slider-container:hover .ad-slider-track {
             animation-play-state: paused;
+        }
+
+        /* ✅ تحسين #14: احترام تفضيل تقليل الحركة على الأجهزة */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
         }
 
         @media (max-width: 380px) {
@@ -1161,7 +980,6 @@
             .game-title { font-size: 13px; }
             .game-play-btn { font-size: 12px; padding: 8px; }
             .ad-slider-container { height: 120px; }
-            .ad-static-nexus { height: 120px; }
             .ad-title { font-size: 15px; }
             .ad-subtitle { font-size: 10px; }
             .ad-content { padding: 0 16px; }
@@ -1204,14 +1022,13 @@
 
     <div class="container">
         <h1>
-            <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--secondary-neon); filter: drop-shadow(0 0 8px var(--secondary-neon));">
+            <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--secondary-neon);">
                 <path d="M6 12h4m-2-2v4m8-1h.01M18 9h.01"/>
                 <path d="M18 6H6a4 4 0 0 0-4 4v4a4 4 0 0 0 4 4h12a4 4 0 0 0 4-4v-4a4 4 0 0 0-4-4Z"/>
             </svg>
             منصة الالعاب Nexus Games™
         </h1>
 
-        <!-- ====== شاشة تسجيل الدخول / إنشاء حساب ====== -->
         <section id="login-section" class="active">
 
             <div class="login-decor">
@@ -1233,10 +1050,6 @@
                             <stop offset="50%" stop-color="#7000ff"/>
                             <stop offset="100%" stop-color="#00f0ff"/>
                         </linearGradient>
-                        <linearGradient id="heroGrad2" x1="100%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" stop-color="#00f0ff"/>
-                            <stop offset="100%" stop-color="#ff2a5f"/>
-                        </linearGradient>
                     </defs>
                     <path d="M40,50 Q40,25 65,25 L135,25 Q160,25 160,50 L160,70 Q160,88 138,88 L118,88 Q108,88 100,80 Q92,88 82,88 L62,88 Q40,88 40,70 Z" 
                           fill="none" stroke="url(#heroGrad)" stroke-width="3" stroke-linejoin="round"/>
@@ -1248,9 +1061,8 @@
                     <circle cx="142" cy="63" r="4" fill="#7000ff"/>
                     <circle cx="122" cy="63" r="4" fill="#00f0ff"/>
                     <circle cx="132" cy="73" r="4" fill="#ffd700"/>
-                    <circle cx="100" cy="42" r="2" fill="#00f0ff" opacity="0.9">
-                        <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite"/>
-                    </circle>
+                    <!-- ✅ تحسين #15: إزالة SVG animate -->
+                    <circle cx="100" cy="42" r="2" fill="#00f0ff" opacity="0.9"/>
                     <circle cx="80" cy="42" r="1.5" fill="#ff2a5f" opacity="0.7"/>
                     <circle cx="120" cy="42" r="1.5" fill="#ff2a5f" opacity="0.7"/>
                 </svg>
@@ -1282,26 +1094,21 @@
                 <button onclick="registerUser()">إنشاء الحساب ✨</button>
             </div>
 
-            <!-- صورة Nexus الثابتة (بدون حركة) -->
-            <div class="ad-static-nexus">
-                <div class="ad-slide nexus">
-                    <img src="Nexus.jpg" alt="Nexus Games" class="ad-img">
-                    <div class="ad-overlay ad-overlay-nexus"></div>
-                    <div class="ad-content">
-                        <span class="ad-badge">✨ مميز</span>
-                        <h4 class="ad-title">Nexus Games™</h4>
-                        <p class="ad-subtitle">عالم الألعاب الاحترافي</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- شريط الإعلانات المتحرك (Sasa فقط) -->
             <div class="ad-slider-container">
                 <div class="ad-slider-track">
 
-                    <!-- الشريحة 1: Sasa -->
+                    <div class="ad-slide nexus">
+                        <img src="Nexus.jpg" alt="Nexus Games" class="ad-img" loading="lazy">
+                        <div class="ad-overlay ad-overlay-nexus"></div>
+                        <div class="ad-content">
+                            <span class="ad-badge">✨ مميز</span>
+                            <h4 class="ad-title">Nexus Games™</h4>
+                            <p class="ad-subtitle">عالم الألعاب الاحترافي</p>
+                        </div>
+                    </div>
+
                     <div class="ad-slide sasa">
-                        <img src="sasa.jpg" alt="Sasa Store" class="ad-img">
+                        <img src="sasa.jpg" alt="Sasa Store" class="ad-img" loading="lazy">
                         <div class="ad-overlay ad-overlay-sasa"></div>
                         <div class="ad-content">
                             <span class="ad-badge">🔥 عروض</span>
@@ -1310,9 +1117,18 @@
                         </div>
                     </div>
 
-                    <!-- الشريحة 2: Sasa (مكرر للتدوير السلس) -->
+                    <div class="ad-slide nexus">
+                        <img src="Nexus.jpg" alt="Nexus Games" class="ad-img" loading="lazy">
+                        <div class="ad-overlay ad-overlay-nexus"></div>
+                        <div class="ad-content">
+                            <span class="ad-badge">✨ مميز</span>
+                            <h4 class="ad-title">Nexus Games™</h4>
+                            <p class="ad-subtitle">عالم الألعاب الاحترافي</p>
+                        </div>
+                    </div>
+
                     <div class="ad-slide sasa">
-                        <img src="sasa.jpg" alt="Sasa Store" class="ad-img">
+                        <img src="sasa.jpg" alt="Sasa Store" class="ad-img" loading="lazy">
                         <div class="ad-overlay ad-overlay-sasa"></div>
                         <div class="ad-content">
                             <span class="ad-badge">🔥 عروض</span>
@@ -1329,7 +1145,7 @@
         <section id="menu-section">
             <div class="dashboard-section">
                 <h2>
-                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary-neon); filter: drop-shadow(0 0 5px var(--primary-neon));">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary-neon);">
                         <path d="M6 12h4m-2-2v4m8-1h.01M18 9h.01"/>
                         <path d="M18 6H6a4 4 0 0 0-4 4v4a4 4 0 0 0 4 4h12a4 4 0 0 0 4-4v-4a4 4 0 0 0-4-4Z"/>
                     </svg>
@@ -1339,7 +1155,7 @@
                 <div class="games-grid">
                     <div class="game-card">
                         <div class="game-img-container">
-                            <img src="xo.jpg" alt="XO">
+                            <img src="xo.jpg" alt="XO" loading="lazy">
                         </div>
                         <div class="game-title">X O</div>
                         <button class="game-play-btn" onclick="startLocalGame()">دخول</button>
@@ -1347,7 +1163,7 @@
 
                     <div class="game-card">
                         <div class="game-img-container">
-                            <img src="ludo.jpg" alt="Ludo">
+                            <img src="ludo.jpg" alt="Ludo" loading="lazy">
                         </div>
                         <div class="game-title">لودو</div>
                         <button class="game-play-btn" onclick="openGameOptionsModalWithoutFriend()">دخول</button>
@@ -1355,7 +1171,7 @@
 
                     <div class="game-card">
                         <div class="game-img-container">
-                            <img src="neshan.jpg" alt="Neshan">
+                            <img src="neshan.jpg" alt="Neshan" loading="lazy">
                         </div>
                         <div class="game-title">نيشان</div>
                         <button class="game-play-btn" onclick="goToArcheryPage()">دخول</button>
@@ -1363,7 +1179,7 @@
 
                     <div class="game-card">
                         <div class="game-img-container">
-                            <img src="mlion.jpg" alt="Millionaire">
+                            <img src="mlion.jpg" alt="Millionaire" loading="lazy">
                         </div>
                         <div class="game-title">المليون</div>
                         <button class="game-play-btn" onclick="window.location.href='millionaire.html'">دخول</button>
@@ -1567,27 +1383,28 @@
         }
 
         function playWinAnimation() {
-            var duration = 3 * 1000; var animationEnd = Date.now() + duration;
-            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 99999 };
+            var duration = 2.5 * 1000; var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 50, zIndex: 99999 };
             function randomInRange(min, max) { return Math.random() * (max - min) + min; }
             var interval = setInterval(function() {
                 var timeLeft = animationEnd - Date.now();
                 if (timeLeft <= 0) { return clearInterval(interval); }
-                var particleCount = 50 * (timeLeft / duration);
+                var particleCount = 40 * (timeLeft / duration);
                 confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
                 confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
-            }, 250);
+            }, 300);
         }
 
+        // ✅ تحسين: تقليل عدد الجزيئات من 20 إلى 8
         function createParticles() {
             const container = document.getElementById('particles');
             const colors = ['#ff2a5f', '#00f0ff', '#7000ff', '#ffd700', '#10b981'];
-            for (let i = 0; i < 20; i++) {
+            for (let i = 0; i < 8; i++) {
                 let drop = document.createElement('div');
                 drop.classList.add('drop');
                 drop.style.left = Math.random() * 100 + 'vw';
-                drop.style.animationDuration = (Math.random() * 2 + 3) + 's'; 
-                drop.style.animationDelay = (Math.random() * 4) + 's';
+                drop.style.animationDuration = (Math.random() * 3 + 4) + 's'; 
+                drop.style.animationDelay = (Math.random() * 5) + 's';
                 drop.style.background = `linear-gradient(180deg, ${colors[Math.floor(Math.random() * colors.length)]}, transparent)`;
                 drop.style.width = (Math.random() * 2 + 2) + 'px';
                 drop.style.height = (Math.random() * 12 + 14) + 'px';
@@ -2052,4 +1869,157 @@
             setupGameUI(`⚡ ${roleDisplay}`);
             
             db.ref('games/' + gameId).on('value', (snapshot) => {
-                const data = snapshot
+                const data = snapshot.val();
+                if (data) {
+                    gameBoard = data.board || ["", "", "", "", "", "", "", "", ""]; isGameOver = data.winner !== '';
+                    playerXName = data.hostName || 'اللاعب (X)'; playerOName = data.guestName || 'اللاعب (O)';
+                    if (data.scores) scores = data.scores;
+                    updateScoreboardDOM(); renderBoard();
+                    
+                    if (data.winner !== '') { handleWinOnline(data); } 
+                    else {
+                        document.getElementById('reset-btn').style.display = 'none';
+                        let currentPlayerName = data.turn === 'X' ? playerXName : playerOName;
+                        if (data.turn === myRole) {
+                            document.getElementById('status-text').innerText = "🟢 دورك الآن..";
+                            document.getElementById('status-text').style.color = "var(--secondary-neon)";
+                        } else {
+                            document.getElementById('status-text').innerText = `⏳ بانتظار ${currentPlayerName}...`;
+                            document.getElementById('status-text').style.color = "#aaa";
+                        }
+                    }
+                } else {
+                    if(document.getElementById('game-section').classList.contains('active')){
+                        showToast("🚪 غادر الخصم اللعبة", "#ff2a5f"); exitGame();
+                    }
+                }
+            });
+        }
+
+        function setupGameUI(roleText) {
+            showSection('game-section');
+            document.getElementById('board').style.display = 'grid';
+            document.getElementById('exit-btn').style.display = 'inline-block';
+            document.getElementById('role-text').innerText = roleText;
+            updateScoreboardDOM(); updateStatusText();
+        }
+
+        function makeMove(index) {
+            if (isGameOver || gameBoard[index] !== "") return;
+            if (isOnline) {
+                db.ref('games/' + gameId).once('value').then((snapshot) => {
+                    let data = snapshot.val();
+                    if (data.turn === myRole && data.board[index] === "" && data.winner === "") {
+                        data.board[index] = myRole; data.turn = myRole === 'X' ? 'O' : 'X';
+                        let winner = checkWin(data.board);
+                        if (winner) {
+                            data.winner = winner;
+                            if (!data.scores) data.scores = { X: 0, O: 0, ties: 0 };
+                            if (winner === 'Draw') data.scores.ties += 1; else data.scores[winner] += 1;
+                        }
+                        db.ref('games/' + gameId).update(data);
+                    }
+                });
+            } else {
+                gameBoard[index] = localTurn;
+                let winner = checkWin(gameBoard);
+                if (winner) {
+                    isGameOver = true;
+                    if (winner === 'Draw') { document.getElementById('status-text').innerText = "🏁 تعادل!"; scores.ties += 1; saveUserStats(false); } 
+                    else {
+                        let winnerRealName = winner === 'X' ? playerXName : playerOName;
+                        document.getElementById('status-text').innerText = `🎉 الفائز: ${winnerRealName}!`;
+                        scores[winner] += 1; highlightWinningLine(gameBoard); playWinAnimation(); saveUserStats(true); 
+                    }
+                    updateScoreboardDOM(); document.getElementById('reset-btn').style.display = 'block';
+                } else { localTurn = localTurn === 'X' ? 'O' : 'X'; updateStatusText(); }
+                renderBoard();
+            }
+        }
+
+        function handleWinOnline(data) {
+            if (data.winner === 'Draw') { document.getElementById('status-text').innerText = "🏁 تعادل!"; saveUserStats(false); } 
+            else {
+                let winnerRealName = data.winner === 'X' ? playerXName : playerOName;
+                document.getElementById('status-text').innerText = `🎉 الفائز هو: ${winnerRealName}!`;
+                highlightWinningLine(gameBoard);
+                if(data.winner === myRole) { playWinAnimation(); saveUserStats(true); } else { saveUserStats(false); }
+            }
+            if(myRole === 'X') document.getElementById('reset-btn').style.display = 'block';
+            else document.getElementById('status-text').innerText += " (بانتظار المستضيف)";
+        }
+
+        function renderBoard() {
+            const cells = document.querySelectorAll('.cell');
+            cells.forEach((cell, index) => {
+                if (gameBoard[index] !== "") {
+                    if (!cell.hasChildNodes()) cell.innerHTML = `<span>${gameBoard[index]}</span>`;
+                } else { cell.innerHTML = ""; cell.classList.remove('winning-cell'); }
+                cell.className = 'cell';
+                if (gameBoard[index] === 'X') cell.classList.add('x');
+                if (gameBoard[index] === 'O') cell.classList.add('o');
+            });
+        }
+
+        function updateScoreboardDOM() {
+            document.getElementById('score-x').innerText = scores.X;
+            document.getElementById('score-o').innerText = scores.O;
+            document.getElementById('score-ties').innerText = scores.ties;
+            
+            let genderX = playerXName === currentUserData?.username ? currentUserData?.gender : null;
+            let genderO = playerOName === currentUserData?.username ? currentUserData?.gender : null;
+
+            document.getElementById('label-x').innerHTML = `<img src="${generateAvatarURL(playerXName, genderX)}" style="width:30px;height:30px;border-radius:50%;border:1px solid rgba(0,240,255,0.2);"><br>${playerXName}`;
+            document.getElementById('label-o').innerHTML = `<img src="${generateAvatarURL(playerOName, genderO)}" style="width:30px;height:30px;border-radius:50%;border:1px solid rgba(0,240,255,0.2);"><br>${playerOName}`;
+        }
+
+        function updateStatusText() {
+            if (!isOnline && !isGameOver) {
+                let currentName = localTurn === 'X' ? playerXName : playerOName;
+                document.getElementById('status-text').innerText = `🎯 دور اللاعب: ${currentName}`;
+            }
+        }
+
+        const winConditions = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
+        function checkWin(board) {
+            for (let condition of winConditions) {
+                let [a, b, c] = condition;
+                if (board[a] && board[a] === board[b] && board[a] === board[c]) return board[a]; 
+            }
+            if (!board.includes("")) return 'Draw'; return null;
+        }
+
+        function highlightWinningLine(board) {
+            for (let condition of winConditions) {
+                let [a, b, c] = condition;
+                if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                    const cells = document.querySelectorAll('.cell');
+                    cells[a].classList.add('winning-cell'); cells[b].classList.add('winning-cell'); cells[c].classList.add('winning-cell');
+                    break;
+                }
+            }
+        }
+
+        function resetGame() {
+            hasLoggedStatThisGame = false;
+            if (isOnline) { db.ref('games/' + gameId).update({ board: ["", "", "", "", "", "", "", "", ""], turn: 'X', winner: '' }); } 
+            else {
+                gameBoard = ["", "", "", "", "", "", "", "", ""]; isGameOver = false; localTurn = 'X';
+                document.getElementById('reset-btn').style.display = 'none'; updateStatusText(); renderBoard();
+            }
+        }
+
+        function exitGame() {
+            if(isOnline && gameId) { db.ref('games/' + gameId).remove(); db.ref('games/' + gameId).off(); }
+            showSection('menu-section');
+        }
+
+        function saveUserStats(isWin) {
+            if (!currentUserData || !currentUserId || hasLoggedStatThisGame) return;
+            hasLoggedStatThisGame = true; currentUserData.played = (currentUserData.played || 0) + 1;
+            if (isWin) currentUserData.wins = (currentUserData.wins || 0) + 1;
+            db.ref('users/' + currentUserId).update({ played: currentUserData.played, wins: currentUserData.wins });
+        }
+    </script>
+</body>
+</html>
