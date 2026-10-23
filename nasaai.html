@@ -44,9 +44,9 @@
   .waiting-overlay {
       position: absolute;
       inset: 0;
-      background: rgba(0,0,0,0.6);
-      backdrop-filter: blur(4px);
-      z-index: 15;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(8px);
+      z-index: 60;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -56,6 +56,18 @@
       font-weight: bold;
       text-shadow: 0 2px 4px rgba(0,0,0,0.8);
   }
+
+  @keyframes lobbyFadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+  }
+  .lobby-anim {
+      animation: lobbyFadeIn 0.5s ease-out forwards;
+  }
+  .custom-scroll::-webkit-scrollbar { width: 6px; }
+  .custom-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 4px; }
+  .custom-scroll::-webkit-scrollbar-thumb { background: rgba(251,191,36,0.5); border-radius: 4px; }
+  .custom-scroll::-webkit-scrollbar-thumb:hover { background: rgba(251,191,36,0.8); }
 </style>
 </head>
 <body class="w-screen h-screen overflow-hidden flex justify-center items-center select-none">
@@ -65,7 +77,7 @@
 
   <!-- شاشة الانتظار (تظهر عندما يكون دور الخصم) -->
   <div id="waitingOverlay" class="waiting-overlay hidden">
-      <i class="fa-solid fa-hourglass-half text-4xl mb-4 text-amber-400 animate-spin"></i>
+      <i class="fa-solid fa-hourglass-half text-5xl mb-4 text-amber-400 animate-spin"></i>
       <div>بانتظار دور الخصم...</div>
   </div>
 
@@ -179,11 +191,114 @@
       </button>
     </div>
   </div>
+
+  <!-- ========================================================= -->
+  <!-- ======= واجهة الدخول (اللوبي) ======= -->
+  <!-- ========================================================= -->
+  <div id="lobbyOverlay" class="absolute inset-0 z-50 bg-slate-950/90 backdrop-blur-xl flex flex-col items-center justify-center p-4 hidden overflow-y-auto">
+      <div class="w-full max-w-md bg-slate-800/80 rounded-3xl p-8 border border-slate-700/50 shadow-2xl relative lobby-anim">
+          <!-- Decorative elements -->
+          <div class="absolute -top-10 -left-10 w-32 h-32 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+          <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+          <div class="text-center mb-8 relative">
+              <h1 class="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-500 to-orange-600 drop-shadow-lg mb-2" style="font-family: 'Teko', sans-serif;">نيشان</h1>
+              <p class="text-slate-400 text-sm">لعبة القوس والنشاب — تطوير حمزة الحماده</p>
+          </div>
+
+          <!-- Profile Info -->
+          <div class="flex items-center gap-4 bg-slate-900/60 p-4 rounded-2xl mb-8 border border-slate-700/50 shadow-inner relative">
+              <img id="lobbyAvatar" src="" class="w-16 h-16 rounded-full border-2 border-amber-400 bg-slate-800 shadow-[0_0_15px_rgba(251,191,36,0.3)]">
+              <div class="flex-1">
+                  <div id="lobbyName" class="text-white font-bold text-xl">جاري التحميل...</div>
+                  <div id="lobbyId" class="text-amber-400 font-mono text-xs mt-1">ID: ---</div>
+              </div>
+              <button onclick="window.location.href='index.html'" class="text-slate-400 hover:text-white bg-slate-800 p-2 rounded-lg" title="الرئيسية"><i class="fa-solid fa-house"></i></button>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="space-y-3 relative">
+              <button onclick="startBotGameFromLobby()" class="w-full py-4 rounded-2xl font-bold text-lg bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/30 active:scale-95 transition flex items-center justify-center gap-3">
+                  <i class="fa-solid fa-robot text-2xl"></i> العب ضد الروبوت
+              </button>
+              <button onclick="openFriendsModal()" class="w-full py-4 rounded-2xl font-bold text-lg bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30 active:scale-95 transition flex items-center justify-center gap-3">
+                  <i class="fa-solid fa-users text-2xl"></i> دعوة صديق
+              </button>
+              <button onclick="openCreateLinkModal()" class="w-full py-4 rounded-2xl font-bold text-lg bg-gradient-to-r from-purple-500 to-fuchsia-600 text-white shadow-lg shadow-purple-500/30 active:scale-95 transition flex items-center justify-center gap-3">
+                  <i class="fa-solid fa-link text-2xl"></i> إنشاء رابط غرفة
+              </button>
+              <button onclick="openJoinLinkModal()" class="w-full py-3 rounded-2xl font-bold text-md bg-slate-700 text-white hover:bg-slate-600 active:scale-95 transition flex items-center justify-center gap-2 mt-4">
+                  <i class="fa-solid fa-right-to-bracket"></i> الانضمام بكود
+              </button>
+          </div>
+      </div>
+  </div>
+
+  <!-- Friends Modal -->
+  <div id="friendsModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center hidden p-4">
+      <div class="bg-slate-800 w-full max-w-sm rounded-3xl p-6 border border-slate-700 shadow-2xl">
+          <h3 class="text-xl font-bold text-white mb-4 text-center">اختر صديقاً للدعوة</h3>
+          <div id="friendsListContainer" class="max-h-64 overflow-y-auto space-y-2 mb-6 custom-scroll pr-1">
+              <!-- Friends list -->
+          </div>
+          <button onclick="document.getElementById('friendsModal').classList.add('hidden')" class="w-full py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-bold transition">إلغاء</button>
+      </div>
+  </div>
+
+  <!-- Create Link Modal -->
+  <div id="createLinkModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center hidden p-4">
+      <div class="bg-slate-800 w-full max-w-sm rounded-3xl p-6 border border-slate-700 shadow-2xl text-center">
+          <h3 class="text-xl font-bold text-white mb-4">إنشاء رابط غرفة</h3>
+          <p class="text-slate-400 text-sm mb-6">اختر نمط اللعب الذي تريده</p>
+          <div class="space-y-3 mb-6">
+              <button onclick="createLinkFromLobby('1v1')" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition">1 ضد 1 (فردي)</button>
+              <button onclick="createLinkFromLobby('2v2')" class="w-full py-3 bg-fuchsia-600 hover:bg-fuchsia-700 text-white rounded-xl font-bold transition">2 ضد 2 (فرق)</button>
+          </div>
+          <button onclick="document.getElementById('createLinkModal').classList.add('hidden')" class="w-full py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-bold transition">إلغاء</button>
+      </div>
+  </div>
+
+  <!-- Join Link Modal -->
+  <div id="joinLinkModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center hidden p-4">
+      <div class="bg-slate-800 w-full max-w-sm rounded-3xl p-6 border border-slate-700 shadow-2xl text-center">
+          <h3 class="text-xl font-bold text-white mb-4">الانضمام بكود</h3>
+          <input type="text" id="joinLinkInput" placeholder="الصق الرابط أو الكود هنا" class="w-full bg-slate-900 text-white border border-slate-700 rounded-xl px-4 py-3 mb-6 outline-none focus:border-amber-500 text-center">
+          <div class="flex gap-3">
+              <button onclick="joinGameByCode()" class="flex-1 py-3 bg-amber-500 hover:bg-amber-600 text-slate-900 rounded-xl font-bold transition">دخول</button>
+              <button onclick="document.getElementById('joinLinkModal').classList.add('hidden')" class="flex-1 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-bold transition">إلغاء</button>
+          </div>
+      </div>
+  </div>
+
+  <!-- Waiting Overlay (for invite/link creation) -->
+  <div id="lobbyWaitingOverlay" class="waiting-overlay hidden z-50 flex-col">
+      <i class="fa-solid fa-hourglass-half text-5xl mb-6 text-amber-400 animate-spin"></i>
+      <div id="waitingTitle" class="text-2xl mb-2 text-white">بانتظار انضمام اللاعب...</div>
+      <div id="waitingSubtitle" class="text-sm text-slate-400 mb-8">الرجاء الانتظار أو مشاركة الرابط</div>
+      <button onclick="cancelWaiting()" class="px-8 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold shadow-lg shadow-red-500/30 transition">إلغاء</button>
+  </div>
+
+  <!-- Invite Received Modal -->
+  <div id="inviteReceivedModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center hidden p-4">
+      <div class="bg-slate-800 w-full max-w-sm rounded-3xl p-6 border border-slate-700 shadow-2xl text-center relative overflow-hidden">
+          <div class="absolute -top-10 -left-10 w-24 h-24 bg-amber-500/20 rounded-full blur-2xl"></div>
+          <div class="w-16 h-16 bg-amber-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-amber-500/50">
+              <i class="fa-solid fa-envelope text-3xl text-amber-400 animate-bounce"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-2">دعوة للعب!</h3>
+          <p class="text-slate-300 mb-6">الصديق <span id="inviteSenderName" class="text-amber-400 font-bold"></span> يدعوك للعب نيشان</p>
+          <div class="flex gap-3">
+              <button id="acceptInviteBtn" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold shadow-lg transition">قبول</button>
+              <button id="rejectInviteBtn" class="flex-1 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-bold transition">رفض</button>
+          </div>
+      </div>
+  </div>
+
 </div>
 
 <script>
 /* =========================================================
-   1) إعداد قاعدة البيانات Firebase (بيانات مشروعك)
+   1) إعداد قاعدة البيانات Firebase
    ========================================================= */
 const firebaseConfig = {
     apiKey: "AIzaSyDr0kbQDE90hhEMohV6X1b4ndu4L7uZz24",
@@ -198,34 +313,58 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 /* =========================================================
-   2) حالة اللعب الأونلاين (Multiplayer)
+   2) حالة اللعب والمستخدم
    ========================================================= */
 let isOnline = false;
 let gameId = null;
-let myRole = 'X'; // X أو O
-let myUid = null;
-let myName = "أنت";
-let oppName = "المنافس";
-let oppUid = null;
+let myRole = 'X'; 
+let myUid = localStorage.getItem('xo_uid'); 
+let myName = localStorage.getItem('xo_username') || 'لاعب';
+let invitedFriendId = null;
 let isListening = false;
+
+if (!myUid) {
+    myUid = 'guest_' + Math.floor(Math.random() * 100000);
+    myName = 'ضيف_' + Math.floor(Math.random() * 1000);
+}
 
 // قراءة بيانات الرابط (إذا كان قادماً من دعوة)
 const urlParams = new URLSearchParams(window.location.search);
 const urlGameId = urlParams.get('gameId');
+
 if (urlGameId) {
     isOnline = true;
     gameId = urlGameId;
-    myRole = urlParams.get('role') || 'X';
-    myUid = urlParams.get('uid');
-    myName = decodeURIComponent(urlParams.get('username') || 'لاعب');
+    let urlRole = urlParams.get('role');
+    let urlUid = urlParams.get('uid');
     
-    // تحديث الأسماء في الواجهة
+    if (!urlRole || !urlUid) {
+        // Guest via link
+        myRole = 'O';
+        myName = localStorage.getItem('xo_username') || 'ضيف_رابط';
+        
+        db.ref('games/' + gameId).once('value').then(snap => {
+            let data = snap.val();
+            if (data) {
+                db.ref('games/' + gameId).update({ 
+                    player2Joined: true, 
+                    guestName: myName,
+                    guestUid: myUid
+                });
+            }
+        });
+    } else {
+        myRole = urlRole;
+        myUid = urlUid;
+        myName = decodeURIComponent(urlParams.get('username') || 'لاعب');
+    }
+    
     document.getElementById('nameX').innerText = myRole === 'X' ? myName : 'الخصم';
     document.getElementById('nameO').innerText = myRole === 'O' ? myName : 'الخصم';
 }
 
 /* =========================================================
-   3) الأصوات — Web Audio
+   3) الأصوات
    ========================================================= */
 class SoundEffects {
   constructor(){ this.ctx = null; }
@@ -349,7 +488,7 @@ let screenShake = 0;
 let readyNotified = false;
 
 /* =========================================================
-   7) أدوات
+   7) أدوات مساعدة
    ========================================================= */
 function roundRectPath(c, x, y, w, h, r){
   r = Math.min(r, w/2, h/2);
@@ -372,6 +511,19 @@ function ringColor(ringNo){
   if(ringNo === 5 || ringNo === 6) return '#3b82f6';
   if(ringNo === 7 || ringNo === 8) return '#0f172a';
   return '#f8fafc';
+}
+
+function generateAvatarURL(seedName, gender) {
+    if (seedName === "حمزة الحماده") return "nbras.jpg";
+    let svgStr = "";
+    if (gender === 'boy') {
+        svgStr = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='gb' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='#00f0ff'/><stop offset='100%' stop-color='#0080ff'/></linearGradient></defs><rect width='100' height='100' fill='#16162a'/><path d='M15 100 C 15 60, 30 50, 50 50 C 70 50, 85 60, 85 100 Z' fill='url(#gb)' opacity='0.9'/><circle cx='50' cy='32' r='18' fill='#ffffff'/><path d='M30 30 Q 50 10 70 30 Q 60 15 40 15 Z' fill='url(#gb)'/></svg>`;
+    } else if (gender === 'girl') {
+        svgStr = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='gg' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='#ff2a5f'/><stop offset='100%' stop-color='#d10043'/></linearGradient></defs><rect width='100' height='100' fill='#16162a'/><path d='M25 40 C 20 60, 15 90, 15 100 L 85 100 C 85 90, 80 60, 75 40 Z' fill='url(#gg)' opacity='0.7'/><path d='M25 100 C 25 70, 35 60, 50 60 C 65 60, 75 70, 75 100 Z' fill='url(#gg)'/><circle cx='50' cy='35' r='16' fill='#ffffff'/></svg>`;
+    } else {
+        svgStr = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='gd' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='#7000ff'/><stop offset='100%' stop-color='#511fff'/></linearGradient></defs><rect width='100' height='100' fill='#16162a'/><path d='M20 100 C 20 65, 35 55, 50 55 C 65 55, 80 65, 80 100 Z' fill='url(#gd)' opacity='0.9'/><circle cx='50' cy='35' r='18' fill='#ffffff'/><rect x='35' y='30' width='30' height='8' rx='4' fill='url(#gd)'/></svg>`;
+    }
+    return "data:image/svg+xml;base64," + btoa(svgStr);
 }
 
 /* =========================================================
@@ -439,7 +591,7 @@ function getXY(e){
 
 function onDown(e){
   if(gameOver || !isPlayerTurn || isArrowInFlight || hitZoom) return;
-  if(isOnline && !isPlayerTurn) return; // حماية إضافية للأونلاين
+  if(isOnline && !isPlayerTurn) return; 
   if(e.target !== canvas) return;
 
   pointerDown = true;
@@ -670,19 +822,40 @@ function onHit(){
     opponentScoreEl.textContent = opponentScore;
   }
 
-  // إرسال النتيجة لقاعدة البيانات في حال اللعب الجماعي
+  // إرسال النتيجة لقاعدة البيانات وإدارة الجولات في اللعب الجماعي
   if (isOnline) {
-      let myCurrentScore = f.isPlayer ? playerScore : opponentScore;
       let updates = {};
-      updates[myRole + '_score'] = myCurrentScore;
+      updates[myRole + '_score'] = (myRole === 'X' ? playerScore : opponentScore);
       updates[myRole + '_shots'] = shotIndex;
-      updates['turn'] = myRole === 'X' ? 'O' : 'X';
+      let nextTurn = myRole === 'X' ? 'O' : 'X';
+      updates['turn'] = nextTurn;
       
-      // التحقق من نهاية اللعبة
-      if (round === maxRounds && shotIndex === 3) {
-          // سيتم حساب الفائز في دالة المزامنة
-      }
-      db.ref('games/' + gameId).update(updates);
+      db.ref('games/' + gameId).once('value').then(snap => {
+          let gData = snap.val();
+          let xShots = myRole === 'X' ? shotIndex : (gData.X_shots || 0);
+          let oShots = myRole === 'O' ? shotIndex : (gData.O_shots || 0);
+          
+          // إذا انتهت رميات الطرفين في هذه الجولة
+          if (xShots >= 3 && oShots >= 3) {
+              let currentRound = gData.round || 1;
+              currentRound++;
+              
+              if (currentRound > maxRounds) {
+                  let finalX = updates['X_score'] !== undefined ? updates['X_score'] : (gData.X_score || 0);
+                  let finalO = updates['O_score'] !== undefined ? updates['O_score'] : (gData.O_score || 0);
+                  if (finalX > finalO) updates['winner'] = 'X';
+                  else if (finalO > finalX) updates['winner'] = 'O';
+                  else updates['winner'] = 'Draw';
+              } else {
+                  updates['round'] = currentRound;
+                  updates['X_shots'] = 0;
+                  updates['O_shots'] = 0;
+                  updates['turn'] = 'X'; // المستضيف يبدأ
+                  updates['stuck'] = null; // مسح السهام من الهدف
+              }
+          }
+          db.ref('games/' + gameId).update(updates);
+      });
   }
 
   setTimeout(() => {
@@ -691,7 +864,7 @@ function onHit(){
     resetShotState();
 
     if(isOnline) {
-        // الأونلاين يعتمد على الـ listener لتحديث الدور
+        // يعتمد على الـ listener
     } else {
         if(f.isPlayer){
           startAITurn();
@@ -784,7 +957,7 @@ function endGame(winnerRole = null, winnerData = null){
   const winnerNameTxt = document.getElementById('winnerNameTxt');
   const winnerIdTxt = document.getElementById('winnerIdTxt');
 
-  winnerDetails.classList.add('hidden'); // إخفاء افتراضي
+  winnerDetails.classList.add('hidden');
 
   if(playerScore > opponentScore){
     title.textContent = 'لقد فزت بالبطولة!';
@@ -793,7 +966,6 @@ function endGame(winnerRole = null, winnerData = null){
     icon.className = 'fa-solid fa-trophy';
     
     if(isOnline && myUid) {
-        // جلب بيانات الفائز (أنت)
         winnerDetails.classList.remove('hidden');
         winnerNameTxt.textContent = myName;
         winnerIdTxt.textContent = `ID: ${myUid}`;
@@ -806,7 +978,7 @@ function endGame(winnerRole = null, winnerData = null){
     
     if(isOnline && winnerData) {
         winnerDetails.classList.remove('hidden');
-        winnerNameTxt.textContent = winnerData.name || oppName;
+        winnerNameTxt.textContent = winnerData.name || 'الخصم';
         winnerIdTxt.textContent = `ID: ${winnerData.uid}`;
     }
   } else {
@@ -820,11 +992,11 @@ function endGame(winnerRole = null, winnerData = null){
 }
 
 function exitToLobby() {
-    window.location.href = 'index.html'; // العودة لصفحة البوابة الرئيسية
+    window.location.href = 'index.html'; 
 }
 
 /* =========================================================
-   16) رسم البيئة (السماء، اسم المطور، العشب)
+   16) رسم البيئة
    ========================================================= */
 function drawSkyName(){
   const cx = W / 2;
@@ -1353,12 +1525,16 @@ function render(now){
    19) منطق اللعب الأونلاين (Firebase)
    ========================================================= */
 function initOnlineMode() {
+    if (isListening) return;
+    isListening = true;
+
     db.ref('games/' + gameId).on('value', (snap) => {
         const data = snap.val();
         if(!data) {
-            // تم حذف الغرفة
-            alert("انتهت الغرفة أو تم إغلاقها.");
-            exitToLobby();
+            if(!gameOver) {
+                alert("انتهت الغرفة أو تم إغلاقها.");
+                exitToLobby();
+            }
             return;
         }
 
@@ -1372,33 +1548,22 @@ function initOnlineMode() {
             if(myRole === 'O') myName = data.guestName;
         }
 
-        // إذا كانت اللعبة قد انتهت
-        if(data.winner) {
-            playerScore = data.X_score || 0;
-            opponentScore = data.O_score || 0;
-            playerScoreEl.textContent = playerScore;
-            opponentScoreEl.textContent = opponentScore;
-            
-            // جلب بيانات الفائز
-            let winnerUid = data.winner === 'X' ? data.hostUid : data.guestUid;
-            let winnerName = data.winner === 'X' ? data.hostName : data.guestName;
-            
-            if(winnerUid) {
-                db.ref('users/' + winnerUid).once('value').then(uSnap => {
-                    let uData = uSnap.val();
-                    endGame(data.winner, { name: uData ? uData.username : winnerName, uid: winnerUid });
-                });
-            } else {
-                endGame(data.winner, null);
-            }
-            return;
-        }
-
         // تحديث النقاط
         playerScore = myRole === 'X' ? (data.X_score || 0) : (data.O_score || 0);
         opponentScore = myRole === 'X' ? (data.O_score || 0) : (data.X_score || 0);
         playerScoreEl.textContent = playerScore;
         opponentScoreEl.textContent = opponentScore;
+
+        // تحديث الجولة والهدف
+        let roundNumber = data.round || 1;
+        if(roundNumber > round) {
+            round = roundNumber;
+            roundText.textContent = round + '/' + maxRounds;
+            stuck = [];
+            shots = [null, null, null];
+            updateShotBoxes();
+            randomizeWind();
+        }
 
         // معرفة دور من
         let currentTurn = data.turn || 'X';
@@ -1415,45 +1580,325 @@ function initOnlineMode() {
             aimHint.style.opacity = '0';
         }
 
-        // تحديث الجولة
-        let roundNumber = data.round || 1;
-        roundText.textContent = roundNumber + '/' + maxRounds;
-        
-        // إذا كنا في اللعبة الأونلاين، نقوم بتصفير السهام إذا تغيرت الجولة
-        if(roundNumber > round) {
-            round = roundNumber;
-            stuck = [];
-            shots = [null, null, null];
-            updateShotBoxes();
-            randomizeWind();
-        }
-
-        // التحقق من انتهاء اللعبة (بعد 3 رميات لكل لاعب)
-        let xShots = data.X_shots || 0;
-        let oShots = data.O_shots || 0;
-        if(xShots >= 3 && oShots >= 3 && round >= maxRounds && !data.winner) {
-            let winnerRole = 'Draw';
-            if((data.X_score || 0) > (data.O_score || 0)) winnerRole = 'X';
-            else if((data.O_score || 0) > (data.X_score || 0)) winnerRole = 'O';
+        // إذا كانت اللعبة قد انتهت
+        if(data.winner && !gameOver) {
+            let winnerUid = data.winner === 'X' ? data.hostUid : data.guestUid;
+            let winnerName = data.winner === 'X' ? data.hostName : data.guestName;
             
-            db.ref('games/' + gameId).update({ winner: winnerRole });
+            if(winnerUid) {
+                db.ref('users/' + winnerUid).once('value').then(uSnap => {
+                    let uData = uSnap.val();
+                    endGame(data.winner, { name: uData ? uData.username : winnerName, uid: winnerUid });
+                });
+            } else {
+                endGame(data.winner, null);
+            }
         }
     });
 }
 
 function startOnlineGame() {
-    // إخفاء رسالة الانتظار إن وجدت
-    waitingOverlay.classList.add('hidden');
+    document.getElementById('lobbyOverlay').classList.add('hidden');
+    document.getElementById('lobbyWaitingOverlay').classList.add('hidden');
+    
+    // تصفير الحالة
+    playerScore = 0;
+    opponentScore = 0;
+    round = 1;
+    shotIndex = 1;
+    stuck = [];
+    shots = [null, null, null];
+    updateShotBoxes();
+    roundText.textContent = '1/' + maxRounds;
+    
     initOnlineMode();
 }
 
-function startBotGame() {
+/* =========================================================
+   20) دوال اللوبي والدعوات
+   ========================================================= */
+function initLobby() {
+    document.getElementById('lobbyOverlay').classList.remove('hidden');
+    if (myUid && localStorage.getItem('xo_uid')) {
+        db.ref('users/' + myUid).once('value').then(snap => {
+            let data = snap.val();
+            if (data) {
+                document.getElementById('lobbyAvatar').src = generateAvatarURL(data.username, data.gender);
+                document.getElementById('lobbyName').innerText = data.username;
+                document.getElementById('lobbyId').innerText = 'ID: ' + myUid;
+            }
+        });
+        listenForInvites();
+    } else {
+        document.getElementById('lobbyAvatar').src = generateAvatarURL(myName, 'boy');
+        document.getElementById('lobbyName').innerText = myName + " (زائر)";
+        document.getElementById('lobbyId').innerText = "ID: " + myUid;
+    }
+}
+
+function startBotGameFromLobby() {
+    document.getElementById('lobbyOverlay').classList.add('hidden');
+    
+    // تصفير الحالة
+    round = 1;
+    shotIndex = 1;
+    playerScore = 0;
+    opponentScore = 0;
+    shots = [null, null, null];
+    stuck = [];
+    flight = null;
+    gameOver = false;
+    hitZoom = false;
+    isArrowInFlight = false;
+    isAiming = false;
+    isCharging = false;
     isPlayerTurn = true;
+    
+    playerScoreEl.textContent = '0';
+    opponentScoreEl.textContent = '0';
+    roundText.textContent = '1/' + maxRounds;
+    updateShotBoxes();
+    hideScorePopup();
+    gameOverModal.classList.add('hidden');
+    
+    document.getElementById('nameX').innerText = myName || 'أنت';
+    document.getElementById('nameO').innerText = 'الروبوت 🤖';
+    
     randomizeWind();
+    aimHint.style.opacity = '1';
+}
+
+function loadFriends() {
+    const container = document.getElementById('friendsListContainer');
+    container.innerHTML = '<div class="text-center text-slate-400 py-4">جاري التحميل...</div>';
+    
+    if (!localStorage.getItem('xo_uid')) {
+        container.innerHTML = '<div class="text-center text-red-400 py-4">يجب تسجيل الدخول من الصفحة الرئيسية أولاً</div>';
+        return;
+    }
+    
+    db.ref('users/' + myUid + '/friends').once('value').then(snap => {
+        const friends = snap.val();
+        if (!friends || Object.keys(friends).length === 0) {
+            container.innerHTML = '<div class="text-center text-slate-400 py-4">لا يوجد أصدقاء مضافون</div>';
+            return;
+        }
+        
+        container.innerHTML = '';
+        for (let id in friends) {
+            let f = friends[id];
+            let name = typeof f === 'string' ? f : f.name;
+            let gender = typeof f === 'string' ? 'boy' : (f.gender || 'boy');
+            let avatar = generateAvatarURL(name, gender);
+            
+            let div = document.createElement('div');
+            div.className = "flex items-center justify-between bg-slate-900/50 p-3 rounded-xl border border-slate-700 cursor-pointer hover:bg-slate-700 transition";
+            div.onclick = () => inviteFriendFromLobby(id, name);
+            div.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <img src="${avatar}" class="w-10 h-10 rounded-full border border-slate-600">
+                    <span class="text-white font-bold">${name}</span>
+                </div>
+                <span class="text-amber-400 text-sm">دعوة <i class="fa-solid fa-paper-plane"></i></span>
+            `;
+            container.appendChild(div);
+        }
+    });
+}
+
+function openFriendsModal() {
+    document.getElementById('friendsModal').classList.remove('hidden');
+    loadFriends();
+}
+
+function openCreateLinkModal() {
+    document.getElementById('createLinkModal').classList.remove('hidden');
+}
+
+function openJoinLinkModal() {
+    document.getElementById('joinLinkModal').classList.remove('hidden');
+    document.getElementById('joinLinkInput').value = '';
+}
+
+function inviteFriendFromLobby(friendId, friendName) {
+    if (!localStorage.getItem('xo_uid')) { alert("يجب تسجيل الدخول أولاً"); return; }
+    document.getElementById('friendsModal').classList.add('hidden');
+    
+    invitedFriendId = friendId;
+    gameId = Math.random().toString(36).substring(2, 10);
+    isOnline = true;
+    
+    let gameData = { 
+        type: 'archery', 
+        winner: '', 
+        player2Joined: false, 
+        hostName: myName, 
+        hostUid: myUid,
+        guestName: friendName, 
+        turn: 'X', 
+        X_score: 0, 
+        O_score: 0,
+        round: 1
+    };
+    
+    db.ref('games/' + gameId).set(gameData).then(() => {
+        db.ref('users/' + friendId + '/game_invite').set({ 
+            gameId: gameId, 
+            gameType: 'archery', 
+            senderId: myUid, 
+            senderName: myName 
+        });
+        
+        document.getElementById('waitingTitle').innerText = "بانتظار قبول الصديق...";
+        document.getElementById('waitingSubtitle').innerText = "تم إرسال الدعوة إلى " + friendName;
+        document.getElementById('lobbyWaitingOverlay').classList.remove('hidden');
+        
+        db.ref('games/' + gameId + '/player2Joined').on('value', snap => {
+            if (snap.val() === true) {
+                db.ref('games/' + gameId + '/player2Joined').off();
+                db.ref('games/' + gameId + '/rejected').off();
+                startOnlineGame();
+            }
+        });
+        
+        db.ref('games/' + gameId + '/rejected').on('value', snap => {
+            if (snap.val() === true) {
+                db.ref('games/' + gameId).remove();
+                cancelWaiting();
+                alert("تم رفض الدعوة.");
+            }
+        });
+    });
+}
+
+function createLinkFromLobby(mode) {
+    if (!localStorage.getItem('xo_uid')) { alert("يجب تسجيل الدخول أولاً"); return; }
+    document.getElementById('createLinkModal').classList.add('hidden');
+    
+    gameId = Math.random().toString(36).substring(2, 10);
+    isOnline = true;
+    
+    let gameData = { 
+        type: 'archery', 
+        mode: mode, 
+        winner: '', 
+        player2Joined: false, 
+        hostName: myName, 
+        hostUid: myUid,
+        guestName: 'جاري الانضمام...', 
+        isLinkInvite: true,
+        turn: 'X', 
+        X_score: 0, 
+        O_score: 0,
+        round: 1
+    };
+    
+    db.ref('games/' + gameId).set(gameData).then(() => {
+        const inviteLink = window.location.origin + window.location.pathname + "?gameId=" + gameId;
+        navigator.clipboard.writeText(inviteLink).then(() => {
+            alert("تم نسخ الرابط بنجاح!\nأرسله لصديقك للانضمام.");
+        });
+        
+        document.getElementById('waitingTitle').innerText = "بانتظار دخول اللاعب...";
+        document.getElementById('waitingSubtitle').innerText = "شارك الرابط مع صديقك";
+        document.getElementById('lobbyWaitingOverlay').classList.remove('hidden');
+        
+        db.ref('games/' + gameId + '/player2Joined').on('value', snap => {
+            if (snap.val() === true) {
+                db.ref('games/' + gameId + '/player2Joined').off();
+                startOnlineGame();
+            }
+        });
+    });
+}
+
+function joinGameByCode() {
+    let input = document.getElementById('joinLinkInput').value.trim();
+    if (!input) return;
+    
+    let targetGameId = '';
+    if (input.includes('gameId=')) {
+        targetGameId = input.split('gameId=')[1].split('&')[0];
+    } else {
+        targetGameId = input;
+    }
+    
+    if (targetGameId.length < 4) { alert("الكود غير صحيح"); return; }
+    
+    gameId = targetGameId;
+    isOnline = true;
+    myRole = 'O';
+    
+    db.ref('games/' + gameId).once('value').then(snap => {
+        let data = snap.val();
+        if (data && !data.player2Joined) {
+            db.ref('games/' + gameId).update({
+                player2Joined: true,
+                guestName: myName,
+                guestUid: myUid
+            });
+            document.getElementById('joinLinkModal').classList.add('hidden');
+            startOnlineGame();
+        } else {
+            alert("الغرفة غير موجودة أو ممتلئة!");
+        }
+    });
+}
+
+function cancelWaiting() {
+    if (gameId) {
+        db.ref('games/' + gameId).remove();
+        db.ref('games/' + gameId).off();
+        gameId = null;
+    }
+    if (invitedFriendId) {
+        db.ref('users/' + invitedFriendId + '/game_invite').remove();
+        invitedFriendId = null;
+    }
+    document.getElementById('lobbyWaitingOverlay').classList.add('hidden');
+    isOnline = false;
+}
+
+function listenForInvites() {
+    if (!myUid || !localStorage.getItem('xo_uid')) return;
+    
+    db.ref('users/' + myUid + '/game_invite').on('value', snap => {
+        const invite = snap.val();
+        if (invite && invite.gameId) {
+            if (isOnline && gameId) return; // Already in game
+            
+            document.getElementById('inviteSenderName').innerText = invite.senderName;
+            document.getElementById('inviteReceivedModal').classList.remove('hidden');
+            
+            document.getElementById('acceptInviteBtn').onclick = () => {
+                db.ref('users/' + myUid + '/game_invite').remove();
+                document.getElementById('inviteReceivedModal').classList.add('hidden');
+                gameId = invite.gameId;
+                isOnline = true;
+                myRole = 'O';
+                
+                db.ref('games/' + gameId).update({ 
+                    player2Joined: true, 
+                    guestName: myName,
+                    guestUid: myUid
+                }).then(() => {
+                    startOnlineGame();
+                });
+            };
+            
+            document.getElementById('rejectInviteBtn').onclick = () => {
+                db.ref('users/' + myUid + '/game_invite').remove();
+                document.getElementById('inviteReceivedModal').classList.add('hidden');
+                db.ref('games/' + invite.gameId + '/rejected').set(true);
+            };
+        } else {
+            document.getElementById('inviteReceivedModal').classList.add('hidden');
+        }
+    });
 }
 
 /* =========================================================
-   20) الإقلاع
+   21) الإقلاع
    ========================================================= */
 window.addEventListener('load', () => {
   resize();
@@ -1462,9 +1907,10 @@ window.addEventListener('load', () => {
   requestAnimationFrame(render);
 
   if (isOnline) {
+      document.getElementById('lobbyOverlay').classList.add('hidden');
       startOnlineGame();
   } else {
-      startBotGame();
+      initLobby();
   }
 });
 </script>
