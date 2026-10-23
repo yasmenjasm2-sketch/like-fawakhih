@@ -7,30 +7,49 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
-            --bg-color: #0b0b14;
-            --container-bg: rgba(20, 20, 35, 0.85);
-            --card-bg: rgba(30, 30, 55, 0.6);
+            --bg-1: #05050d;
+            --bg-2: #0d0a1f;
+            --bg-3: #120a24;
+            --container-bg: rgba(18, 18, 34, 0.72);
+            --card-bg: rgba(30, 30, 55, 0.55);
             --primary-neon: #ff2a5f;
             --secondary-neon: #00f0ff;
-            --accent-glow: #7000ff;
+            --accent-glow: #8b5cf6;
+            --accent-deep: #4f1fff;
+            --success: #10b981;
+            --danger: #ff2a5f;
+            --gold: #ffd700;
             --text-main: #ffffff;
-            --cell-bg: #1a1a3a;
-            --cell-hover: #2b2b54;
+            --text-dim: #b8b8cc;
+            --cell-bg: rgba(26, 26, 58, 0.65);
+            --cell-hover: rgba(43, 43, 84, 0.9);
+            --border-soft: rgba(255, 255, 255, 0.08);
+            --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
         * {
             box-sizing: border-box;
-            transition: all 0.25s ease;
+            transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #06060c 0%, #120a24 100%);
+            background: radial-gradient(circle at 20% 10%, rgba(139, 92, 246, 0.25), transparent 45%),
+                        radial-gradient(circle at 80% 90%, rgba(0, 240, 255, 0.18), transparent 50%),
+                        radial-gradient(circle at 50% 50%, rgba(255, 42, 95, 0.1), transparent 60%),
+                        linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 50%, var(--bg-3) 100%);
+            background-attachment: fixed;
             color: var(--text-main);
             text-align: center;
-            margin: 0;
-            padding: 15px;
-            min-height: 100dvh; 
+            padding: 18px 15px;
+            min-height: 100dvh;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -39,9 +58,40 @@
             position: relative;
         }
 
+        /* شبكة خفيفة احترافية في الخلفية */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+            background-size: 42px 42px;
+            z-index: -3;
+            mask-image: radial-gradient(ellipse at center, black 40%, transparent 85%);
+            -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 85%);
+        }
+
+        /* هالة متوهجة خلفية */
+        body::after {
+            content: '';
+            position: fixed;
+            top: -30%; left: 50%;
+            width: 120vmin; height: 120vmin;
+            transform: translateX(-50%);
+            background: radial-gradient(circle, rgba(139,92,246,0.18), transparent 65%);
+            z-index: -4;
+            pointer-events: none;
+            animation: pulseHalo 8s ease-in-out infinite alternate;
+        }
+        @keyframes pulseHalo {
+            0% { opacity: 0.5; transform: translateX(-50%) scale(1); }
+            100% { opacity: 0.9; transform: translateX(-50%) scale(1.15); }
+        }
+
         .particles-container {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            inset: 0;
             z-index: -1;
             overflow: hidden;
             pointer-events: none;
@@ -50,220 +100,355 @@
             position: absolute;
             bottom: -50px;
             width: 3px;
-            height: 20px;
+            height: 22px;
             border-radius: 50%;
             opacity: 0;
             will-change: transform, opacity;
             animation: rise linear infinite;
+            filter: blur(0.4px);
         }
         @keyframes rise {
             0% { transform: translate3d(0, 0, 0) scale(1); opacity: 0; }
-            20% { opacity: 0.6; }
-            80% { opacity: 0.3; }
+            15% { opacity: 0.75; }
+            80% { opacity: 0.35; }
             100% { transform: translate3d(0, -120vh, 0) scale(0.5); opacity: 0; }
         }
 
+        /* ============ شارة المطور العلوية ============ */
         .developer-badge {
             font-size: 13px;
-            color: rgba(255, 255, 255, 0.8);
-            margin-bottom: 15px;
-            background: linear-gradient(90deg, rgba(112, 0, 255, 0.2), rgba(0, 240, 255, 0.2));
-            padding: 8px 20px;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 18px;
+            background: linear-gradient(90deg, rgba(139, 92, 246, 0.18), rgba(0, 240, 255, 0.18), rgba(255, 42, 95, 0.18));
+            background-size: 200% 100%;
+            padding: 10px 22px;
             border-radius: 50px;
-            border: 1px solid rgba(0, 240, 255, 0.3);
+            border: 1px solid rgba(0, 240, 255, 0.28);
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
+            gap: 8px;
+            box-shadow: 0 0 22px rgba(0, 240, 255, 0.15), inset 0 0 12px rgba(255,255,255,0.05);
+            animation: shimmerBadge 4s linear infinite;
+            backdrop-filter: blur(6px);
+        }
+        @keyframes shimmerBadge {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+        .developer-badge::before {
+            content: '✦';
+            color: var(--gold);
+            text-shadow: 0 0 8px var(--gold);
+            font-size: 14px;
         }
         .developer-badge span {
             color: var(--secondary-neon);
-            font-weight: bold;
-            text-shadow: 0 0 8px var(--secondary-neon);
+            font-weight: 800;
+            text-shadow: 0 0 10px var(--secondary-neon);
+            letter-spacing: 0.5px;
         }
 
+        /* ============ الحاوية الرئيسية ============ */
         .container {
             background: var(--container-bg);
-            padding: 30px 20px;
-            border-radius: 24px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 40px rgba(112, 0, 255, 0.1);
-            max-width: 420px;
+            padding: 32px 22px 26px;
+            border-radius: 28px;
+            box-shadow:
+                0 24px 60px rgba(0, 0, 0, 0.65),
+                0 0 45px rgba(139, 92, 246, 0.12),
+                inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            max-width: 440px;
             width: 100%;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-soft);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             position: relative;
             z-index: 10;
         }
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 12%; right: 12%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0,240,255,0.55), transparent);
+        }
 
+        /* ============ بطاقة المستخدم ============ */
         .user-profile-card {
             background: var(--card-bg);
-            border: 1px solid rgba(0, 240, 255, 0.25);
-            border-radius: 16px;
-            padding: 15px;
-            margin-bottom: 20px;
-            display: none; 
+            border: 1px solid rgba(0, 240, 255, 0.22);
+            border-radius: 18px;
+            padding: 16px;
+            margin-bottom: 22px;
+            display: none;
             flex-direction: column;
             gap: 12px;
-            box-shadow: inset 0 0 15px rgba(0, 240, 255, 0.05);
+            box-shadow: inset 0 0 18px rgba(0, 240, 255, 0.06), 0 8px 22px rgba(0,0,0,0.35);
+            backdrop-filter: blur(10px);
         }
         .user-profile-card.active { display: flex; animation: fadeIn 0.4s ease-out; }
         .profile-header { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-        
-        .avatar-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+        .avatar-container { display: flex; align-items: center; gap: 12px; }
         .user-avatar {
-            width: 50px;
-            height: 50px;
+            width: 52px; height: 52px;
             border-radius: 50%;
             background: rgba(255,255,255,0.1);
             border: 2px solid var(--secondary-neon);
-            box-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
+            box-shadow: 0 0 14px rgba(0, 240, 255, 0.45);
             object-fit: cover;
         }
-
         .user-info { text-align: right; }
-        .user-name { font-size: 17px; font-weight: bold; color: #fff; display: flex; align-items: center; flex-wrap: wrap; gap: 5px;}
-        
+        .user-name { font-size: 17px; font-weight: bold; color: #fff; display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
         .admin-badge {
-            background: linear-gradient(90deg, #ffd700, #ff8c00);
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
             color: #000;
             font-size: 11px;
-            padding: 2px 8px;
+            padding: 3px 9px;
             border-radius: 12px;
             font-weight: 900;
-            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            box-shadow: 0 0 12px rgba(255, 215, 0, 0.6);
             display: inline-flex;
             align-items: center;
             gap: 3px;
+            animation: glowGold 2s ease-in-out infinite alternate;
+        }
+        @keyframes glowGold {
+            0% { box-shadow: 0 0 8px rgba(255,215,0,0.45); }
+            100% { box-shadow: 0 0 18px rgba(255,215,0,0.85); }
+        }
+        .user-id-box {
+            background: rgba(0, 0, 0, 0.42);
+            padding: 9px 13px;
+            border-radius: 12px;
+            font-size: 13px;
+            color: #eee;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: space-between;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .user-stats { font-size: 12px; color: #bbb; display: flex; gap: 8px; margin-top: 6px; }
+        .user-stats span {
+            background: rgba(255,255,255,0.07);
+            padding: 4px 9px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.04);
         }
 
-        .user-id-box { 
-            background: rgba(0, 0, 0, 0.4); padding: 8px 12px; border-radius: 10px; 
-            font-size: 13px; color: #eee; display: flex; align-items: center; gap: 8px; justify-content: space-between;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-        .user-stats { font-size: 12px; color: #bbb; display: flex; gap: 10px; margin-top: 5px;}
-        .user-stats span { background: rgba(255,255,255,0.07); padding: 4px 8px; border-radius: 8px;}
-
+        /* ============ العناوين ============ */
         h1 {
-            font-size: 26px;
+            font-size: 27px;
             margin-top: 0;
-            margin-bottom: 25px;
+            margin-bottom: 26px;
             font-weight: 900;
-            background: linear-gradient(90deg, var(--primary-neon), var(--secondary-neon));
+            background: linear-gradient(90deg, var(--primary-neon), var(--accent-glow), var(--secondary-neon));
+            background-size: 200% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(0, 240, 255, 0.1);
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(0, 240, 255, 0.12);
+            animation: titleFlow 5s linear infinite;
+            letter-spacing: -0.5px;
         }
+        @keyframes titleFlow {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
+        h2 { font-size: 18px; margin-bottom: 16px; color: #e6e6f2; font-weight: 700; }
 
-        h2 { font-size: 19px; margin-bottom: 15px; color: #e1e1f0; font-weight: 600; }
-
+        /* ============ الحقول ============ */
         input[type="text"], input[type="password"], input[type="number"], select {
             width: 100%;
-            padding: 14px;
-            margin: 8px 0;
-            background: rgba(0, 0, 0, 0.4);
-            border: 2px solid rgba(255, 255, 255, 0.08);
+            padding: 15px 16px;
+            margin: 9px 0;
+            background: rgba(0, 0, 0, 0.42);
+            border: 1.5px solid rgba(255, 255, 255, 0.08);
             color: white;
-            border-radius: 12px;
+            border-radius: 14px;
             font-size: 15px;
             text-align: center;
             outline: none;
+            font-family: inherit;
         }
-        input:focus, select:focus { border-color: var(--secondary-neon); box-shadow: 0 0 10px rgba(0, 240, 255, 0.2); }
+        input::placeholder { color: #6e6e88; }
+        input:focus, select:focus {
+            border-color: var(--secondary-neon);
+            box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.12), 0 0 16px rgba(0, 240, 255, 0.15);
+            background: rgba(0, 0, 0, 0.55);
+        }
 
+        /* ============ الأزرار الأساسية ============ */
         button {
-            background: linear-gradient(90deg, #511fff, var(--accent-glow));
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--accent-deep), var(--accent-glow));
             color: white;
-            border: none;
-            padding: 14px 20px;
-            margin: 10px 0;
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 15px 22px;
+            margin: 9px 0;
             font-size: 15px;
-            font-weight: bold;
-            border-radius: 12px;
+            font-weight: 700;
+            border-radius: 14px;
             cursor: pointer;
             width: 100%;
-            box-shadow: 0 6px 15px rgba(112, 0, 255, 0.3);
+            font-family: inherit;
+            box-shadow:
+                0 8px 20px rgba(79, 31, 255, 0.35),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+            letter-spacing: 0.2px;
+            z-index: 1;
         }
-        button:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(112, 0, 255, 0.4); }
-        button:active { transform: translateY(1px); }
-        button:disabled { background: #444 !important; cursor: not-allowed; box-shadow: none; color: #aaa; transform: none; }
-        button.secondary-btn { background: linear-gradient(90deg, var(--primary-neon), #d10043); box-shadow: 0 6px 15px rgba(255, 42, 95, 0.3); }
-        button.ludo-btn { background: linear-gradient(90deg, #00b4db, #0083b0); box-shadow: 0 6px 15px rgba(0, 180, 219, 0.3); }
-        button.friends-panel-btn { background: linear-gradient(90deg, #10b981, #059669); box-shadow: 0 6px 15px rgba(16, 185, 129, 0.3); }
-        button.millionaire-btn { background: linear-gradient(90deg, #ffb400, #ff8c00); box-shadow: 0 6px 15px rgba(255, 140, 0, 0.3); color: #000; text-shadow: none; }
-        button.action-btn { width: auto; padding: 6px 14px; font-size: 12px; margin: 0; box-shadow: none; }
-        button.small-btn { padding: 10px 20px; font-size:14px; width:auto; }
+        button::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
+            transition: left 0.6s ease;
+            z-index: -1;
+        }
+        button:hover::after { left: 100%; }
+        button:hover {
+            transform: translateY(-2.5px);
+            box-shadow:
+                0 14px 28px rgba(79, 31, 255, 0.5),
+                0 0 22px rgba(139, 92, 246, 0.35),
+                inset 0 1px 0 rgba(255,255,255,0.2);
+        }
+        button:active { transform: translateY(1px) scale(0.985); }
+        button:disabled {
+            background: linear-gradient(135deg, #333344, #2a2a3a) !important;
+            cursor: not-allowed;
+            box-shadow: none;
+            color: #888;
+            transform: none;
+        }
+        button.secondary-btn {
+            background: linear-gradient(135deg, var(--primary-neon), #b8003a);
+            box-shadow: 0 8px 20px rgba(255, 42, 95, 0.35), inset 0 1px 0 rgba(255,255,255,0.15);
+        }
+        button.secondary-btn:hover {
+            box-shadow: 0 14px 28px rgba(255, 42, 95, 0.5), 0 0 22px rgba(255,42,95,0.35), inset 0 1px 0 rgba(255,255,255,0.2);
+        }
+        button.ludo-btn {
+            background: linear-gradient(135deg, #00b4db, #0078b0);
+            box-shadow: 0 8px 20px rgba(0, 180, 219, 0.35), inset 0 1px 0 rgba(255,255,255,0.15);
+        }
+        button.ludo-btn:hover {
+            box-shadow: 0 14px 28px rgba(0, 180, 219, 0.5), 0 0 22px rgba(0,180,219,0.35), inset 0 1px 0 rgba(255,255,255,0.2);
+        }
+        button.friends-panel-btn {
+            background: linear-gradient(135deg, #10b981, #047857);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.35), inset 0 1px 0 rgba(255,255,255,0.15);
+        }
+        button.friends-panel-btn:hover {
+            box-shadow: 0 14px 28px rgba(16, 185, 129, 0.5), 0 0 22px rgba(16,185,129,0.35), inset 0 1px 0 rgba(255,255,255,0.2);
+        }
+        button.millionaire-btn {
+            background: linear-gradient(135deg, #ffb400, #e07b00);
+            box-shadow: 0 8px 20px rgba(255, 140, 0, 0.35), inset 0 1px 0 rgba(255,255,255,0.2);
+            color: #1a0f00;
+            text-shadow: 0 1px 0 rgba(255,255,255,0.25);
+        }
+        button.millionaire-btn:hover {
+            box-shadow: 0 14px 28px rgba(255, 140, 0, 0.55), 0 0 22px rgba(255,180,0,0.4), inset 0 1px 0 rgba(255,255,255,0.25);
+        }
+        button.action-btn {
+            width: auto;
+            padding: 7px 15px;
+            font-size: 12px;
+            margin: 0;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        button.small-btn { padding: 11px 20px; font-size: 14px; width: auto; border-radius: 12px; }
 
-        /* تقسيم اللوحات بشكل منفصل */
+        /* ============ أقسام اللوحة ============ */
         .dashboard-section {
-            background: rgba(0, 0, 0, 0.2);
-            padding: 15px;
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            margin-bottom: 15px;
+            background: rgba(0, 0, 0, 0.22);
+            padding: 16px;
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 16px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
         }
 
+        /* ============ شريط النتيجة ============ */
         .scoreboard {
             display: flex;
             justify-content: space-around;
-            background: rgba(0, 0, 0, 0.4);
-            padding: 12px;
-            border-radius: 16px;
+            background: rgba(0, 0, 0, 0.42);
+            padding: 14px 10px;
+            border-radius: 18px;
             margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            gap: 8px;
         }
-        .score-box { display: flex; flex-direction: column; align-items: center; width: 33%; }
-        .score-label { font-size: 11px; color: #bbb; margin-bottom: 4px; text-overflow: ellipsis; overflow: hidden; }
-        .score-value { font-size: 22px; font-weight: bold; }
-        .score-box.x-team .score-value { color: var(--primary-neon); text-shadow: 0 0 10px rgba(255,42,95,0.3); }
-        .score-box.o-team .score-value { color: var(--secondary-neon); text-shadow: 0 0 10px rgba(0,240,255,0.3); }
+        .score-box { display: flex; flex-direction: column; align-items: center; width: 33%; gap: 2px; }
+        .score-label { font-size: 11px; color: #b0b0c4; margin-bottom: 4px; text-overflow: ellipsis; overflow: hidden; max-width: 100%; }
+        .score-value { font-size: 22px; font-weight: 800; }
+        .score-box.x-team .score-value { color: var(--primary-neon); text-shadow: 0 0 12px rgba(255,42,95,0.35); }
+        .score-box.o-team .score-value { color: var(--secondary-neon); text-shadow: 0 0 12px rgba(0,240,255,0.35); }
 
+        /* ============ اللوحة ============ */
         .board {
-            display: grid;
+            display: none;
             grid-template-columns: repeat(3, 1fr);
             gap: 12px;
-            margin: 25px auto 15px auto;
-            display: none;
+            margin: 25px auto 18px auto;
             max-width: 320px;
         }
         .cell {
             width: 100%;
             aspect-ratio: 1;
             background-color: var(--cell-bg);
-            border-radius: 16px;
+            border-radius: 18px;
             display: flex;
             justify-content: center;
             align-items: center;
             font-size: 42px;
             font-weight: 900;
             cursor: pointer;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            box-shadow: inset 0 0 12px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: inset 0 0 14px rgba(0,0,0,0.45), 0 4px 10px rgba(0,0,0,0.25);
+            backdrop-filter: blur(4px);
         }
-        .cell:hover { background-color: var(--cell-hover); }
+        .cell:hover { background-color: var(--cell-hover); transform: translateY(-2px); }
         .cell:active { transform: scale(0.94); }
-        .cell span { animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .cell span { animation: popIn 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
 
-        @keyframes popIn { 0% { transform: scale(0.4); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes popIn { 0% { transform: scale(0.35); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
-        .cell.x { color: var(--primary-neon); text-shadow: 0 0 15px rgba(255, 42, 95, 0.6); }
-        .cell.o { color: var(--secondary-neon); text-shadow: 0 0 15px rgba(0, 240, 255, 0.6); }
-        .cell.winning-cell { background: linear-gradient(135deg, var(--accent-glow), #4f46e5) !important; color: #fff !important; transform: scale(1.03); box-shadow: 0 0 20px var(--accent-glow); }
+        .cell.x { color: var(--primary-neon); text-shadow: 0 0 18px rgba(255, 42, 95, 0.7); }
+        .cell.o { color: var(--secondary-neon); text-shadow: 0 0 18px rgba(0, 240, 255, 0.7); }
+        .cell.winning-cell {
+            background: linear-gradient(135deg, var(--accent-glow), var(--accent-deep)) !important;
+            color: #fff !important;
+            transform: scale(1.04);
+            box-shadow: 0 0 24px var(--accent-glow), inset 0 0 20px rgba(255,255,255,0.15);
+        }
 
+        /* ============ الأقسام العامة ============ */
         section { display: none; }
-        section.active { display: block; animation: fadeIn 0.4s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        section.active { display: block; animation: fadeIn 0.42s cubic-bezier(0.2, 0.9, 0.3, 1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 
-        #status-text { font-size: 17px; margin: 15px 0; font-weight: bold; color: #f1f5f9; }
-        #role-text { font-size: 13px; padding: 6px 14px; background: rgba(255, 255, 255, 0.06); border-radius: 30px; display: inline-block; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); }
+        #status-text { font-size: 16px; margin: 15px 0; font-weight: 700; color: #f1f5f9; }
+        #role-text {
+            font-size: 13px;
+            padding: 7px 16px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 30px;
+            display: inline-block;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255,255,255,0.06);
+            font-weight: 600;
+        }
 
+        /* ============ القوائم ============ */
         .list-container {
-            background: rgba(0,0,0,0.4);
+            background: rgba(0,0,0,0.42);
             border-radius: 14px;
             max-height: 220px;
             overflow-y: auto;
@@ -271,47 +456,107 @@
             padding: 8px;
             border: 1px solid rgba(255,255,255,0.06);
         }
+        .list-container::-webkit-scrollbar { width: 6px; }
+        .list-container::-webkit-scrollbar-track { background: transparent; }
+        .list-container::-webkit-scrollbar-thumb { background: rgba(139,92,246,0.4); border-radius: 4px; }
         .list-item {
-            display: flex; justify-content: space-between; align-items: center;
-            background: rgba(255,255,255,0.04); padding: 10px 12px; border-radius: 10px; margin-bottom: 6px;
-            border: 1px solid rgba(255,255,255,0.02);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.04);
+            padding: 10px 12px;
+            border-radius: 12px;
+            margin-bottom: 6px;
+            border: 1px solid rgba(255,255,255,0.03);
         }
         .list-item:hover { background: rgba(255,255,255,0.08); }
-        .list-item span { font-size: 14px; font-weight: bold; color: #fff; display: flex; align-items: center; gap: 10px;}
-        .list-item img { width: 28px; height: 28px; border-radius: 50%; background: #333; object-fit: cover;}
+        .list-item span { font-size: 14px; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 10px; }
+        .list-item img { width: 30px; height: 30px; border-radius: 50%; background: #333; object-fit: cover; border: 1px solid rgba(255,255,255,0.1); }
 
+        /* ============ التوست ============ */
         .toast {
-            position: fixed; bottom: 25px; background: #10b981; color: white; padding: 12px 24px;
-            border-radius: 50px; font-size: 14px; font-weight: bold;
-            transform: translateY(100px); opacity: 0; pointer-events: none; z-index: 9999;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            position: fixed;
+            bottom: 26px;
+            background: var(--success);
+            color: white;
+            padding: 13px 26px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 700;
+            transform: translateY(110px);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 9999;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.4), 0 0 20px rgba(16,185,129,0.35);
         }
         .toast.show { transform: translateY(0); opacity: 1; }
 
+        /* ============ النوافذ المنبثقة ============ */
         .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); z-index: 99999;
-            display: none; justify-content: center; align-items: center;
-            backdrop-filter: blur(8px);
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.86);
+            z-index: 99999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            padding: 20px;
         }
         .modal-overlay.active { display: flex; animation: fadeIn 0.3s ease-out; }
         .modal-content {
-            background: #151525; padding: 30px 25px; border-radius: 24px;
-            border: 2px solid var(--secondary-neon); text-align: center; width: 90%; max-width: 340px;
-            box-shadow: 0 0 30px rgba(0, 240, 255, 0.2);
+            background: linear-gradient(160deg, #17172b, #101020);
+            padding: 32px 26px;
+            border-radius: 26px;
+            border: 1.5px solid var(--secondary-neon);
+            text-align: center;
+            width: 90%;
+            max-width: 360px;
+            box-shadow: 0 0 40px rgba(0, 240, 255, 0.25), inset 0 1px 0 rgba(255,255,255,0.06);
         }
-        .modal-content h3 { margin-top: 0; color: #fff; font-size: 20px; }
-        .modal-buttons { display: flex; flex-direction: column; gap: 10px; margin-top: 25px; }
+        .modal-content h3 { margin-top: 0; color: #fff; font-size: 20px; margin-bottom: 10px; }
+        .modal-buttons { display: flex; flex-direction: column; gap: 10px; margin-top: 22px; }
         .modal-buttons-row { display: flex; gap: 10px; }
-        
+
         .invite-link-box {
-            background: rgba(255, 42, 95, 0.05);
-            border: 1px dashed rgba(255, 42, 95, 0.4);
-            padding: 15px;
+            background: rgba(255, 42, 95, 0.06);
+            border: 1px dashed rgba(255, 42, 95, 0.45);
+            padding: 16px;
             border-radius: 16px;
             margin-bottom: 20px;
             text-align: center;
         }
+
+        /* ============ شارة المطور داخل اللعبة (تظهر للخصم) ============ */
+        .in-game-dev-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            color: #000;
+            font-size: 9px;
+            padding: 2px 7px;
+            border-radius: 10px;
+            font-weight: 900;
+            box-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+            margin-right: 3px;
+            animation: glowGold 2s ease-in-out infinite alternate;
+            white-space: nowrap;
+        }
+
+        .opponent-dev-notice {
+            display: none;
+            background: linear-gradient(135deg, rgba(255,215,0,0.12), rgba(255,140,0,0.12));
+            border: 1px solid rgba(255,215,0,0.35);
+            padding: 8px 14px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: #ffd700;
+            margin-bottom: 12px;
+            font-weight: 700;
+            box-shadow: 0 0 18px rgba(255,215,0,0.15);
+        }
+        .opponent-dev-notice.show { display: flex; align-items: center; justify-content: center; gap: 6px; }
     </style>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -322,7 +567,7 @@
     <div class="particles-container" id="particles"></div>
 
     <div class="developer-badge">
-        تطوير: <span>حمزة الحماده</span>
+        تطوير وإبداع: <span>حمزة الحماده</span>
     </div>
 
     <div class="user-profile-card" id="user-profile">
@@ -337,7 +582,7 @@
                     </div>
                 </div>
             </div>
-            <button onclick="openSettings()" class="action-btn" style="background: transparent; font-size: 24px; box-shadow: none; padding: 5px;">⚙️</button>
+            <button onclick="openSettings()" class="action-btn" style="background: transparent; font-size: 22px; box-shadow: none; padding: 5px; border: none;">⚙️</button>
         </div>
         <div class="user-id-box">
             <span>الآيدي (ID): <strong id="display-id" style="color:var(--secondary-neon); letter-spacing:1px;">--------</strong></span>
@@ -368,7 +613,7 @@
                 <button class="ludo-btn" onclick="openGameOptionsModalWithoutFriend()">إنشاء غرفة أونلاين (رابط مباشر) 🎲</button>
                 <button class="millionaire-btn" onclick="window.location.href='millionaire.html'">💰 العب من سيربح المليون (فردية)</button>
             </div>
-            
+
             <div class="dashboard-section" style="margin-top: 20px;">
                 <h2>👥 شبكة الأصدقاء والتواصل</h2>
                 <button class="friends-panel-btn" onclick="showSection('friends-section')">عرض قائمة الأصدقاء والطلبات الحية</button>
@@ -379,15 +624,15 @@
             <div class="invite-link-box">
                 <h3 style="font-size: 15px; margin-top: 0; color: #fff;">🔗 توليد روابط دعوة مباشرة</h3>
                 <p style="font-size: 12px; color: #ccc; margin-bottom: 12px;">أرسل الرابط مباشرة دون الحاجة لإضافة الصديق لقائمتك</p>
-                <button onclick="createInviteLink('xo')" style="background: linear-gradient(90deg, #ff2a5f, #c10036); margin: 0; font-size: 12px; padding: 10px;">رابط مواجهة X O</button>
-                <button onclick="createInviteLink('ludo2')" style="background: linear-gradient(90deg, #00b4db, #0083b0); margin: 8px 0 0 0; font-size: 12px; padding: 10px;">رابط تحدي لودو 1v1</button>
+                <button onclick="createInviteLink('xo')" style="background: linear-gradient(135deg, #ff2a5f, #c10036); margin: 0; font-size: 12px; padding: 11px;">رابط مواجهة X O</button>
+                <button onclick="createInviteLink('ludo2')" style="background: linear-gradient(135deg, #00b4db, #0078b0); margin: 9px 0 0 0; font-size: 12px; padding: 11px;">رابط تحدي لودو 1v1</button>
             </div>
 
             <div class="dashboard-section">
                 <h2>🔍 إضافة صديق جديد</h2>
                 <div style="display: flex; gap: 8px; align-items: center;">
                     <input type="number" id="search-id-input" placeholder="أدخل ID الصديق" style="margin:0;">
-                    <button class="action-btn" id="add-friend-btn" onclick="searchAndAddFriend()" style="height: 48px; padding: 0 15px;">إضافة</button>
+                    <button class="action-btn" id="add-friend-btn" onclick="searchAndAddFriend()" style="height: 50px; padding: 0 16px;">إضافة</button>
                 </div>
             </div>
 
@@ -406,12 +651,13 @@
 
         <section id="waiting-section">
             <h2 id="waiting-msg-title">بانتظار قبول صديقك للدعوة...</h2>
-            <div class="loader" style="margin: 25px auto; width: 45px; height: 45px; border: 4px solid #222; border-top: 4px solid var(--secondary-neon); border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+            <div class="loader" style="margin: 25px auto; width: 46px; height: 46px; border: 4px solid #222; border-top: 4px solid var(--secondary-neon); border-radius: 50%; animation: spin 0.85s linear infinite;"></div>
             <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
             <button class="secondary-btn" onclick="cancelInvite()">إلغاء الطلب والعودة</button>
         </section>
 
         <section id="game-section">
+            <div id="opponent-dev-notice" class="opponent-dev-notice"></div>
             <div class="scoreboard">
                 <div class="score-box x-team">
                     <span class="score-label" id="label-x">المستضيف (X)</span>
@@ -429,7 +675,7 @@
 
             <div id="role-text"></div>
             <div id="status-text">جاري مزامنة الغرفة...</div>
-            
+
             <div class="board" id="board">
                 <div class="cell" onclick="makeMove(0)"></div>
                 <div class="cell" onclick="makeMove(1)"></div>
@@ -450,7 +696,7 @@
         <div class="modal-content">
             <h3>⚙️ الإعدادات</h3>
             <div class="modal-buttons">
-                <button onclick="logout()" class="secondary-btn" style="background: linear-gradient(90deg, #ff2a5f, #c10036);">تسجيل الخروج 🚪</button>
+                <button onclick="logout()" class="secondary-btn" style="background: linear-gradient(135deg, #ff2a5f, #c10036);">تسجيل الخروج 🚪</button>
                 <button onclick="closeSettings()" class="secondary-btn" style="background: #252535; margin-top: 10px;">إغلاق الترس ✖️</button>
             </div>
         </div>
@@ -461,9 +707,9 @@
             <h3>اختر نوع المواجهة</h3>
             <p style="font-size: 13px; color: #aaa; margin-bottom: 15px;">حدد اللعبة المطلوبة لإرسال إشعار فوري للطرف الآخر:</p>
             <div class="modal-buttons">
-                <button onclick="sendSpecificInvite('xo')" style="background: linear-gradient(90deg, #511fff, #7000ff);">طاولة X O الاحترافية</button>
-                <button onclick="sendSpecificInvite('ludo2')" style="background: linear-gradient(90deg, #ff2a5f, #d10043);">حرب اللودو (1 ضد 1)</button>
-                <button onclick="sendSpecificInvite('ludo4')" style="background: linear-gradient(90deg, #10b981, #059669);">حرب اللودو (2 ضد 2 فريق)</button>
+                <button onclick="sendSpecificInvite('xo')" style="background: linear-gradient(135deg, #511fff, #7000ff);">طاولة X O الاحترافية</button>
+                <button onclick="sendSpecificInvite('ludo2')" style="background: linear-gradient(135deg, #ff2a5f, #d10043);">حرب اللودو (1 ضد 1)</button>
+                <button onclick="sendSpecificInvite('ludo4')" style="background: linear-gradient(135deg, #10b981, #059669);">حرب اللودو (2 ضد 2 فريق)</button>
                 <button onclick="document.getElementById('choose-game-modal').classList.remove('active')" class="secondary-btn" style="background: #252535; margin-top: 10px;">تراجع</button>
             </div>
         </div>
@@ -473,7 +719,7 @@
         <div class="modal-content">
             <h3 id="invite-msg">هناك تحدٍ قادم في انتظارك!</h3>
             <div class="modal-buttons modal-buttons-row">
-                <button onclick="acceptGameInvite()" style="background: #10b981;">قبول التحدي</button>
+                <button onclick="acceptGameInvite()" style="background: linear-gradient(135deg, #10b981, #047857);">قبول التحدي</button>
                 <button onclick="rejectGameInvite()" class="secondary-btn">رفض</button>
             </div>
         </div>
@@ -493,13 +739,13 @@
         const db = firebase.database();
 
         let currentUserData = null;
-        let currentUserId = localStorage.getItem('xo_uid'); 
+        let currentUserId = localStorage.getItem('xo_uid');
         let currentUsername = localStorage.getItem('xo_username');
 
-        let myRole = ''; 
+        let myRole = '';
         let gameId = '';
         let isOnline = false;
-        let localTurn = 'X'; 
+        let localTurn = 'X';
         let gameBoard = ["", "", "", "", "", "", "", "", ""];
         let isGameOver = false;
         let scores = { X: 0, O: 0, ties: 0 };
@@ -509,9 +755,12 @@
 
         let playerXName = "اللاعب (X)";
         let playerOName = "اللاعب (O)";
-        
+
         let activeFriendIdForInvite = null;
         let activeFriendNameForInvite = null;
+
+        const DEVELOPER_NAME = "حمزة الحماده";
+        const DEVELOPER_UID = "552";
 
         function openSettings() { document.getElementById('settings-modal').classList.add('active'); }
         function closeSettings() { document.getElementById('settings-modal').classList.remove('active'); }
@@ -521,13 +770,12 @@
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
                 const osc = ctx.createOscillator();
                 const gain = ctx.createGain();
-                osc.connect(gain);
-                gain.connect(ctx.destination);
+                osc.connect(gain); gain.connect(ctx.destination);
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(523.25, ctx.currentTime); 
-                osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1); 
-                osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.2); 
-                osc.frequency.setValueAtTime(1046.50, ctx.currentTime + 0.3); 
+                osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+                osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1);
+                osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.2);
+                osc.frequency.setValueAtTime(1046.50, ctx.currentTime + 0.3);
                 gain.gain.setValueAtTime(0.1, ctx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 1);
                 osc.start(); osc.stop(ctx.currentTime + 1);
@@ -535,7 +783,7 @@
         }
 
         function generateAvatarURL(seedName, gender) {
-            if (seedName === "حمزة الحماده") return "nbras.jpg";
+            if (seedName === DEVELOPER_NAME) return "nbras.jpg";
             let svgStr = "";
             if (gender === 'boy') {
                 svgStr = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='gb' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='#00f0ff'/><stop offset='100%' stop-color='#0080ff'/></linearGradient></defs><rect width='100' height='100' fill='#16162a'/><path d='M15 100 C 15 60, 30 50, 50 50 C 70 50, 85 60, 85 100 Z' fill='url(#gb)' opacity='0.9'/><circle cx='50' cy='32' r='18' fill='#ffffff'/><path d='M30 30 Q 50 10 70 30 Q 60 15 40 15 Z' fill='url(#gb)'/></svg>`;
@@ -562,13 +810,15 @@
 
         function createParticles() {
             const container = document.getElementById('particles');
-            const colors = ['#ff2a5f', '#00f0ff', '#7000ff']; 
-            for (let i = 0; i < 15; i++) {
+            const colors = ['#ff2a5f', '#00f0ff', '#8b5cf6', '#ffd700'];
+            for (let i = 0; i < 22; i++) {
                 let drop = document.createElement('div');
                 drop.classList.add('drop');
                 drop.style.left = Math.random() * 100 + 'vw';
-                drop.style.animationDuration = (Math.random() * 2 + 3) + 's'; 
-                drop.style.animationDelay = (Math.random() * 3) + 's';
+                drop.style.animationDuration = (Math.random() * 2.5 + 3.5) + 's';
+                drop.style.animationDelay = (Math.random() * 4) + 's';
+                drop.style.width = (Math.random() * 2 + 2) + 'px';
+                drop.style.height = (Math.random() * 10 + 15) + 'px';
                 drop.style.background = `linear-gradient(180deg, ${colors[Math.floor(Math.random() * colors.length)]}, transparent)`;
                 container.appendChild(drop);
             }
@@ -613,7 +863,7 @@
                 } else { if(onSuccess) onSuccess(); }
             });
         }
-        
+
         function setupOnlineStatus(uid) {
             const userStatusRef = db.ref('users/' + uid + '/status');
             db.ref('.info/connected').on('value', function(snapshot) {
@@ -632,12 +882,12 @@
             if (password.length < 4) { showToast("⚠️ كلمة المرور قصيرة جداً!", "#ff2a5f"); return; }
             if (!gender || gender === "") { showToast("⚠️ يرجى تحديد الجنس للتمكن من الدخول!", "#ff2a5f"); return; }
 
-            let isAdmin = (username === "حمزة الحماده" && password === "hamzagmailcom34567");
-            if(isAdmin) username = "حمزة الحماده"; 
+            let isAdmin = (username === DEVELOPER_NAME && password === "hamzagmailcom34567");
+            if(isAdmin) username = DEVELOPER_NAME;
 
             db.ref('usernames/' + username).once('value').then(snap => {
                 let uid = snap.exists() ? snap.val() : null;
-                if (isAdmin) uid = "552";
+                if (isAdmin) uid = DEVELOPER_UID;
 
                 if (uid) {
                     checkIfBanned(uid, () => {
@@ -648,12 +898,12 @@
                                 db.ref('users/' + uid + '/gender').set(gender);
                                 loginSuccess(uid, username, data);
                             } else if (isAdmin) {
-                                createAccount(username, password, "552", gender);
+                                createAccount(username, password, DEVELOPER_UID, gender);
                             } else { showToast("❌ كلمة المرور غير صحيحة!", "#ff2a5f"); }
                         });
                     });
                 } else {
-                    if(isAdmin) createAccount(username, password, "552", gender);
+                    if(isAdmin) createAccount(username, password, DEVELOPER_UID, gender);
                     else {
                         let newUid = Math.floor(10000000 + Math.random() * 90000000).toString();
                         createAccount(username, password, newUid, gender);
@@ -688,7 +938,7 @@
         function showProfileAndMenu() {
             document.getElementById('user-profile').classList.add('active');
             let displayNameHTML = `أهلاً، ${currentUserData.username}`;
-            if (currentUserData.username === "حمزة الحماده" || currentUserId === "552") {
+            if (currentUserData.username === DEVELOPER_NAME || currentUserId === DEVELOPER_UID) {
                 displayNameHTML += ` <span class="admin-badge">👑 المطور</span>`;
             }
             document.getElementById('display-name').innerHTML = displayNameHTML;
@@ -703,7 +953,7 @@
             navigator.clipboard.writeText(currentUserId).then(() => showToast("📋 تم نسخ الآيدي الخاص بك"));
         }
 
-        let friendStatusListeners = {}; 
+        let friendStatusListeners = {};
 
         function setupRealtimeListeners() {
             db.ref('users/' + currentUserId + '/requests').on('value', snap => {
@@ -715,7 +965,7 @@
                         html += `
                         <div class="list-item">
                             <span><img src="${generateAvatarURL(friendName, friendGender)}"> ${friendName}</span>
-                            <button class="action-btn" onclick="acceptFriend('${id}', '${friendName}', '${friendGender}')" style="background:#10b981;">قبول</button>
+                            <button class="action-btn" onclick="acceptFriend('${id}', '${friendName}', '${friendGender}')" style="background: linear-gradient(135deg, #10b981, #047857);">قبول</button>
                         </div>`;
                     }
                 } else { html = '<div style="text-align:center;color:#666;padding:10px;">لا توجد طلبات معلقة</div>'; }
@@ -723,16 +973,18 @@
             });
 
             db.ref('users/' + currentUserId + '/friends').on('value', snap => {
-                const friends = snap.val(); 
+                const friends = snap.val();
                 let html = '';
                 if(friends) {
                     for(let id in friends) {
                         let friendName = typeof friends[id] === 'string' ? friends[id] : friends[id].name;
                         let friendGender = typeof friends[id] === 'string' ? null : friends[id].gender;
-                        
+                        let isDev = (friendName === DEVELOPER_NAME || id === DEVELOPER_UID);
+                        let devTag = isDev ? `<span class="in-game-dev-badge">👑 المطور</span>` : '';
+
                         html += `
                         <div class="list-item">
-                            <span><img src="${generateAvatarURL(friendName, friendGender)}"> ${friendName} <span id="status-${id}" style="color:#aaa;font-size:10px;margin-right:5px;">⏳</span></span>
+                            <span><img src="${generateAvatarURL(friendName, friendGender)}"> ${friendName} ${devTag} <span id="status-${id}" style="color:#aaa;font-size:10px;margin-right:5px;">⏳</span></span>
                             <button class="action-btn" id="invite-btn-${id}" style="background:#444; cursor:not-allowed;" disabled>انتظار</button>
                         </div>`;
 
@@ -741,14 +993,14 @@
                                 let st = statusSnap.val();
                                 let isOnline = (st === 'online');
                                 let statusDot = isOnline ? '<span style="color:#10b981;font-size:10px;">🟢 متصل</span>' : '<span style="color:#ff2a5f;font-size:10px;">🔴 غير متصل</span>';
-                                
+
                                 let statElem = document.getElementById('status-' + id);
                                 if(statElem) statElem.innerHTML = statusDot;
-                                
+
                                 let btn = document.getElementById('invite-btn-' + id);
                                 if(btn) {
                                     if(isOnline) {
-                                        btn.style.background = 'linear-gradient(90deg, #511fff, var(--accent-glow))';
+                                        btn.style.background = 'linear-gradient(135deg, #511fff, #8b5cf6)';
                                         btn.style.cursor = 'pointer';
                                         btn.disabled = false;
                                         btn.innerText = 'دعوة للعب';
@@ -764,8 +1016,8 @@
                             });
                         }
                     }
-                } else { 
-                    html = '<div style="text-align:center;color:#666;padding:10px;">لا يوجد أصدقاء بعد</div>'; 
+                } else {
+                    html = '<div style="text-align:center;color:#666;padding:10px;">لا يوجد أصدقاء بعد</div>';
                 }
                 document.getElementById('friends-list').innerHTML = html;
 
@@ -782,7 +1034,8 @@
                 if(invite && invite.gameId) {
                     pendingInviteId = invite.gameId;
                     let gameName = invite.gameType === 'xo' ? 'X O' : 'لودو';
-                    document.getElementById('invite-msg').innerText = `صديقك ${invite.senderName} يدعوك للعب ${gameName}!`;
+                    let devNotice = invite.senderName === DEVELOPER_NAME ? ' 👑 (من المطور)' : '';
+                    document.getElementById('invite-msg').innerText = `صديقك ${invite.senderName}${devNotice} يدعوك للعب ${gameName}!`;
                     document.getElementById('invite-modal').classList.add('active');
                 } else { document.getElementById('invite-modal').classList.remove('active'); pendingInviteId = null; }
             });
@@ -822,7 +1075,7 @@
             showToast("🤝 أصبحتم أصدقاء الآن!");
         }
 
-        let activeFriendId = null; 
+        let activeFriendId = null;
         function openGameOptionsModal(friendId, friendName) {
             activeFriendIdForInvite = friendId; activeFriendNameForInvite = friendName;
             document.getElementById('choose-game-modal').classList.add('active');
@@ -857,7 +1110,7 @@
 
             db.ref('games/' + gameId + '/player2Joined').on('value', snap => {
                 if(snap.val() === true) {
-                    playAcceptSound(); 
+                    playAcceptSound();
                     db.ref('games/' + gameId + '/player2Joined').off();
                     db.ref('games/' + gameId + '/rejected').off();
                     if(gameType === 'xo') startGameOnline(); else startLudoOnline(gameType);
@@ -877,7 +1130,7 @@
 
         function createInviteLink(gameType = 'xo') {
             gameId = Math.random().toString(36).substring(2, 10);
-            myRole = gameType === 'xo' ? 'X' : 'Red'; isOnline = true; activeFriendId = null; 
+            myRole = gameType === 'xo' ? 'X' : 'Red'; isOnline = true; activeFriendId = null;
 
             let gameData = { type: gameType, winner: '', player2Joined: false, hostName: currentUserData.username, guestName: 'جاري الانضمام...', isLinkInvite: true };
             if(gameType === 'xo') {
@@ -893,7 +1146,7 @@
 
             db.ref('games/' + gameId + '/player2Joined').on('value', snap => {
                 if(snap.val() === true) {
-                    playAcceptSound(); 
+                    playAcceptSound();
                     db.ref('games/' + gameId + '/player2Joined').off();
                     if(gameType === 'xo') startGameOnline(); else startLudoOnline(gameType);
                 }
@@ -906,7 +1159,8 @@
                 if (data && data.isLinkInvite && !data.player2Joined) {
                     pendingInviteId = gameIdParam;
                     let gameName = data.type === 'xo' ? 'X O' : 'لودو';
-                    document.getElementById('invite-msg').innerText = `دعوة خاصة للعب ${gameName} من ${data.hostName}!`;
+                    let devNotice = data.hostName === DEVELOPER_NAME ? ' 👑 (من المطور)' : '';
+                    document.getElementById('invite-msg').innerText = `دعوة خاصة للعب ${gameName} من ${data.hostName}${devNotice}!`;
                     document.getElementById('invite-modal').classList.add('active');
                     window.history.replaceState({}, document.title, window.location.pathname);
                 } else { showToast("❌ الرابط منتهي أو الغرفة ممتلئة!", "#ff2a5f"); }
@@ -954,6 +1208,7 @@
             isOnline = false; myRole = 'All'; gameBoard = ["", "", "", "", "", "", "", "", ""];
             isGameOver = false; hasLoggedStatThisGame = false; localTurn = 'X'; scores = { X: 0, O: 0, ties: 0 };
             playerXName = currentUserData.username; playerOName = "المنافس المحلي";
+            document.getElementById('opponent-dev-notice').classList.remove('show');
             setupGameUI("🎮 نمط: لعب محلي"); renderBoard();
         }
 
@@ -961,7 +1216,7 @@
             hasLoggedStatThisGame = false;
             let roleDisplay = myRole === 'X' ? "أنت (X) المستضيف" : "أنت (O) الضيف";
             setupGameUI(`⚡ ${roleDisplay}`);
-            
+
             db.ref('games/' + gameId).on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
@@ -969,8 +1224,9 @@
                     playerXName = data.hostName || 'اللاعب (X)'; playerOName = data.guestName || 'اللاعب (O)';
                     if (data.scores) scores = data.scores;
                     updateScoreboardDOM(); renderBoard();
-                    
-                    if (data.winner !== '') { handleWinOnline(data); } 
+                    updateOpponentDevNotice();
+
+                    if (data.winner !== '') { handleWinOnline(data); }
                     else {
                         document.getElementById('reset-btn').style.display = 'none';
                         let currentPlayerName = data.turn === 'X' ? playerXName : playerOName;
@@ -988,6 +1244,17 @@
                     }
                 }
             });
+        }
+
+        function updateOpponentDevNotice() {
+            let notice = document.getElementById('opponent-dev-notice');
+            let opponentName = (myRole === 'X') ? playerOName : playerXName;
+            if (opponentName === DEVELOPER_NAME) {
+                notice.innerHTML = '👑 خصمك هو المطور "حمزة الحماده" — حظاً موفقاً!';
+                notice.classList.add('show');
+            } else {
+                notice.classList.remove('show');
+            }
         }
 
         function setupGameUI(roleText) {
@@ -1019,11 +1286,11 @@
                 let winner = checkWin(gameBoard);
                 if (winner) {
                     isGameOver = true;
-                    if (winner === 'Draw') { document.getElementById('status-text').innerText = "🏁 تعادل!"; scores.ties += 1; saveUserStats(false); } 
+                    if (winner === 'Draw') { document.getElementById('status-text').innerText = "🏁 تعادل!"; scores.ties += 1; saveUserStats(false); }
                     else {
                         let winnerRealName = winner === 'X' ? playerXName : playerOName;
                         document.getElementById('status-text').innerText = `🎉 الفائز: ${winnerRealName}!`;
-                        scores[winner] += 1; highlightWinningLine(gameBoard); playWinAnimation(); saveUserStats(true); 
+                        scores[winner] += 1; highlightWinningLine(gameBoard); playWinAnimation(); saveUserStats(true);
                     }
                     updateScoreboardDOM(); document.getElementById('reset-btn').style.display = 'block';
                 } else { localTurn = localTurn === 'X' ? 'O' : 'X'; updateStatusText(); }
@@ -1032,7 +1299,7 @@
         }
 
         function handleWinOnline(data) {
-            if (data.winner === 'Draw') { document.getElementById('status-text').innerText = "🏁 تعادل!"; saveUserStats(false); } 
+            if (data.winner === 'Draw') { document.getElementById('status-text').innerText = "🏁 تعادل!"; saveUserStats(false); }
             else {
                 let winnerRealName = data.winner === 'X' ? playerXName : playerOName;
                 document.getElementById('status-text').innerText = `🎉 الفائز هو: ${winnerRealName}!`;
@@ -1059,12 +1326,15 @@
             document.getElementById('score-x').innerText = scores.X;
             document.getElementById('score-o').innerText = scores.O;
             document.getElementById('score-ties').innerText = scores.ties;
-            
+
             let genderX = playerXName === currentUserData?.username ? currentUserData?.gender : null;
             let genderO = playerOName === currentUserData?.username ? currentUserData?.gender : null;
 
-            document.getElementById('label-x').innerHTML = `<img src="${generateAvatarURL(playerXName, genderX)}" style="width:30px;height:30px;border-radius:50%;"><br>${playerXName}`;
-            document.getElementById('label-o').innerHTML = `<img src="${generateAvatarURL(playerOName, genderO)}" style="width:30px;height:30px;border-radius:50%;"><br>${playerOName}`;
+            let devX = (playerXName === DEVELOPER_NAME) ? '<span class="in-game-dev-badge">👑 المطور</span>' : '';
+            let devO = (playerOName === DEVELOPER_NAME) ? '<span class="in-game-dev-badge">👑 المطور</span>' : '';
+
+            document.getElementById('label-x').innerHTML = `<img src="${generateAvatarURL(playerXName, genderX)}" style="width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,0.15);"><br>${playerXName} ${devX}`;
+            document.getElementById('label-o').innerHTML = `<img src="${generateAvatarURL(playerOName, genderO)}" style="width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,0.15);"><br>${playerOName} ${devO}`;
         }
 
         function updateStatusText() {
@@ -1078,7 +1348,7 @@
         function checkWin(board) {
             for (let condition of winConditions) {
                 let [a, b, c] = condition;
-                if (board[a] && board[a] === board[b] && board[a] === board[c]) return board[a]; 
+                if (board[a] && board[a] === board[b] && board[a] === board[c]) return board[a];
             }
             if (!board.includes("")) return 'Draw'; return null;
         }
@@ -1096,7 +1366,7 @@
 
         function resetGame() {
             hasLoggedStatThisGame = false;
-            if (isOnline) { db.ref('games/' + gameId).update({ board: ["", "", "", "", "", "", "", "", ""], turn: 'X', winner: '' }); } 
+            if (isOnline) { db.ref('games/' + gameId).update({ board: ["", "", "", "", "", "", "", "", ""], turn: 'X', winner: '' }); }
             else {
                 gameBoard = ["", "", "", "", "", "", "", "", ""]; isGameOver = false; localTurn = 'X';
                 document.getElementById('reset-btn').style.display = 'none'; updateStatusText(); renderBoard();
@@ -1105,6 +1375,7 @@
 
         function exitGame() {
             if(isOnline && gameId) { db.ref('games/' + gameId).remove(); db.ref('games/' + gameId).off(); }
+            document.getElementById('opponent-dev-notice').classList.remove('show');
             showSection('menu-section');
         }
 
