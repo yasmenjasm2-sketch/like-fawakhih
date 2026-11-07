@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0B0612">
+    <title>FawakihAI - Ocean Party</title>
+
+    <style>
+        :root {
+            --bg-main: #0B0612;
+            --bg-panel: #130922;
+            --bg-card: #180C2B;
+            --primary: #9D4EDD;
+            --primary-dark: #5A189A;
+            --gold: #F8C000;
+            --neon-blue: #00E5FF;
+            --neon-pink: #FF00E5;
+            --success: #00E676;
+            --danger: #FF4757;
+            --danger-glow: #FF6B81;
+            --text-main: #FFFFFF;
+            --text-muted: #8A7A9E;
+            --border-color: #2D1B4E;
+            --glass-bg: rgba(19, 9, 34, 0.92);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: #0B0612;
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(0, 229, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(157, 78, 221, 0.10) 0%, transparent 50%),
+                linear-gradient(135deg, #09040d 0%, #1a0b2e 50%, #0d0616 100%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            position: relative;
+            overflow-x: hidden;
+            transform: translateZ(0);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        #dev-logo {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 2px solid var(--neon-blue);
+            cursor: pointer;
+            z-index: 1000;
+            object-fit: cover;
+            box-shadow: 0 0 10px rgba(0, 229, 255, 0.6);
+            transition: transform 0.2s ease;
+        }
+        #dev-logo:active { transform: scale(1.15); }
+
+        #dev-info {
+            position: absolute;
+            top: 68px;
+            right: 15px;
+            background: var(--glass-bg);
+            border: 1px solid var(--neon-blue);
+            padding: 12px 18px;
+            border-radius: 14px;
+            text-align: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+        }
+        #dev-info.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .dev-name { color: var(--gold); font-size: 14px; font-weight: bold; }
+        .dev-sub { color: var(--neon-blue); font-size: 12px; margin-top: 3px; }
+
+        /* شاشة النظام الرئيسية */
+        #game-screen {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 480px;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .app-header {
+            text-align: center;
+            margin-bottom: 5px;
+            position: relative;
+        }
+        .app-header h1 {
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--neon-blue);
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
+        }
+        .app-header h1 span { color: var(--gold); font-size: 18px; }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--glass-bg);
+            border: 1px solid var(--neon-blue);
+            box-shadow: 0 0 12px rgba(0, 229, 255, 0.25);
+            border-radius: 12px;
+            padding: 12px 15px;
+            font-size: 12px;
+            font-weight: bold;
+            color: var(--text-muted);
+            gap: 6px;
+        }
+        .stats-bar span { display: flex; align-items: center; gap: 5px; }
+        .stat-value { color: var(--neon-blue); }
+        .stat-icon { color: var(--gold); }
+
+        .game-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background-color: var(--bg-card);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 2px solid var(--primary);
+            box-shadow: 0 0 20px rgba(157, 78, 221, 0.35);
+            margin-bottom: 10px;
+        }
+        #img-wrap {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        .game-image {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
+            opacity: 0.95;
+            transition: opacity 0.3s;
+        }
+        .game-image.analyzing { opacity: 0.5; }
+
+        .marker {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            transform: translate(-50%, -50%);
+            display: none;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        .marker .corner {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            border-color: var(--neon-blue);
+            filter: drop-shadow(0 0 5px var(--neon-blue));
+        }
+        .marker .corner.tl { top: 0; left: 0; border-top: 3px solid; border-left: 3px solid; }
+        .marker .corner.tr { top: 0; right: 0; border-top: 3px solid; border-right: 3px solid; }
+        .marker .corner.bl { bottom: 0; left: 0; border-bottom: 3px solid; border-left: 3px solid; }
+        .marker .corner.br { bottom: 0; right: 0; border-bottom: 3px solid; border-right: 3px solid; }
+        
+        .marker .center-dot {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 6px; height: 6px;
+            transform: translate(-50%, -50%);
+            background: var(--neon-blue);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--neon-blue);
+        }
+
+        .marker.marker-special .corner { border-color: var(--gold); filter: drop-shadow(0 0 6px var(--gold)); }
+        .marker.marker-special .center-dot { background: var(--gold); box-shadow: 0 0 10px var(--gold); }
+        .marker.marker-special { animation: markerFlash 1s ease-in-out infinite; }
+
+        .controls-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 5px;
+        }
+        
+        .modern-input {
+            width: 100%;
+            padding: 16px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid #3B0A75;
+            border-radius: 30px;
+            color: white;
+            text-align: center;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .start-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #00E676, #00B0FF, #F8C000);
+            color: #000;
+            border: none;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: 900;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 230, 118, 0.4);
+            transition: transform 0.2s ease;
+        }
+        .start-btn:active { transform: scale(0.97); }
+        .start-btn:disabled {
+            background: #2D1B4E;
+            color: #8A7A9E;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        .panel {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 15px;
+        }
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 13px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .predictions-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 10px;
+            width: 100%;
+        }
+        .pred-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px;
+            position: relative;
+            cursor: pointer;
+            flex: 0 0 calc(33.333% - 7px);
+            max-width: calc(33.333% - 7px);
+        }
+
+        .pred-card.active-card {
+            border-color: var(--gold);
+            box-shadow: 0 0 12px rgba(248, 192, 0, 0.2);
+        }
+
+        .pred-card.special-red {
+            border: 2px solid var(--gold);
+            background: linear-gradient(145deg, rgba(248, 192, 0, 0.18), rgba(248, 192, 0, 0.05));
+            animation: goldGlowPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes goldGlowPulse {
+            0%, 100% { box-shadow: 0 0 12px rgba(248, 192, 0, 0.55); }
+            50% { box-shadow: 0 0 22px rgba(248, 192, 0, 0.85); }
+        }
+
+        @keyframes markerFlash {
+            0%, 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.5; transform: translate(-50%, -50%) scale(0.9); }
+        }
+
+        .pred-type { font-size: 10px; color: var(--text-muted); text-align: right; margin-bottom: 5px; }
+        .pred-title { font-size: 15px; font-weight: bold; color: white; text-align: center; margin-bottom: 5px; }
+        .progress-track { width: 100%; height: 4px; background: #25163D; border-radius: 2px; overflow: hidden; margin-bottom: 5px; }
+        .progress-fill { height: 100%; background: var(--success); width: 0%; transition: width 0.8s ease; }
+        .pred-footer { font-size: 10px; color: var(--text-muted); text-align: center; }
+
+        .system-log {
+            background: #060309;
+            border: 1px solid #1E1035;
+            border-radius: 8px;
+            padding: 10px;
+            height: 100px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 11px;
+            color: #A093B5;
+            direction: ltr;
+            text-align: left;
+        }
+        .log-highlight { color: var(--success); }
+
+        .analyzing-bar {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px;
+            color: var(--primary);
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <img src="hamza.jpg" id="dev-logo" alt="Developer" onclick="showDevInfo()">
+    <div id="dev-info">
+        <div class="dev-name">hamza elhumada</div>
+        <div class="dev-sub">nbras</div>
+    </div>
+
+    <!-- شاشة النظام الرئيسية -->
+    <div id="game-screen">
+        
+        <div class="app-header">
+            <h1>🌊 OCEAN PARTY <span>v1.0</span></h1>
+        </div>
+
+        <div class="game-container">
+            <div id="img-wrap">
+                <!-- صورة اللعبة -->
+                <img src="hamzacc.jpg" alt="Ocean Party" class="game-image" id="main-image">
+
+                <!-- 7 علامات تاشير تتوافق مع المربعات في الصورة -->
+                <div id="marker-1" class="marker">
+                    <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div><div class="center-dot"></div>
+                </div>
+                <div id="marker-2" class="marker">
+                    <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div><div class="center-dot"></div>
+                </div>
+                <div id="marker-3" class="marker">
+                    <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div><div class="center-dot"></div>
+                </div>
+                <div id="marker-4" class="marker">
+                    <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div><div class="center-dot"></div>
+                </div>
+                <div id="marker-5" class="marker">
+                    <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div><div class="center-dot"></div>
+                </div>
+                <div id="marker-6" class="marker">
+                    <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div><div class="center-dot"></div>
+                </div>
+                <!-- الماركر السابع المميز -->
+                <div id="marker-7" class="marker marker-special">
+                    <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div><div class="center-dot"></div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="stats-bar">
+            <span><span class="stat-icon">⏱</span> جولة: <span class="stat-value" id="round-timer">0</span></span>
+            <span><span class="stat-icon">👑</span> <span class="stat-value" style="color: var(--gold);">VIP نشط</span></span>
+            <span><span class="stat-icon">👤</span> <span class="stat-value" id="online-count">0</span></span>
+        </div>
+
+        <div class="controls-container">
+            <input type="text" id="fruit-training-input" class="modern-input" placeholder="🧠 أدخل اسم الكائن (مثال: قرش)">
+            <!-- زر بدء الجولة 26 ثانية -->
+            <button id="start-round-btn" class="start-btn" onclick="startNewRound()">بدء جولة جديدة 🚀</button>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <span>🎯 توقعات المحيط</span>
+            </div>
+            <div class="analyzing-bar" id="analyzing-ui">جاري التحليل... 🧠</div>
+            <div class="predictions-grid" id="predictions-grid">
+                <div style="width: 100%; text-align: center; color: var(--text-muted); font-size: 12px; padding: 20px;">
+                    اضغط "بدء جولة جديدة" لاستخراج 7 توقعات
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header"><span>📋 سجل النظام</span></div>
+            <div class="system-log" id="system-log">
+                <div><span class="log-time">[نظام]</span> 🌊 OCEAN PARTY AI - جاهز للعمل</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function showDevInfo() {
+            const infoBox = document.getElementById('dev-info');
+            infoBox.classList.add('show');
+            setTimeout(() => { infoBox.classList.remove('show'); }, 3000); 
+        }
+
+        // إحداثيات 7 مربعات بناءً على صورة اللعبة
+        const slots = [
+            { id: 1, top: '18%', left: '16%' }, // سلحفاة 12x
+            { id: 2, top: '18%', left: '50%' }, // دولفين 35x
+            { id: 3, top: '18%', left: '84%' }, // قرش 100x
+            { id: 4, top: '55%', left: '14%' }, // سلحفاة 4x
+            { id: 5, top: '55%', left: '38%' }, // دولفين 4x
+            { id: 6, top: '55%', left: '62%' }, // قرش 4x
+            { id: 7, top: '55%', left: '86%' }  // مختلط 6x
+        ];
+
+        // بيانات الكائنات البحرية
+        const oceanData = {
+            1: { name: 'سلحفاة', icon: '🐢', mult: 'x12' },
+            2: { name: 'دولفين', icon: '🐬', mult: 'x35' },
+            3: { name: 'قرش', icon: '🦈', mult: 'x100' },
+            4: { name: 'سلحفاة', icon: '🐢', mult: 'x4' },
+            5: { name: 'دولفين', icon: '🐬', mult: 'x4' },
+            6: { name: 'قرش', icon: '🦈', mult: 'x4' },
+            7: { name: 'مختلط', icon: '🌊', mult: 'x6' }
+        };
+
+        let currentRoundTime = 26; // 26 ثانية
+        let roundInterval;
+        let isGuessingAllowed = true;
+
+        window.onload = function() {
+            document.getElementById('online-count').innerText = Math.floor(Math.random() * 500) + 100;
+        };
+
+        // خوارزمية التخمين العشوائية جداً (مدمجة)
+        function generateRandomPrediction() {
+            let shuffledSlots = [...slots];
+            // خلط عشوائي (Fisher-Yates Shuffle)
+            for (let i = shuffledSlots.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffledSlots[i], shuffledSlots[j]] = [shuffledSlots[j], shuffledSlots[i]];
+            }
+            
+            // إرجاع 7 توقعات
+            return shuffledSlots.map((slot, index) => {
+                return {
+                    id: slot.id,
+                    top: slot.top,
+                    left: slot.left,
+                    confidence: Math.floor(Math.random() * 10) + 88, // نسبة ثقة عشوائية بين 88% و 98%
+                    score: (Math.random() * 5000 + 1000).toFixed(1)
+                };
+            });
+        }
+
+        function addSystemLog(msg) {
+            const logBox = document.getElementById('system-log');
+            const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+            logBox.innerHTML += `<div><span class="log-time">[${time}]</span> <span class="log-highlight">${msg}</span></div>`;
+            logBox.scrollTop = logBox.scrollHeight;
+        }
+
+        function renderPredictions(predictions) {
+            const grid = document.getElementById('predictions-grid');
+            grid.innerHTML = '';
+
+            predictions.forEach((pred, index) => {
+                const data = oceanData[pred.id];
+                
+                // المربع الأسطوري (القرش 100x) نعطيه كلاس مميز
+                const isSpecial = pred.id === 3; 
+                const specialClass = isSpecial ? 'special-red' : '';
+
+                grid.innerHTML += `
+                    <div class="pred-card ${specialClass}">
+                        <div class="pred-type">توقع ${index + 1}</div>
+                        <div class="pred-title">${data.name} ${data.mult} ${data.icon}</div>
+                        <div class="progress-track">
+                            <div class="progress-fill" style="width: ${pred.confidence}%; background: ${isSpecial ? 'var(--gold)' : 'var(--success)'};"></div>
+                        </div>
+                        <div class="pred-footer">ثقة: ${pred.confidence}%</div>
+                    </div>
+                `;
+            });
+        }
+
+        function startNewRound() {
+            if (!isGuessingAllowed) return;
+
+            const btn = document.getElementById('start-round-btn');
+            const mainImg = document.getElementById('main-image');
+            const grid = document.getElementById('predictions-grid');
+            const analyzingUI = document.getElementById('analyzing-ui');
+            
+            // إخفاء كل العلامات
+            for(let i=1; i<=7; i++) {
+                const m = document.getElementById('marker-'+i);
+                if (m) m.style.display = 'none';
+            }
+            
+            grid.style.display = 'none';
+            analyzingUI.style.display = 'flex';
+            mainImg.classList.add('analyzing');
+            addSystemLog("🚀 بدء تحليل المحيط...");
+            
+            btn.disabled = true;
+            btn.innerText = "جاري التحليل...";
+            isGuessingAllowed = false;
+
+            setTimeout(() => {
+                // استخدام الخوارزمية العشوائية
+                let predictions = generateRandomPrediction();
+                
+                analyzingUI.style.display = 'none';
+                grid.style.display = 'flex';
+                renderPredictions(predictions);
+
+                // عرض العلامات على الصورة
+                predictions.forEach((pred, index) => {
+                    let marker = document.getElementById('marker-' + (index + 1));
+                    if (marker) {
+                        marker.style.top = pred.top;
+                        marker.style.left = pred.left;
+                        marker.style.display = 'block';
+                    }
+                });
+
+                mainImg.classList.remove('analyzing');
+                addSystemLog("✅ تم استخراج 7 توقعات بنجاح");
+                
+                startActiveRoundTimer();
+            }, 1500); // تأخير بسيط لمحاكاة التحليل
+        }
+
+        function startActiveRoundTimer() {
+            currentRoundTime = 26; // 26 ثانية
+            const btn = document.getElementById('start-round-btn');
+            const timerDisplay = document.getElementById('round-timer');
+            
+            btn.innerText = `الرجاء الانتظار (${currentRoundTime})`;
+            timerDisplay.innerText = currentRoundTime;
+
+            if (roundInterval) clearInterval(roundInterval);
+
+            roundInterval = setInterval(() => {
+                currentRoundTime--;
+                if (currentRoundTime > 0) {
+                    btn.innerText = `الرجاء الانتظار (${currentRoundTime})`;
+                    timerDisplay.innerText = currentRoundTime;
+                } else {
+                    clearInterval(roundInterval);
+                    timerDisplay.innerText = "0";
+                    addSystemLog("⏳ انتهت الجولة. يمكنك البدء مجدداً.");
+                    resetEngineUI();
+                }
+            }, 1000);
+        }
+
+        function resetEngineUI() {
+            const btn = document.getElementById('start-round-btn');
+            btn.disabled = false;
+            btn.innerText = "بدء جولة جديدة 🚀";
+            document.getElementById('main-image').classList.remove('analyzing');
+            isGuessingAllowed = true;
+        }
+    </script>
+</body>
+</html>
