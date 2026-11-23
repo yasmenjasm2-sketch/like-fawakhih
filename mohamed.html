@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الشيف محمد الحسن | Şef Muhammed El-Hasan</title>
+<meta name="description" content="الشيف محمد الحسن - حلويات بقلاوة فاخرة | Şef Muhammed El-Hasan - Premium Baklava">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;700;900&family=Cinzel:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --gold:#d4a84b; --gold-2:#f6dd8e; --gold-3:#8a6420;
+    --ink:#07070a; --ink-2:#12101a; --cream:#fbf3de;
+    --pist:#8fbf3a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Poppins','Cairo',sans-serif;
+    background:var(--ink); color:var(--cream);
+    overflow-x:hidden; line-height:1.7;
+  }
+  body[lang="en"]{direction:ltr}
+  .ar{font-family:'Cairo','Amiri',serif}
+  body:not([lang="en"]) .en-only{display:none}
+  body[lang="en"] .ar-only{display:none}
+
+  /* ---------- Background marble + particles ---------- */
+  .marble{
+    position:fixed; inset:0; z-index:-2;
+    background:
+      radial-gradient(circle at 20% 10%, rgba(212,168,75,.12), transparent 40%),
+      radial-gradient(circle at 80% 90%, rgba(143,191,58,.10), transparent 45%),
+      linear-gradient(160deg,#0a0a0f,#15110a 60%,#07070a);
+  }
+  #particles{position:fixed; inset:0; z-index:-1; pointer-events:none}
+
+  /* ---------- Top bar ---------- */
+  nav{
+    position:fixed; top:0; left:0; right:0; z-index:50;
+    display:flex; justify-content:space-between; align-items:center;
+    padding:14px 5%; backdrop-filter:blur(10px);
+    background:linear-gradient(to bottom,rgba(7,7,10,.85),rgba(7,7,10,0));
+    animation:drop 1s ease both;
+  }
+  .logo{font-family:'Amiri',serif; color:var(--gold); font-size:1.3rem; font-weight:700}
+  .logo small{display:block; font-family:'Cinzel',serif; font-size:.6rem; letter-spacing:.3em; color:var(--gold-3)}
+  .nav-links{display:flex; gap:22px; align-items:center}
+  .nav-links a{color:var(--cream); text-decoration:none; font-size:.9rem; opacity:.8; transition:.3s}
+  .nav-links a:hover{color:var(--gold-2); opacity:1}
+  .lang-btn{
+    border:1px solid var(--gold); background:transparent; color:var(--gold);
+    padding:6px 14px; border-radius:30px; cursor:pointer; font-family:inherit;
+    transition:.3s;
+  }
+  .lang-btn:hover{background:var(--gold); color:var(--ink)}
+  @keyframes drop{from{transform:translateY(-100%);opacity:0}to{transform:none;opacity:1}}
+
+  /* ---------- Hero ---------- */
+  .hero{
+    min-height:100vh; position:relative; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; text-align:center; padding:120px 6% 60px;
+    overflow:hidden;
+  }
+  .hero-frame{
+    position:absolute; inset:18px; border:1px solid rgba(212,168,75,.35);
+    border-radius:24px; pointer-events:none; animation:frameIn 2.2s ease both;
+  }
+  @keyframes frameIn{from{clip-path:inset(50% 50% 50% 50%)}to{clip-path:inset(0 0 0 0)}}
+
+  .crown{
+    width:150px; height:150px; margin:0 auto 10px; position:relative;
+    animation:spinSlow 26s linear infinite;
+  }
+  @keyframes spinSlow{to{transform:rotate(360deg)}}
+  .crown svg{width:100%; height:100%; filter:drop-shadow(0 0 18px rgba(212,168,75,.5))}
+
+  .hero h1{
+    font-family:'Amiri',serif; font-size:clamp(2.6rem,8vw,5.5rem); line-height:1.3;
+    background:linear-gradient(90deg,var(--gold-3),var(--gold-2),var(--gold),var(--gold-2),var(--gold-3));
+    background-size:300% auto; -webkit-background-clip:text; background-clip:text; color:transparent;
+    animation:shimmer 5s linear infinite, rise 1.4s .3s ease both;
+  }
+  @keyframes shimmer{to{background-position:300% center}}
+  @keyframes rise{from{opacity:0;transform:translateY(40px) scale(.96)}to{opacity:1;transform:none}}
+
+  .hero h2{
+    font-family:'Cinzel',serif; font-size:clamp(1rem,2.6vw,1.6rem); letter-spacing:.35em;
+    color:var(--gold); margin-top:6px; animation:rise 1.4s .6s ease both;
+  }
+  .tagline{
+    margin:22px auto 34px; max-width:640px; font-size:1.1rem; opacity:0;
+    animation:fadeUp 1.2s 1s ease forwards;
+  }
+  @keyframes fadeUp{to{opacity:.9;transform:none}}
+
+  .cta{display:flex; gap:14px; justify-content:center; flex-wrap:wrap; animation:rise 1.2s 1.3s ease both}
+  .btn{
+    display:inline-block; padding:14px 34px; border-radius:50px; text-decoration:none;
+    font-weight:600; transition:.4s; position:relative; overflow:hidden;
+  }
+  .btn-gold{background:linear-gradient(135deg,var(--gold-2),var(--gold),var(--gold-3)); color:var(--ink); box-shadow:0 10px 30px rgba(212,168,75,.35)}
+  .btn-gold:hover{transform:translateY(-4px) scale(1.04); box-shadow:0 16px 40px rgba(212,168,75,.55)}
+  .btn-line{border:1px solid var(--gold); color:var(--gold-2)}
+  .btn-line:hover{background:rgba(212,168,75,.12); transform:translateY(-4px)}
+  .btn::after{
+    content:""; position:absolute; top:0; left:-75%; width:50%; height:100%;
+    background:linear-gradient(120deg,transparent,rgba(255,255,255,.5),transparent);
+    transform:skewX(-20deg); animation:sweep 3.5s infinite;
+  }
+  @keyframes sweep{0%{left:-75%}60%,100%{left:130%}}
+
+  .scroll-hint{position:absolute; bottom:24px; left:50%; transform:translateX(-50%); color:var(--gold); font-size:.8rem; letter-spacing:.2em; animation:bob 2s infinite}
+  @keyframes bob{50%{transform:translate(-50%,8px)}}
+
+  /* ---------- Sections ---------- */
+  section{padding:110px 6%; position:relative}
+  .title{text-align:center; margin-bottom:60px}
+  .title h2{font-family:'Amiri',serif; font-size:clamp(2rem,5vw,3.2rem); color:var(--gold-2)}
+  .title .line{width:0; height:2px; margin:14px auto 0; background:linear-gradient(90deg,transparent,var(--gold),transparent); transition:width 1.6s ease}
+  .title.in .line{width:220px}
+  .title p{opacity:.7; margin-top:10px}
+
+  .reveal{opacity:0; transform:translateY(60px) scale(.97); transition:opacity 1s ease, transform 1s cubic-bezier(.2,.8,.2,1)}
+  .reveal.in{opacity:1; transform:none}
+  .reveal.d1{transition-delay:.15s}.reveal.d2{transition-delay:.3s}.reveal.d3{transition-delay:.45s}
+
+  /* ---------- About ---------- */
+  .about{display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center; max-width:1200px; margin:auto}
+  .about-img{position:relative; border-radius:28px; overflow:hidden; border:1px solid rgba(212,168,75,.4); box-shadow:0 30px 80px rgba(0,0,0,.6)}
+  .about-img img{width:100%; aspect-ratio:4/5; object-fit:cover; display:block; transition:transform 1.2s ease}
+  .about-img:hover img{transform:scale(1.07)}
+  .about-img::after{content:""; position:absolute; inset:0; background:linear-gradient(to top,rgba(7,7,10,.6),transparent 50%); pointer-events:none}
+  .about-text h3{font-family:'Amiri',serif; font-size:2.2rem; color:var(--gold-2); margin-bottom:14px}
+  .about-text p{font-size:1.05rem; opacity:.85; margin-bottom:16px}
+  .badges{display:flex; gap:12px; flex-wrap:wrap; margin-top:22px}
+  .badge{padding:8px 16px; border:1px dashed var(--gold); border-radius:30px; font-size:.9rem; color:var(--gold-2); animation:float 4s ease-in-out infinite}
+  .badge:nth-child(2){animation-delay:.6s}.badge:nth-child(3){animation-delay:1.2s}
+  @keyframes float{50%{transform:translateY(-8px)}}
+
+  /* ---------- Gallery / Ads ---------- */
+  .gallery{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:26px; max-width:1300px; margin:auto}
+  .card{
+    position:relative; border-radius:24px; overflow:hidden; background:var(--ink-2);
+    border:1px solid rgba(212,168,75,.25); transition:transform .6s cubic-bezier(.2,.8,.2,1), box-shadow .6s;
+    transform-style:preserve-3d; perspective:900px;
+  }
+  .card:hover{box-shadow:0 30px 60px rgba(212,168,75,.25); border-color:var(--gold)}
+  .card .ph{aspect-ratio:4/5; overflow:hidden; background:linear-gradient(135deg,#2a1d07,#0d3a20)}
+  .card img{width:100%; height:100%; object-fit:cover; display:block; transition:transform 1.2s ease}
+  .card:hover img{transform:scale(1.12) rotate(1deg)}
+  .card .tag{
+    position:absolute; top:14px; right:14px; background:var(--gold); color:var(--ink);
+    font-weight:700; padding:6px 14px; border-radius:20px; font-size:.8rem;
+    animation:pulse 2.4s infinite;
+  }
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(212,168,75,.6)}50%{box-shadow:0 0 0 12px rgba(212,168,75,0)}}
+  .card .info{padding:20px 22px 24px}
+  .card h4{font-family:'Amiri',serif; font-size:1.5rem; color:var(--gold-2)}
+  .card p{font-size:.92rem; opacity:.75}
+  .card .price{margin-top:10px; color:var(--pist); font-weight:600}
+
+  /* ---------- Ad banner (rotating ticker) ---------- */
+  .ticker{overflow:hidden; white-space:nowrap; border-block:1px solid rgba(212,168,75,.3); padding:18px 0; background:rgba(212,168,75,.06)}
+  .ticker-track{display:inline-block; animation:tick 28s linear infinite; font-family:'Amiri',serif; font-size:1.6rem; color:var(--gold-2)}
+  .ticker-track span{margin:0 34px}
+  .ticker-track b{color:var(--pist)}
+  @keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+  /* ---------- Story / process ---------- */
+  .steps{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:30px; max-width:1100px; margin:auto}
+  .step{text-align:center; padding:34px 22px; border-radius:24px; background:linear-gradient(170deg,rgba(212,168,75,.08),transparent); border:1px solid rgba(212,168,75,.2); transition:.5s}
+  .step:hover{transform:translateY(-12px); border-color:var(--gold)}
+  .step .num{font-family:'Cinzel',serif; font-size:2.8rem; color:var(--gold); animation:spinY 6s linear infinite}
+  @keyframes spinY{to{transform:rotateY(360deg)}}
+  .step h5{font-size:1.2rem; margin:10px 0; color:var(--gold-2)}
+  .step p{opacity:.75; font-size:.95rem}
+
+  /* ---------- Order ---------- */
+  .order{
+    text-align:center; border-radius:36px; padding:80px 6%; margin:0 4%;
+    background:
+      radial-gradient(circle at top,rgba(212,168,75,.25),transparent 60%),
+      linear-gradient(180deg,#14100a,#07070a);
+    border:1px solid rgba(212,168,75,.4); position:relative; overflow:hidden;
+  }
+  .order h2{font-family:'Amiri',serif; font-size:clamp(2rem,5vw,3.4rem); color:var(--gold-2)}
+  .order p{opacity:.8; margin:14px auto 30px; max-width:560px}
+  .phone{
+    display:inline-block; font-family:'Cinzel',serif; font-size:clamp(1.6rem,4vw,2.6rem);
+    color:var(--ink); background:linear-gradient(90deg,var(--gold-2),var(--gold),var(--gold-2));
+    background-size:200% auto; padding:18px 40px; border-radius:60px; text-decoration:none;
+    box-shadow:0 14px 40px rgba(212,168,75,.45); animation:shimmer 4s linear infinite, bounceIn 1s ease both;
+    direction:ltr; letter-spacing:.05em;
+  }
+  @keyframes bounceIn{0%{transform:scale(.5);opacity:0}70%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+  .wa{margin-top:22px}
+  .wa a{color:var(--pist); text-decoration:none; font-weight:600; border-bottom:1px dashed var(--pist)}
+  .order .orb{position:absolute; border-radius:50%; background:rgba(212,168,75,.15); filter:blur(30px); animation:drift 12s ease-in-out infinite}
+  @keyframes drift{50%{transform:translate(40px,-30px)}}
+
+  /* ---------- Footer ---------- */
+  footer{text-align:center; padding:50px 6% 40px; border-top:1px solid rgba(212,168,75,.2); margin-top:90px}
+  footer .f-logo{font-family:'Amiri',serif; font-size:2rem; color:var(--gold)}
+  footer p{opacity:.6; font-size:.9rem; margin-top:6px}
+  .dev{
+    display:inline-block; margin-top:24px; padding:10px 22px; border-radius:30px;
+    border:1px solid rgba(143,191,58,.6); color:var(--pist); font-size:.9rem;
+    animation:glow 3s ease-in-out infinite;
+  }
+  @keyframes glow{50%{box-shadow:0 0 22px rgba(143,191,58,.5)}}
+
+  /* ---------- Floating call button ---------- */
+  .fab{
+    position:fixed; bottom:24px; left:24px; z-index:60; width:62px; height:62px; border-radius:50%;
+    display:grid; place-items:center; background:linear-gradient(135deg,var(--gold-2),var(--gold));
+    box-shadow:0 10px 30px rgba(0,0,0,.5); text-decoration:none; font-size:1.7rem;
+    animation:ring 2.8s infinite;
+  }
+  body[lang="en"] .fab{left:auto; right:24px}
+  @keyframes ring{0%,100%{transform:rotate(0)}5%{transform:rotate(-14deg)}10%{transform:rotate(14deg)}15%{transform:rotate(-8deg)}20%{transform:rotate(0)}}
+
+  /* ---------- Responsive ---------- */
+  @media(max-width:850px){
+    .about{grid-template-columns:1fr}
+    .nav-links a:not(.lang-btn){display:none}
+    section{padding:80px 5%}
+  }
+</style>
+</head>
+<body lang="ar">
+<div class="marble"></div>
+<canvas id="particles"></canvas>
+
+<nav>
+  <div class="logo"><span class="ar-only">الشيف محمد الحسن</span><span class="en-only">Şef Muhammed El-Hasan</span><small>BAKLAVA · HALVA</small></div>
+  <div class="nav-links">
+    <a href="#about"><span class="ar-only">عنّا</span><span class="en-only">About</span></a>
+    <a href="#gallery"><span class="ar-only">الإعلانات</span><span class="en-only">Gallery</span></a>
+    <a href="#order"><span class="ar-only">اطلب الآن</span><span class="en-only">Order</span></a>
+    <button class="lang-btn" id="langBtn">English</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-frame"></div>
+  <div class="crown">
+    <svg viewBox="0 0 200 200">
+      <defs>
+        <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0" stop-color="#f6dd8e"/><stop offset=".5" stop-color="#d4a84b"/><stop offset="1" stop-color="#8a6420"/>
+        </linearGradient>
+      </defs>
+      <g fill="url(#g)" stroke="#8a6420" stroke-width=".6">
+        <path d="M100 20 L118 60 L100 100 L82 60Z"/>
+        <path d="M100 20 L118 60 L100 100 L82 60Z" transform="rotate(45 100 100)"/>
+        <path d="M100 20 L118 60 L100 100 L82 60Z" transform="rotate(90 100 100)"/>
+        <path d="M100 20 L118 60 L100 100 L82 60Z" transform="rotate(135 100 100)"/>
+        <path d="M100 20 L118 60 L100 100 L82 60Z" transform="rotate(180 100 100)"/>
+        <path d="M100 20 L118 60 L100 100 L82 60Z" transform="rotate(225 100 100)"/>
+        <path d="M100 20 L118 60 L100 100 L82 60Z" transform="rotate(270 100 100)"/>
+        <path d="M100 20 L118 60 L100 100 L82 60Z" transform="rotate(315 100 100)"/>
+      </g>
+      <circle cx="100" cy="100" r="22" fill="#8fbf3a" stroke="#f6dd8e" stroke-width="2"/>
+      <circle cx="100" cy="100" r="8" fill="#d4e89a"/>
+    </svg>
+  </div>
+  <h1 class="ar-only">الشيف محمد الحسن</h1>
+  <h1 class="en-only">Şef Muhammed El-Hasan</h1>
+  <h2 class="ar-only">بقلاوة فاخرة · حلويات شرقية</h2>
+  <h2 class="en-only">PREMIUM BAKLAVA · ORIENTAL SWEETS</h2>
+  <p class="tagline ar-only">طعم أصيل، فستق حلبي، وعجينة تذوب في الفم. كل قطعة تُصنع بحب ومهارة الشيف محمد.</p>
+  <p class="tagline en-only">Authentic taste, real pistachio and pastry that melts in your mouth. Every piece handcrafted by Chef Muhammed.</p>
+  <div class="cta">
+    <a class="btn btn-gold" href="tel:+905314904736"><span class="ar-only">اتصل واطلب</span><span class="en-only">Call to Order</span></a>
+    <a class="btn btn-line" href="#gallery"><span class="ar-only">شاهد الإعلانات</span><span class="en-only">View Offers</span></a>
+  </div>
+  <div class="scroll-hint">↓</div>
+</header>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-track">
+    <span class="ar-only">🥇 بقلاوة بالفستق الحلبي</span><span class="ar-only">✨ كنافة ناعمة</span><span class="ar-only">🌿 بقلاوة خضراء</span><span class="ar-only">🍫 براونيز الفستق والشوكولاتة</span><span class="ar-only">🎁 طلبات الأعراس والمناسبات</span><span class="ar-only">📞 <b>+90 531 490 47 36</b></span>
+    <span class="en-only">🥇 Pistachio Baklava</span><span class="en-only">✨ Soft Kunafa</span><span class="en-only">🌿 Green Baklava</span><span class="en-only">🍫 Pistachio & Chocolate Brownies</span><span class="en-only">🎁 Weddings & Events Orders</span><span class="en-only">📞 <b>+90 531 490 47 36</b></span>
+    <span class="ar-only">🥇 بقلاوة بالفستق الحلبي</span><span class="ar-only">✨ كنافة ناعمة</span><span class="ar-only">🌿 بقلاوة خضراء</span><span class="ar-only">🍫 براونيز الفستق والشوكولاتة</span><span class="ar-only">🎁 طلبات الأعراس والمناسبات</span><span class="ar-only">📞 <b>+90 531 490 47 36</b></span>
+    <span class="en-only">🥇 Pistachio Baklava</span><span class="en-only">✨ Soft Kunafa</span><span class="en-only">🌿 Green Baklava</span><span class="en-only">🍫 Pistachio & Chocolate Brownies</span><span class="en-only">🎁 Weddings & Events Orders</span><span class="en-only">📞 <b>+90 531 490 47 36</b></span>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about">
+    <div class="about-img reveal">
+      <img src="vava4.jpg" alt="Chef Muhammed El-Hasan">
+    </div>
+    <div class="about-text reveal d2">
+      <div class="title" style="text-align:right">
+        <h2 class="ar-only" style="font-family:'Amiri',serif;color:var(--gold-2);font-size:2.4rem">عن الشيف</h2>
+        <h2 class="en-only" style="font-family:'Amiri',serif;color:var(--gold-2);font-size:2.4rem">About the Chef</h2>
+      </div>
+      <h3 class="ar-only">الشيف محمد الحسن</h3>
+      <h3 class="en-only">Chef Muhammed El-Hasan</h3>
+      <p class="ar-only">نصنع البقلاوة والكنافة والحلويات الشرقية بوصفات أصيلة، وبأجود أنواع الفستق والسمن والعسل. كل صينية تخرج من مطبخنا بلمسة فنية تجعلها تحفة تُقدَّم على كل مائدة.</p>
+      <p class="en-only">We craft baklava, kunafa and oriental sweets using authentic recipes with the finest pistachio, butter and honey. Every tray leaves our kitchen as a work of art for your table.</p>
+      <div class="badges">
+        <span class="badge ar-only">فستق حلبي أصلي</span>
+        <span class="badge ar-only">تحضير يومي طازج</span>
+        <span class="badge ar-only">طلبات المناسبات</span>
+        <span class="badge en-only">Real Aleppo Pistachio</span>
+        <span class="badge en-only">Fresh Daily</span>
+        <span class="badge en-only">Event Orders</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY / ADS -->
+<section id="gallery">
+  <div class="title reveal">
+    <h2 class="ar-only">إعلاناتنا ومنتجاتنا</h2>
+    <h2 class="en-only">Our Ads & Products</h2>
+    <div class="line"></div>
+    <p class="ar-only">اختر ما يناسب ذوقك</p>
+    <p class="en-only">Choose what suits your taste</p>
+  </div>
+  <div class="gallery">
+    <div class="card reveal">
+      <div class="ph"><img src="vava1.jpg" alt="Round pistachio baklava"></div>
+      <span class="tag ar-only">الأكثر طلباً</span><span class="tag en-only">Best Seller</span>
+      <div class="info">
+        <h4 class="ar-only">بقلاوة دائرية بالفستق</h4><h4 class="en-only">Round Pistachio Baklava</h4>
+        <p class="ar-only">طبقات ذهبية مقرمشة مع حشوة فستق حلبي، ونثرة فستق في المنتصف.</p>
+        <p class="en-only">Golden crispy layers with Aleppo pistachio filling and a pistachio crown.</p>
+      </div>
+    </div>
+    <div class="card reveal d1">
+      <div class="ph"><img src="vava2.jpg" alt="Green pistachio baklava"></div>
+      <span class="tag ar-only">فستق أخضر</span><span class="tag en-only">Green Pistachio</span>
+      <div class="info">
+        <h4 class="ar-only">بقلاوة الفستق الأخضر</h4><h4 class="en-only">Green Pistachio Baklava</h4>
+        <p class="ar-only">قطع مربعة مغطاة بفستق حلبي مطحون ناعم.</p>
+        <p class="en-only">Square pieces coated in finely ground Aleppo pistachio.</p>
+      </div>
+    </div>
+    <div class="card reveal d2">
+      <div class="ph"><img src="vava3.jpg" alt="Kunafa"></div>
+      <span class="tag ar-only">طازجة</span><span class="tag en-only">Fresh</span>
+      <div class="info">
+        <h4 class="ar-only">كنافة الشعر بالفستق</h4><h4 class="en-only">Pistachio Kunafa</h4>
+        <p class="ar-only">كنافة ناعمة بالقطر والفستق، تُقدَّم دافئة.</p>
+        <p class="en-only">Soft shredded pastry with syrup and pistachio, served warm.</p>
+      </div>
+    </div>
+    <div class="card reveal">
+      <div class="ph"><img src="vava4.jpg" alt="Pistachio and chocolate squares"></div>
+      <span class="tag ar-only">جديد</span><span class="tag en-only">New</span>
+      <div class="info">
+        <h4 class="ar-only">مربعات الفستق والشوكولاتة</h4><h4 class="en-only">Pistachio & Chocolate Squares</h4>
+        <p class="ar-only">مزيج الفستق الأخضر والكاكاو في صينية واحدة.</p>
+        <p class="en-only">Green pistachio and cocoa squares in one elegant tray.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STEPS -->
+<section>
+  <div class="title reveal">
+    <h2 class="ar-only">كيف نعمل؟</h2>
+    <h2 class="en-only">How It Works</h2>
+    <div class="line"></div>
+  </div>
+  <div class="steps">
+    <div class="step reveal"><div class="num">١</div><h5 class="ar-only">اختر صينيتك</h5><h5 class="en-only">Choose Your Tray</h5><p class="ar-only">تصفح التشكيلة واختر ما يناسبك.</p><p class="en-only">Browse the selection and pick your favorite.</p></div>
+    <div class="step reveal d1"><div class="num">٢</div><h5 class="ar-only">اتصل بنا</h5><h5 class="en-only">Call Us</h5><p class="ar-only">أرسل طلبك عبر الهاتف أو واتساب.</p><p class="en-only">Send your order by phone or WhatsApp.</p></div>
+    <div class="step reveal d2"><div class="num">٣</div><h5 class="ar-only">استلم طازجاً</h5><h5 class="en-only">Receive Fresh</h5><p class="ar-only">نحضّر طلبك بعناية ونسلّمه في وقته.</p><p class="en-only">We prepare your order with care and deliver on time.</p></div>
+  </div>
+</section>
+
+<!-- ORDER -->
+<section id="order" style="padding-top:40px">
+  <div class="order reveal">
+    <div class="orb" style="width:260px;height:260px;top:-80px;left:-60px"></div>
+    <div class="orb" style="width:200px;height:200px;bottom:-60px;right:-40px;animation-delay:3s"></div>
+    <h2 class="ar-only">اطلب الآن</h2>
+    <h2 class="en-only">Order Now</h2>
+    <p class="ar-only">للطلبات والاستفسارات والمناسبات، تواصل معنا مباشرة.</p>
+    <p class="en-only">For orders, inquiries and events, contact us directly.</p>
+    <a class="phone" href="tel:+905314904736">+90 531 490 47 36</a>
+    <div class="wa">
+      <a href="https://wa.me/905314904736" target="_blank" rel="noopener"><span class="ar-only">أو راسلنا على واتساب</span><span class="en-only">Or message us on WhatsApp</span></a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="f-logo ar-only">الشيف محمد الحسن</div>
+  <div class="f-logo en-only">Şef Muhammed El-Hasan</div>
+  <p class="ar-only">جميع الحقوق محفوظة © 2026</p>
+  <p class="en-only">All rights reserved © 2026</p>
+  <div class="dev ar-only">برمجة: حمزة الحماده</div>
+  <div class="dev en-only">Developed by: Hamza Al-Hamada</div>
+</footer>
+
+<a class="fab" href="tel:+905314904736" aria-label="Call">📞</a>
+
+<script>
+  // Language toggle
+  const body = document.body, btn = document.getElementById('langBtn');
+  btn.addEventListener('click', () => {
+    const en = body.getAttribute('lang') === 'en';
+    body.setAttribute('lang', en ? 'ar' : 'en');
+    body.setAttribute('dir', en ? 'rtl' : 'ltr');
+    document.documentElement.lang = en ? 'ar' : 'en';
+    document.documentElement.dir = en ? 'rtl' : 'ltr';
+    btn.textContent = en ? 'English' : 'العربية';
+  });
+
+  // Scroll reveal
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: .15 });
+  document.querySelectorAll('.reveal, .title').forEach(el => io.observe(el));
+
+  // 3D tilt on cards
+  document.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
+      card.style.transform = `rotateY(${x * 12}deg) rotateX(${-y * 12}deg) translateY(-8px)`;
+    });
+    card.addEventListener('mouseleave', () => card.style.transform = '');
+  });
+
+  // Golden particles (floating baklava-gold dust)
+  const cv = document.getElementById('particles'), ctx = cv.getContext('2d');
+  let W, H, pts = [];
+  function resize(){ W = cv.width = innerWidth; H = cv.height = innerHeight; }
+  resize(); addEventListener('resize', resize);
+  for (let i = 0; i < 70; i++) pts.push({
+    x: Math.random() * innerWidth, y: Math.random() * innerHeight,
+    r: Math.random() * 2.2 + .4, s: Math.random() * .6 + .15,
+    a: Math.random() * Math.PI * 2, green: Math.random() < .25
+  });
+  (function draw(){
+    ctx.clearRect(0, 0, W, H);
+    pts.forEach(p => {
+      p.y -= p.s; p.a += .01; p.x += Math.sin(p.a) * .4;
+      if (p.y < -10) { p.y = H + 10; p.x = Math.random() * W; }
+      ctx.beginPath();
+      ctx.fillStyle = p.green ? 'rgba(143,191,58,.6)' : 'rgba(246,221,142,.55)';
+      ctx.shadowBlur = 10; ctx.shadowColor = p.green ? '#8fbf3a' : '#d4a84b';
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  })();
+</script>
+</body>
+</html>
